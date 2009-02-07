@@ -1,0 +1,56 @@
+// BMM LOC annotation file.
+//
+// Release 10.1i - Data2MEM K.39, build 1.5.7 Nov 8, 2007
+// Copyright (c) 1995-2009 Xilinx, Inc.  All rights reserved.
+//
+// Created on 02/07/09 12:30 am
+//
+
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Unnamed 405 PPC processor, ID 0, memory map.
+//
+///////////////////////////////////////////////////////////////////////////////
+
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Address space 'my_rom' 0x0000C000:0x0000FFFF (16 KB).
+//
+///////////////////////////////////////////////////////////////////////////////
+
+ADDRESS_SPACE my_rom RAMB16 [0x0000C000:0x0000FFFF]
+    BUS_BLOCK
+        my_rom/RAM0 [7:0] PLACED = X0Y0;
+    END_BUS_BLOCK;
+
+    BUS_BLOCK
+        my_rom/RAM1 [7:0] PLACED = X0Y1;
+    END_BUS_BLOCK;
+
+    BUS_BLOCK
+        my_rom/RAM2 [7:0] PLACED = X0Y6;
+    END_BUS_BLOCK;
+
+    BUS_BLOCK
+        my_rom/RAM3 [7:0] PLACED = X0Y5;
+    END_BUS_BLOCK;
+
+    BUS_BLOCK
+        my_rom/RAM4 [7:0] PLACED = X0Y3;
+    END_BUS_BLOCK;
+
+    BUS_BLOCK
+        my_rom/RAM5 [7:0] PLACED = X0Y2;
+    END_BUS_BLOCK;
+
+    BUS_BLOCK
+        my_rom/RAM6 [7:0] PLACED = X0Y7;
+    END_BUS_BLOCK;
+
+    BUS_BLOCK
+        my_rom/RAM7 [7:0] PLACED = X0Y4;
+    END_BUS_BLOCK;
+END_ADDRESS_SPACE;
+

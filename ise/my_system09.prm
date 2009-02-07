@@ -1,0 +1,17 @@
+PROMGEN: Xilinx Prom Generator K.39
+Copyright (c) 1995-2008 Xilinx, Inc.  All rights reserved.
+
+promgen -w -p mcs -c FF -o C:\hans\rekonstrukt\ise\//my_system09.mcs -u 0 C:/hans/rekonstrukt/ise/my_system09.bit -x xcf04s 
+
+PROM C:\hans\rekonstrukt\ise\//my_system09.prm map: Sat Feb 07 12:32:29 2009
+
+Calculating PROM checksum with fill value ff
+
+Format        Mcs86 (32-bit)
+Size          512K
+PROM start    0000:0000
+PROM end      0007:ffff
+PROM checksum 03fb7124
+
+        Addr1        Addr2                     Date File(s)
+    0000:0000    0004:547f     Feb 07 12:30:51 2009 C:/hans/rekonstrukt/ise/my_system09.bit
