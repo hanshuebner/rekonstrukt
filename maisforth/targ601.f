@@ -1850,11 +1850,13 @@ INSIDE:
 : !HIMEM ( -- )   \ test eerste cell per 2K RAM (AN) 2004
   -800 TO HIMEM
   BEGIN  800 +TO HIMEM
-         HIMEM @             ( x )     \ lees
-         DUP INVERT HIMEM !  ( x )     \ store geinverteerde x
-         HIMEM @             ( x xi? ) \ lees het terug
-         OVER HIMEM !        ( x xi? ) \ zet correcte x terug
-         INVERT <>           ( vlag )  \ ongelijk?
+         HIMEM @             ( x )     \ read
+         DUP INVERT HIMEM !  ( x )     \ store inverted in new proposed HIMEM
+         HIMEM @             ( x xi? ) \ read back
+         OVER HIMEM !        ( x xi? ) \ set HIMEM to current address
+         INVERT <>           ( flag )  \ read back differently?
+         HIMEM 8000 =        ( flag flag ) \ at 32 kb
+         OR
   UNTIL ; \ laagste niet bestaande RAM adres staat nu in HIMEM
 
 FORTH:
@@ -1870,7 +1872,8 @@ CODE COLD ( ? -- )   \ cold start Forth system (AN) 2004
  END-CODE
  ]
  ORIGIN 0 [ UOFFSET ] LITERAL CMOVE
- !HIMEM  !TOPNFA 0 TO CS#
+ !HIMEM
+ !TOPNFA 0 TO CS#
  SAFE-THERE DROP
  FRESH DEFINITIONS
  7F !USART
