@@ -6,12 +6,16 @@ CPPFLAGS	=
 LDFLAGS		=
 
 SRCS		= usim.cc misc.cc \
-		  mc6809.cc mc6809in.cc mc6809_X.cc \
+		  mc6809.cc mc6809in.cc \
 		  mc6850.cc term.cc \
 		  main.cc
 OBJS		= $(SRCS:.cc=.o)
 BIN		= usim
-LIBS		= -lX11
+
+ifdef X11
+SRCS            += mc6809_X.cc
+LIBS		+= -lX11
+endif
 
 $(BIN):		$(OBJS)
 	$(CCC) -o $(@) $(CCFLAGS) $(LDFLAGS) $(OBJS) $(LIBS)
