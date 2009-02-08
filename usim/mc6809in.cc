@@ -118,7 +118,7 @@ void mc6809::anda(void)
 
 void mc6809::andb(void)
 {
-	help_andb(b);
+	help_and(b);
 }
 
 void mc6809::andcc(void)
