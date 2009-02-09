@@ -23,7 +23,7 @@
 
 #ifdef sun
 extern "C" int select(int, fd_set *, fd_set *, fd_set *,
-		const struct timeval *);
+                      const struct timeval *);
 #else
 extern "C" int select(int, fd_set *, fd_set *, fd_set *, struct timeval *);
 #endif
@@ -32,59 +32,53 @@ extern "C" void bzero(char *, int);
 
 Terminal::Terminal()
 {
-	input = stdin;
-	output = stdout;
-	input_fd = fileno(input);
+  input = stdin;
+  output = stdout;
+  input_fd = fileno(input);
 
-	// Set input and output to be unbuffered
-	setbuf(input, (char *)0);
-	setbuf(output, (char *)0);
+  // Set input and output to be unbuffered
+  setbuf(input, (char *)0);
+  setbuf(output, (char *)0);
 
-	// Get copies of current terminal attributes
-	tcgetattr(input_fd, &oattr);
-	tcgetattr(input_fd, &nattr);
+  // Get copies of current terminal attributes
+  tcgetattr(input_fd, &oattr);
+  tcgetattr(input_fd, &nattr);
 
-	nattr.c_lflag &= ~ICANON;
-	nattr.c_lflag &= ~ISIG;
+  cfmakeraw(&nattr);
 
-	nattr.c_lflag &= ~ECHO;
-	nattr.c_lflag |= ECHOE;
-
-	nattr.c_iflag &= ~ICRNL;
-	nattr.c_oflag &= ~ONLCR;
-
-	tcsetattr(input_fd, TCSANOW, &nattr);
+  tcsetattr(input_fd, TCSANOW, &nattr);
 }
 
 Terminal::~Terminal()
 {
-	tcsetattr(input_fd, TCSANOW, &oattr);
+  tcsetattr(input_fd, TCSANOW, &oattr);
 }
 
 int Terminal::poll()
 {
-	fd_set			fds;
+  fd_set fds;
 
-	// Uses minimal (1ms) delay in select(2) call to
-	// ensure that idling simulations don't chew
-	// up masses of CPU time
-	static struct timeval	tv = { 0L, 1000L };
+  // Uses minimal (1ms) delay in select(2) call to
+  // ensure that idling simulations don't chew
+  // up masses of CPU time
+  static struct timeval	tv = { 0L, 0L };
 
-	FD_ZERO(&fds);
-	FD_SET(input_fd, &fds);
-	(void)select(FD_SETSIZE, &fds, NULL, NULL, &tv);
+  FD_ZERO(&fds);
+  FD_SET(input_fd, &fds);
+  int nready = select(FD_SETSIZE, &fds, NULL, NULL, &tv);
 
-	return FD_ISSET(input_fd, &fds);
+  return nready > 0;
 }
 
 Byte Terminal::read()
 {
-	return (Byte)fgetc(input);
+  return (Byte)fgetc(input);
 }
 
 void Terminal::write(Byte ch)
 {
-	fputc(ch, output);
+  fputc(ch, output);
+  fflush(output);
 }
 
 //------------------------------------------------------------------------
@@ -102,17 +96,17 @@ Terminal::~Terminal()
 
 int Terminal::poll()
 {
-	return kbhit();
+  return kbhit();
 }
 
 Byte Terminal::read()
 {
-	return (Byte)getch();
+  return (Byte)getch();
 }
 
 void Terminal::write(Byte ch)
 {
-	putch(ch);
+  putch(ch);
 }
 
 #endif

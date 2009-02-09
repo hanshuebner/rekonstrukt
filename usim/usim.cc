@@ -16,46 +16,46 @@
 //----------------------------------------------------------------------------
 void USim::run(void)
 {
-	halted = 0;
-	while (!halted) {
-		execute();
-	}
-	status();
+  halted = 0;
+  while (!halted) {
+    execute();
+  }
+  status();
 }
 
 void USim::step(void)
 {
-	execute();
-	status();
+  execute();
+  status();
 }
 
 void USim::halt(void)
 {
-	halted = 1;
+  halted = 1;
 }
 
 Byte USim::fetch(void)
 {
-	Byte		val = read(pc);
-	pc += 1;
+  Byte		val = read(pc);
+  pc += 1;
 
-	return val;
+  return val;
 }
 
 Word USim::fetch_word(void)
 {
-	Word		val = read_word(pc);
-	pc += 2;
+  Word		val = read_word(pc);
+  pc += 2;
 
-	return val;
+  return val;
 }
 
 void USim::invalid(const char *msg)
 {
-	fprintf(stderr, "\r\ninvalid %s : pc = [%04x], ir = [%04x]\r\n",
-		msg ? msg : "",
-		pc, ir);
-	halt();
+  fprintf(stderr, "\r\ninvalid %s : pc = [%04x], ir = [%04x]\r\n",
+          msg ? msg : "",
+          pc, ir);
+  halt();
 }
 
 //----------------------------------------------------------------------------
@@ -65,13 +65,13 @@ void USim::invalid(const char *msg)
 // Single byte read
 Byte USim::read(Word offset)
 {
-	return memory[offset];
+  return memory[offset];
 }
 
 // Single byte write
 void USim::write(Word offset, Byte val)
 {
-	memory[offset] = val;
+  memory[offset] = val;
 }
 
 //----------------------------------------------------------------------------
@@ -79,61 +79,63 @@ void USim::write(Word offset, Byte val)
 //----------------------------------------------------------------------------
 static Byte fread_byte(FILE *fp)
 {
-	char			str[3];
-	long			l;
+  char			str[3];
+  long			l;
 
-	str[0] = fgetc(fp);
-	str[1] = fgetc(fp);
-	str[2] = '\0';
+  str[0] = fgetc(fp);
+  str[1] = fgetc(fp);
+  str[2] = '\0';
 
-	l = strtol(str, NULL, 16);
-	return (Byte)(l & 0xff);
+  l = strtol(str, NULL, 16);
+  return (Byte)(l & 0xff);
 }
 
 static Word fread_word(FILE *fp)
 {
-	Word		ret;
+  Word		ret;
 
-	ret = fread_byte(fp);
-	ret <<= 8;
-	ret |= fread_byte(fp);
+  ret = fread_byte(fp);
+  ret <<= 8;
+  ret |= fread_byte(fp);
 
-	return ret;
+  return ret;
 }
 
-void USim::load_intelhex(const char *filename)
+void USim::load_intelhex(const char *filename, bool read_start_from_file)
 {
-	FILE		*fp;
-	int		done = 0;
+  FILE		*fp;
+  int		done = 0;
 
-	fp = fopen(filename, "r");
-	if (!fp) {
-		perror("filename");
-		exit(EXIT_FAILURE);
-	}
+  fp = fopen(filename, "r");
+  if (!fp) {
+    perror(filename);
+    exit(EXIT_FAILURE);
+  }
 
-	while (!done) {
-		Byte		n, t;
-		Word		addr;
-		Byte		b;
+  while (!done && !feof(fp)) {
+    Byte		n, t;
+    Word		addr;
+    Byte		b;
 
-		(void)fgetc(fp);
-		n = fread_byte(fp);
-		addr = fread_word(fp);
-		t = fread_byte(fp);
-		if (t == 0x00) {
-			while (n--) {
-				b = fread_byte(fp);
-				memory[addr++] = b;
-			}
-		} else if (t == 0x01) {
-			pc = addr;
-			done = 1;
-		}
-		// Read and discard checksum byte
-		(void)fread_byte(fp);
-		if (fgetc(fp) == '\r') (void)fgetc(fp);
-	}
+    (void)fgetc(fp);
+    n = fread_byte(fp);
+    addr = fread_word(fp);
+    t = fread_byte(fp);
+    if (t == 0x00) {
+      while (n--) {
+        b = fread_byte(fp);
+        memory[addr++] = b;
+      }
+    } else if (t == 0x01) {
+      if (read_start_from_file) {
+        pc = addr;
+      }
+      done = 1;
+    }
+    // Read and discard checksum byte
+    (void)fread_byte(fp);
+    if (fgetc(fp) == '\r') (void)fgetc(fp);
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -142,19 +144,19 @@ void USim::load_intelhex(const char *filename)
 
 Word USimMotorola::read_word(Word offset)
 {
-	Word		tmp;
+  Word		tmp;
 
-	tmp = read(offset++);
-	tmp <<= 8;
-	tmp |= read(offset);
+  tmp = read(offset++);
+  tmp <<= 8;
+  tmp |= read(offset);
 
-	return tmp;
+  return tmp;
 }
 
 void USimMotorola::write_word(Word offset, Word val)
 {
-	write(offset++, (Byte)(val >> 8));
-	write(offset, (Byte)val);
+  write(offset++, (Byte)(val >> 8));
+  write(offset, (Byte)val);
 }
 
 //----------------------------------------------------------------------------
@@ -163,16 +165,16 @@ void USimMotorola::write_word(Word offset, Word val)
 
 Word USimIntel::read_word(Word offset)
 {
-	Word		tmp;
+  Word		tmp;
 
-	tmp = read(offset++);
-	tmp |= (read(offset) << 8);
+  tmp = read(offset++);
+  tmp |= (read(offset) << 8);
 
-	return tmp;
+  return tmp;
 }
 
 void USimIntel::write_word(Word offset, Word val)
 {
-	write(offset++, (Byte)val);
-	write(offset, (Byte)(val >> 8));
+  write(offset++, (Byte)val);
+  write(offset, (Byte)(val >> 8));
 }

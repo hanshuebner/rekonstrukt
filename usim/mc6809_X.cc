@@ -145,7 +145,7 @@ void mc6809_X::status(void)
 			strcat(tmp, " ");
 		}
 
-		for (j = 0; j < 8; ++j) {
+		for (int j = 0; j < 8; ++j) {
 			Byte		ch = memory[stk + j];
 			strcat(tmp, ascchr(ch));
 		}

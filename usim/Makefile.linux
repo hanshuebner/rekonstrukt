@@ -14,8 +14,13 @@ BIN		= usim
 
 ifdef X11
 SRCS            += mc6809_X.cc
-LIBS		+= -lX11
+LIBS		+= -L/usr/X11R6/lib -lX11
+CPPFLAGS	+= -I/usr/X11R6/include -DX11
 endif
+
+.PHONY: an601.hex
+
+all: $(BIN) an601.hex
 
 $(BIN):		$(OBJS)
 	$(CCC) -o $(@) $(CCFLAGS) $(LDFLAGS) $(OBJS) $(LIBS)
@@ -32,6 +37,9 @@ machdep:	machdep.o
 
 machdep.h:	machdep
 	./machdep $(@)
+
+an601.hex: ../maisforth/an601.bin
+	objcopy -I binary ../maisforth/an601.bin -O ihex --adjust-vma 0xc000 an601.hex
 
 clean:
 	$(RM) -f machdep.h machdep.o machdep $(BIN) $(OBJS)

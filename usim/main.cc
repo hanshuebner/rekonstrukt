@@ -62,6 +62,9 @@ Byte sys::read(Word addr)
 
 void sys::write(Word addr, Byte x)
 {
+  if ((addr & 0xF000) == 0xC000) {
+    printf("\r\ninvalid write to 0x%04x\r\n", addr);
+  }
   if ((addr & 0xfffe) == UART_ADDR) {
     uart.write(addr, x);
   } else {
@@ -82,12 +85,16 @@ void update(int, ...)
 }
 #endif // SIGALRM
 
+char *progname;
+void usage()
+{
+  fprintf(stderr, "usage: usim [ -r ] <hexfile>\n");
+  exit(EXIT_FAILURE);
+}
+
 int main(int argc, char *argv[])
 {
-  if (argc != 2) {
-    fprintf(stderr, "usage: usim <hexfile>\n");
-    return EXIT_FAILURE;
-  }
+  progname = argv[0];
 
   (void)signal(SIGINT, SIG_IGN);
 #ifdef SIGALRM
@@ -95,7 +102,32 @@ int main(int argc, char *argv[])
   alarm(1);
 #endif
 
-  sys.load_intelhex(argv[1]);
+  bool read_start_from_file = false;
+  int c;
+  const char* trace = 0;
+
+  while ((c = getopt(argc, argv, "rt:")) != -1) {
+    switch (c) {
+    case 'r':
+      read_start_from_file = true;
+      break;
+    case 't':
+      trace = optarg;
+      break;
+    default:
+      usage();
+    }
+  }
+
+  if (argc == optind) {
+    usage();
+  }
+
+  sys.load_intelhex(argv[optind], read_start_from_file);
+  sys.reset();
+  if (trace) {
+    sys.trace(trace);
+  }
   sys.run();
 
   return EXIT_SUCCESS;
