@@ -19,11 +19,11 @@ DECIMAL
 
 \ Error messages
 : ?NOTYET     ABORT"  Bestaat nog niet " ;    \ (KOMPILE (MET-DOER xPOSTPONE x'
-: ?UNKNOWN    ABORT"  Wat is dit? " ;         \ >NUM HERE-IS
-: ?INPUT      ABORT"  Geen input " ;          \ BL-WORD x[CHAR]
-: ?INTERRUPTED ABORT"  Afgebroken " ;          \ WAIT/GO :::MAIS:::
-: ?STACK      DEPTH 0< ABORT"  Stack leeg " ; \ .STACK
-: ?USERSPACE  ABORT"  Te weinig userbytes " ; 
+: ?UNKNOWN    ABORT"  Unknown word " ;        \ >NUM HERE-IS
+: ?INPUT      ABORT"  Missing input " ;       \ BL-WORD x[CHAR]
+: ?INTERRUPTED ABORT"  Interrupted " ;        \ WAIT/GO :::MAIS:::
+: ?STACK      DEPTH 0< ABORT"  Empty stack " ; \ .STACK
+: ?USERSPACE  ABORT"  Not enough user space " ; 
 : ?PREFIX     ABORT"  Niet geschikt voor prefixes " ;
 : ?PAIR   ( x y - ) <> ABORT" Afgekeurd " ;
 
@@ -127,14 +127,14 @@ bij het starten van de metacompiler. Zie :::MAIS:::
 
 \ adresformaten
 <---- qqq
-HOSTA maakt van een 16bits Target adres een 32bits Host adres.
-TARGA maakt van een 32bits Host adres een 16bits Target adres.
+HOSTA converts from a 16 bit target address to a 32 bit host address
+TARGA converts from a 32 bit host address to a 16 bit target address
 ---->
 
 : HOSTA ( xa - a)  ORIGINTARGA - ORIGINHOSTA + ; \ Zie xFIND
 : TARGA ( a - xa ) ORIGINHOSTA - ORIGINTARGA + ; \ Zie xCOMPILE, xCOMPILE!
 
-\ Host cel = 32 bits, Target cel = 16 bits.
+\ Host cell = 32 bits, Target cell = 16 bits.
 \ Host needs alignment, Target doesn't.
 
 VARIABLE xSTATE   0 xSTATE !
@@ -143,9 +143,9 @@ VARIABLE xSTATE   0 xSTATE !
 : WAIT/GO ( -- ) \ Voor .HERE TARGDUMP
   KEY? 0= IF }
   2 0 DO KEY HX 1B = LOOP
-  OR ?INTERRUPTED ;        \ Stop bij [ESC]
+  OR ?INTERRUPTED ;        \ Stop at [ESC]
 
-: .STACK  ( -- ) \ Voor .HERE
+: .STACK  ( -- ) \ For .HERE
   ?STACK 
   ." ( "  DEPTH IF 0 DEPTH 2 - DO I PICK . -1 +LOOP THEN
   ." ) " ; 

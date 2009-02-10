@@ -866,10 +866,11 @@ EXTRA:
 INSIDE:
 : ACCEPTING ( n a i - i )             \ n a i       n=imax, a=adr, i=count
   KEY                                 \ n a i ch
-  DUP BL <
+  DUP DUP BL < SWAP 7E > OR
   IF
-     0D OVER = IF 2NIP DROP }            \ i           char=CR: ready, leave ACCEPTING
-     8 = IF DUP IF BACKSPACE 1- THEN RE} \ n a i-      destructive backspace when i<>0
+      0D OVER = IF 2NIP DROP }        \ i           char=CR: ready, leave ACCEPTING
+     DUP 8 = SWAP 7F = OR IF
+     DUP IF BACKSPACE 1- THEN RE}        \ n a i-      destructive backspace when i<>0
      BL                                  \ n a i bl    ctrl char is replaced by BL
   THEN
   OVER 4 PICK = IF DROP RE}              \ n a i       i=n: no action
@@ -1857,7 +1858,7 @@ INSIDE:
          INVERT <>           ( flag )  \ read back differently?
          HIMEM 8000 =        ( flag flag ) \ at 32 kb
          OR
-  UNTIL ; \ laagste niet bestaande RAM adres staat nu in HIMEM
+  UNTIL ; \ HIMEM now points to the first non-matching addres (or $8000, whatever smaller)
 
 FORTH:
 : UNUSED ( -- n )   HIMEM 20 - HERE - ;
