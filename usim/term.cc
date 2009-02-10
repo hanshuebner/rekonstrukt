@@ -61,7 +61,7 @@ int Terminal::poll()
   // Uses minimal (1ms) delay in select(2) call to
   // ensure that idling simulations don't chew
   // up masses of CPU time
-  static struct timeval	tv = { 0L, 0L };
+  static struct timeval	tv = { 0L, 1000L };
 
   FD_ZERO(&fds);
   FD_SET(input_fd, &fds);

@@ -62,7 +62,7 @@ Byte sys::read(Word addr)
 
 void sys::write(Word addr, Byte x)
 {
-  if ((addr & 0xF000) == 0xC000) {
+  if ((addr & 0xC000) == 0xC000) {
     printf("\r\ninvalid write to 0x%04x\r\n", addr);
   }
   if ((addr & 0xfffe) == UART_ADDR) {

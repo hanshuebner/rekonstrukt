@@ -9,37 +9,48 @@
 #define __mc6850_h__
 
 #include <stdio.h>
+#ifdef THREADS
+#include <pthread.h>
+#endif
 #include "misc.h"
 #include "term.h"
 
 class mc6850 {
 
-// Internal registers
+  // Internal registers
 
-protected:
+ protected:
 
-	Byte			 td, rd, cr, sr;
+  Byte td, rd, cr, sr;
 
-// Access to real IO device
+  // Access to real IO device
 
-	Terminal		 term;
+  Terminal term;
 
-// Initialisation functions
+#ifdef THREADS
+  // Internal polling routine
+ private:
+  pthread_t poll_thread;
+  static void* poll_input(void* arg);
+#endif
+  void poll();
 
-protected:
+  // Initialisation functions
 
-	void			 reset(void);
+ protected:
 
-// Read and write functions
-public:
+  void reset();
 
-	Byte			 read(Word offset);
-	void			 write(Word offset, Byte val);
+  // Read and write functions
+ public:
 
-// Public constructor and destructor
+  Byte read(Word offset);
+  void write(Word offset, Byte val);
 
-				 mc6850();
-				~mc6850();
+  // Public constructor and destructor
+
+  mc6850();
+  ~mc6850();
 
 };
 

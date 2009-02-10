@@ -15,6 +15,9 @@
 mc6850::mc6850()
 {
   reset();
+#ifdef THREADS
+  pthread_create(&poll_thread, NULL, poll_input, this);
+#endif
 }
 
 mc6850::~mc6850()
@@ -29,23 +32,42 @@ void mc6850::reset()
   bset(sr, 1);	// Set TDRE to true
 }
 
+#ifdef THREADS
+void* mc6850::poll_input(void* arg) {
+  mc6850* p = (mc6850*) arg;
+  for (;;) {
+    p->poll();
+  }
+}
+#endif
+
+void mc6850::poll()
+{
+  // If input is ready read a character
+  if (
+#ifdef THREADS
+      !btst(sr, 0) &&
+#endif
+      term.poll()) {
+
+    rd = term.read();
+
+    // Check for IRQ
+    if (btst(cr, 7)) {	// If CR7
+      bset(sr, 7);	// Set IRQ
+    }
+
+    bset(sr, 0);		// Set RDRF
+  }
+}
+
 Byte mc6850::read(Word offset)
 {
   // Check for a received character if one isn't available
   if (!btst(sr, 0)) {
-    Byte ch;
-
-    // If input is ready read a character
-    if (term.poll()) {
-      rd = term.read();
-
-      // Check for IRQ
-      if (btst(cr, 7)) {	// If CR7
-        bset(sr, 7);	// Set IRQ
-      }
-
-      bset(sr, 0);		// Set RDRF
-    }
+#ifndef THREADS
+    poll();
+#endif
   }
 
   Byte retval = 0;
