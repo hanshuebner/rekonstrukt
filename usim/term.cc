@@ -44,7 +44,14 @@ Terminal::Terminal()
   tcgetattr(input_fd, &oattr);
   tcgetattr(input_fd, &nattr);
 
-  cfmakeraw(&nattr);
+  nattr.c_lflag &= ~ICANON;
+  nattr.c_lflag &= ~ISIG;
+
+  nattr.c_lflag &= ~ECHO;
+  nattr.c_lflag |= ECHOE;
+
+  nattr.c_iflag &= ~ICRNL;
+  nattr.c_oflag &= ~ONLCR;
 
   tcsetattr(input_fd, TCSANOW, &nattr);
 }
