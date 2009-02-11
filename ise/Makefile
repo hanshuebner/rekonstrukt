@@ -27,7 +27,7 @@
 #
 #===================================================================
 
-MKFRAGS := ../../mkfiles
+MKFRAGS := ../mkfiles
 export MKFRAGS
 
 #===================================================================
@@ -52,7 +52,7 @@ roms:
 #===================================================================
 # You should not need to edit anything below this line
 
-include ../../mkfiles/xilinx_rules.mk
+include ../mkfiles/xilinx_rules.mk
 
 #===================================================================
 # TARGETS
