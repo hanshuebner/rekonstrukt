@@ -1,11 +1,7 @@
 #===================================================================
-# File:        Makefile
-# Author:      David Burnette 
-# Created:     July 5, 2007
-# 
-# Description: 
-#  Makefile to build the System09 by John Kent
-# 
+# Makefile to synthesize rekonstruct, adapted from David Burnette's
+# System09 Makefile
+#
 #  This makefile will build John Kent's entire System09 project 
 #  (RTL synthesis and monitor ROMs) and even download the final 
 #  bitstream to the prototype board.
@@ -18,12 +14,6 @@
 #
 # Dependencies:
 #  Depends on makefile fragments in the 'MKFRAGS' directory.
-#
-# Revision History:
-#   dgb  2007-07-05  Original version
-#
-#   dgb  2008-04-07  Split out files into fragments. Modified
-#                    ROM source generation to be per src directory.
 #
 #===================================================================
 
@@ -38,7 +28,7 @@ export MKFRAGS
 DESIGN_NAME := my_system09
 #
 # Constraint file (unfortunately it cannot be extracted from ISE)
-UCF_FILE    := System09_Digilent_3S500E.ucf
+UCF_FILE    := ../vhdl/s3esk-maisforth.ucf
 #
 # Technology family (unfortunately it cannot be extracted from ISE)
 FAMILY      := spartan3
@@ -46,8 +36,7 @@ FAMILY      := spartan3
 # List of ROM VHDL files
 .PHONY: roms
 roms:
-	@$(MAKE) -C ../../src/sys09bug sys09s3e.vhd
-	@$(MAKE) -C ../../src/Flex9 flex9cf8.vhd
+	@$(MAKE) -C ../forth an601.vhd
 
 #===================================================================
 # You should not need to edit anything below this line
