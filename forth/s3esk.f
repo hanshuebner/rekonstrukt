@@ -11,12 +11,63 @@ vdu 3 + constant vdu-vcursor
 vdu 4 + constant vdu-voffset
 decimal
 
-: str-vdu
+: str-vdu ( addr c -- )
     0 do
         i vdu-hcursor c!
         dup c@ vdu-char c!
         1 +
     loop drop ;
+
+decimal
+: vdu-save ( -- h v ) vdu-hcursor c@ vdu-vcursor c@ ;
+: vdu-restore ( h v -- ) vdu-vcursor c! vdu-hcursor c! ;
+: vdu-cr ( -- ) 0 vdu-hcursor c! ;
+: vdu-clreol ( -- )
+    vdu-hcursor c@
+    dup 80 swap - 0 do
+        bl vdu-char c!
+        1 vdu-hcursor c+!
+    loop
+    vdu-hcursor c! ;
+: vdu-lf ( -- )
+    vdu-vcursor c@
+    dup 24 = if
+        drop vdu-voffset c@ 1+ 25 mod vdu-voffset c!
+        vdu-save vdu-cr vdu-clreol vdu-restore
+    else
+        1+ 25 mod vdu-vcursor c!
+    then ;
+: vdu-clreos ( -- )
+    vdu-save
+    vdu-clreol
+    25 vdu-vcursor c@ - 0 do
+        vdu-cr vdu-lf vdu-clreol
+    loop
+    vdu-restore ;
+: vdu-home ( -- )
+    0 vdu-hcursor c!
+    0 vdu-vcursor c! ;
+: vdu-emit ( c -- )
+    dup 10 = if \ linefeed
+        vdu-lf drop exit
+    then
+    dup 13 = if \ return
+        vdu-cr drop exit
+    then
+    dup 8 = if \ backspace
+        vdu-hcursor c@ if -1 vdu-hcursor c+! then
+        drop exit
+    then
+    vdu-char c!
+    vdu-hcursor @ 80 = if
+        vdu-cr
+        vdu-lf
+    else
+        1 vdu-hcursor c+!
+    then ;
+
+: to-vdu ['] vdu-emit 'emit ! ;
+: to-uart [ inside ] ['] uart-emit [ extra ] 'emit ! ;
 
 hex
 B030 constant leds
