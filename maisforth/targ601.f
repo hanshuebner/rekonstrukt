@@ -2,7 +2,7 @@
 
 \ MAIS AN601 TARGET CODE -- Albert Nijhof -- 06jun2005
 
-HX 65 TO USERBYTES
+HX 67 TO USERBYTES
 
 \ HX 2000 TO ORIGINTARGA
 NOTRACE
@@ -178,7 +178,7 @@ CODE EMIT?   ( -- flag )
     NEXT END-CODE
 
 INSIDE:
-CODE (EMIT   ( char -- )
+CODE UART-EMIT   ( char -- )
     ACIA-CONTROL # LDX
     \ ACIA-CONTROL C@ 2 AND UNTIL
     BEGIN
@@ -334,16 +334,18 @@ CODE J ( -- j )   REG D PSHS   U 6 #) LDD   U 8 #) SUBD   NEXT END-CODE
 
 \ ----- 05 ----- ttt
 
+
+: BYE FFFF EXECUTE ;
+
 <----
- IVAL en IVAR
- de I staat voor indirectie. De "userpage" begint op 0000.
- Eerst een jump naar COLD, dan 16 draden (03-023)
- De koude offset t.o.v. ORIGIN is dus tevens warm RAM adres.
- IVAL gedraagt zich als een value. Het systeem kan hem veranderen,
- de programmeur kan dat niet rechtstreeks:
+IVAL and IVAR
+I stands for "indirect".  The "userpage" begins at 0000.
+The first entry is a jump to COLD, then 16 threads (03-23).
+The cold offset relative ORIGIN is hot RAM address. 
+IVAL behaves like a value. The system can change it, 
+the programmer can't directly
 ---->
-\ indirecte values (an)
-\ De programmeur kan deze grootheden alleen indirect wijzigen.
+\ Indirect values
 \ The programmer can only indirectly change these system values.
 INSIDE:  0 IVAL TOPVOC   \  See WORDLIST VOC>NAMA (FORGET
          0 IVAL TOPMSG   \  See MSG" .MSG (FORGET
@@ -370,6 +372,7 @@ INSIDE:  0 IVAR WRD  2 UALLOT   \ see WORD
 FORTH:   0 IVAR >IN      \ ( -- adr )
         0A IVAR BASE     \ ( -- adr )
          0 IVAR STATE    \ ( -- adr )
+EXTRA:   0 IVAR 'EMIT    \ ( -- xt )
 
 \ Interrupt en Exception vectoren.
 \ De pointers in FFF0-FFFF wijzen naar deze adressen.
@@ -851,6 +854,8 @@ CODE S>D   REG D PSHS   A B TFR   SEX   A B TFR   NEXT END-CODE
 \ ----- 09 -----
 
 FORTH:
+: (EMIT  ( c -- ) 'EMIT @ EXECUTE ;
+\ : (EMIT ( c -- ) UART-EMIT ;
 : EMIT   ( c -- )   (EMIT INCR HOR ;
 : CR     ( -- )     0D (EMIT 0A (EMIT FALSE TO HOR INCR VER ;
 : SPACE  ( -- )     BL EMIT ;
@@ -1877,6 +1882,7 @@ CODE COLD ( ? -- )   \ cold start Forth system (AN) 2004
  !TOPNFA 0 TO CS#
  SAFE-THERE DROP
  FRESH DEFINITIONS
+ ['] UART-EMIT 'EMIT !
  7F !USART
  CR 0 .MSG
  CR ." Copyright (c) 2005 HCC Forth-gg"
@@ -2200,7 +2206,7 @@ FORTH:
 ( -61 ) -3D MSG" What's this?"
 ( -62 ) -3E MSG" BASE is reset to decimal"
 ( -63 ) -3F MSG" Illegal addressing mode"
-\ ( -64 ) -40 MSG" Ivalid Baud rate"
+\ ( -64 ) -40 MSG" Invalid Baud rate"
 
 \ store starting adres on last memory address - 2 
 

@@ -18,7 +18,7 @@ HEX   5F VALUE USERBYTES    \ ORIGIN until ORIGIN+USERBYTES: area with cold data
 DECIMAL
 
 \ Error messages
-: ?NOTYET     ABORT"  Bestaat nog niet " ;    \ (KOMPILE (MET-DOER xPOSTPONE x'
+: ?NOTYET     ABORT"  Does not yet exist " ;    \ (KOMPILE (MET-DOER xPOSTPONE x'
 : ?UNKNOWN    ABORT"  Unknown word " ;        \ >NUM HERE-IS
 : ?INPUT      ABORT"  Missing input " ;       \ BL-WORD x[CHAR]
 : ?INTERRUPTED ABORT"  Interrupted " ;        \ WAIT/GO :::MAIS:::
@@ -32,7 +32,7 @@ DECIMAL
 
 \ Add text to dictionary as a counted string. Zie IGNORE xHEADER x" x."
 : STRING, ( a n -- )
-  HERE SWAP C, COUNT DUP ALLOT MOVE ALIGN ;
+    HERE SWAP C, COUNT DUP ALLOT MOVE ALIGN ;
 
 \ Read next word, doing a REFILL if necessary.
 : BL-WORD ( -- countedstring )
@@ -297,11 +297,11 @@ CREATE WORDA HX 22 ALLOT ALIGN \ Voor de opslag vh resultaat van BL WORD
   TRACER IF CR CR THEN
   BL-WORD COUNT >WORDA              \ n a a m  inlezen
   WORDA xFIND >R
-  R@ IF CR ." --- Redefining:" THEN \ bestaat-ie al?
-  SPACE
+  R@ IF CR ." --- Redefining:" WORDA COUNT TYPE THEN \ bestaat-ie al?
+\  SPACE
   R@ IF DUP CFA>NFA xCOMPILE, THEN   \ h o m l i n k ,
   DROP
-  WORDA COUNT TYPE 2 SPACES         \ n a a m  afdrukken
+  TRACER IF WORDA COUNT TYPE 2 SPACES THEN         \ n a a m  afdrukken
 \  WORDA DRAAD# ." /" .
   WORDA DRAAD
      DUP x@ x,                      \ l i n k , (naar vorig woord)
@@ -398,6 +398,7 @@ HEX
 DECIMAL
 
 : ;;;MAIS;;; ALIGN CHECKSUM, TRUE TO KLAAR? ;
+: HONK ." HONK HONK " ;
 
 <---- qqq
  :::MAIS::: en ;;;;MAIS;;;; zijn respectievelijk
@@ -486,13 +487,13 @@ HX 03B CONSTANT (RTI)
 
 : DICTIONARY (  -- )
   HERE HX 20 ALLOT HX 20 0 FILL 
-  TRACER IF ." 10 cellen gereserveerd voor dictionary " THEN ;
+  TRACER IF ." 10 cells reserved for dictionary " THEN ;
 
 : I-DATA ( -- )
   HERE ORIGINHOSTA - TO UOFFSET
   HERE USERBYTES UOFFSET -
   DUP ALLOT
-  TRACER IF DUP . ." bytes gereserveerd voor koude data " THEN
+  TRACER IF DUP . ." bytes reserved for cold data " THEN
   0 FILL  ;
 
 : xIVAL ( x <naam> -- )
@@ -731,7 +732,7 @@ FORTH
   REPEAT R> 2DROP ;
 
 : CREATING11 ( doertoken -- ) \ Tweemaal 8 bit in body
-  >R ." ~ "
+  >R \ ." ~ "
   BEGIN  POSTPONE HX  -1 OVER <>
   WHILE  POSTPONE HX xHEADER R@ DOER, xC, xC,
   REPEAT R> 2DROP ;
@@ -891,6 +892,7 @@ META-WORDS:
   RSHIFT     RSHIFT
   ACIA-CONTROL ACIA-CONTROL   ( -- targa )
   ACIA-DATA    ACIA-DATA ( -- targa )
+  INCLUDE INCLUDE
   ;;;MAIS;;;   ;;;MAIS;;;
 
 \  (JMP)      (JMP)        ( -- hosta )
