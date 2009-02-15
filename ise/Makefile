@@ -33,21 +33,19 @@ UCF_FILE    := ../vhdl/s3esk-maisforth.ucf
 # Technology family (unfortunately it cannot be extracted from ISE)
 FAMILY      := spartan3
 
-# List of ROM VHDL files
-.PHONY: roms
-roms:
-	@$(MAKE) -C ../forth an601.vhd
-
 #===================================================================
 # You should not need to edit anything below this line
-
-include ../mkfiles/xilinx_rules.mk
 
 #===================================================================
 # TARGETS
 
 .PHONY: all
-all: bit 
+all: rekonstrukt-s3e-sk.bit
+
+rekonstrukt-s3e-sk.bit: bit
+	cp $(DESIGN_NAME).bit rekonstrukt-s3e-sk.bit
+
+include ../mkfiles/xilinx_rules.mk
 
 .PHONY: bit
 bit: roms $(DESIGN_NAME).bit
@@ -56,6 +54,11 @@ bit: roms $(DESIGN_NAME).bit
 impact: roms bit do_impact
 
 prom: roms $(DESIGN_NAME).mcs
+
+# List of ROM VHDL files
+.PHONY: roms
+roms:
+	@$(MAKE) -C ../forth an601.vhd
 
 .PHONY: help
 help:

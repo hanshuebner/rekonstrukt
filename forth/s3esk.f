@@ -9,14 +9,6 @@ vdu 1 + constant vdu-color
 vdu 2 + constant vdu-hcursor
 vdu 3 + constant vdu-vcursor
 vdu 4 + constant vdu-voffset
-decimal
-
-: str-vdu ( addr c -- )
-    0 do
-        i vdu-hcursor c!
-        dup c@ vdu-char c!
-        1 +
-    loop drop ;
 
 decimal
 : vdu-save ( -- h v ) vdu-hcursor c@ vdu-vcursor c@ ;
@@ -45,8 +37,7 @@ decimal
     loop
     vdu-restore ;
 : vdu-home ( -- )
-    0 vdu-hcursor c!
-    0 vdu-vcursor c! ;
+    0 0 vdu-restore ;
 : vdu-emit ( c -- )
     dup 10 = if \ linefeed
         vdu-lf drop exit
@@ -65,9 +56,10 @@ decimal
     else
         1 vdu-hcursor c+!
     then ;
+: cls vdu-home vdu-clreos ;
 
 : to-vdu ['] vdu-emit 'emit ! ;
-: to-uart [ inside ] ['] uart-emit [ extra ] 'emit ! ;
+: to-uart [ inside ] ['] uart-emit [ forth ] 'emit ! ;
 
 hex
 B030 constant leds

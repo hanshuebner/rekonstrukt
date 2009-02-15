@@ -1,4 +1,4 @@
-loadProjectFile -file "C:\hans\rekonstrukt\ise/ise.ipf"
+loadProjectFile -file "C:/hans/rekonstrukt/ise/ise.ipf"
 setMode -bs
 setMode -ss
 setMode -sm
@@ -23,14 +23,19 @@ setMode -pff
 setCurrentDesign -version 0
 setMode -pff
 setCurrentDeviceChain -index 0
-setMode -bs
-deleteDevice -position 3
-deleteDevice -position 2
-deleteDevice -position 1
 setMode -pff
-deletePromDevice -position 1
+setSubmode -pffserial
+setAttribute -configdevice -attr fillValue -value "FF"
+setAttribute -configdevice -attr fileFormat -value "mcs"
+setAttribute -configdevice -attr dir -value "UP"
+setAttribute -configdevice -attr path -value "C:\hans\rekonstrukt\ise\/"
+setAttribute -configdevice -attr name -value "my_system09.mcs"
+generate
 setCurrentDesign -version 0
-deleteDevice -position 1
-deleteDesign -version 0
-setCurrentDesign -version -1
 setMode -bs
+setMode -bs
+setCable -port auto
+Program -p 2 -e -v 
+Program -p 1 
+setMode -pff
+setMode -pff

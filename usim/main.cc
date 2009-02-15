@@ -67,7 +67,9 @@ void sys::write(Word addr, Byte x)
   }
   if ((addr & 0xfffe) == UART_ADDR) {
     uart.write(addr, x);
-  } else {
+  } else if ((addr & 0xfff0) == 0xb040) {
+    printf("0x%04x => 0x%02x\r\n", addr, x);
+  } else if (addr < (32*1024)) {
     mc6809::write(addr, x);
   }
 }
