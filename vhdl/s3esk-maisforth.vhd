@@ -51,9 +51,13 @@ entity my_system09 is
     DAC_CS,
     AMP_CS,
     AD_CONV,
-    SF_CE0,
-    FPGA_INIT_B,
     SPI_SS_B : out std_logic;
+
+    -- Control signals that need to be initialized to free the SPI bus
+    SF_CE0,
+    SF_OE,
+    SF_WE,
+    FPGA_INIT_B : out std_logic;
     
     -- LEDS & Switches
     LED        : out std_logic_vector(7 downto 0);
@@ -330,10 +334,9 @@ begin
     spi_cs_n(0)          => DAC_CS,
     spi_cs_n(1)          => AMP_CS,
     spi_cs_n(2)          => ad_conv_n,
-    spi_cs_n(3)          => SF_CE0,
-    spi_cs_n(4)          => FPGA_INIT_B,
-    spi_cs_n(5)          => SPI_SS_B,
-    spi_cs_n(7 downto 6) => open
+    spi_cs_n(3)          => SPI_SS_B,
+    spi_cs_n(4)          => SF_CE0,
+    spi_cs_n(7 downto 5) => open
     );
 
 --
@@ -539,5 +542,10 @@ begin
   led           <= led_reg;
   AD_CONV       <= not ad_conv_n;
 
-end my_computer; --===================== End of architecture =======================--
+  -- disable devices that would otherwise cause conflicts on the SPI bus
+  FPGA_INIT_B   <= '0';
+  SF_OE         <= '1';
+  SF_WE         <= '1';
+  
+end my_computer;  --===================== End of architecture =======================--
 

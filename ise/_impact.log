@@ -1,6 +1,6 @@
 iMPACT Version: 10.1.03
 
-iMPACT log file Started on Sun Feb 15 21:38:15 2009
+iMPACT log file Started on Mon Feb 16 07:09:47 2009
 
 // *** BATCH CMD : loadProjectFile -file "C:/hans/rekonstrukt/ise/ise.ipf"
 Connecting to cable (Usb Port - USB21).
@@ -154,7 +154,7 @@ done.
 '2': Putting device in ISP mode...done.
 '2': Verifying device...done.
 '2': Verification completed successfully.
-'2': Calculated checksum matches expected checksum, 003f9ece5
+'2': Calculated checksum matches expected checksum, 003fac12c
 '2': Putting device in ISP mode...done.
 '2': Putting device in ISP mode...done.
 '2': Setting user-programmable bits...
@@ -163,7 +163,7 @@ done.
 '2': Programming completed successfully.
 '2': Programming completed successfully.
 PROGRESS_END - End Operation.
-Elapsed time =     15 sec.
+Elapsed time =     14 sec.
 // *** BATCH CMD : Program -p 1 
 Maximum TCK operating frequency for this device chain: 10000000.
 Validating chain...
@@ -194,6 +194,6 @@ INFO:iMPACT:579 - '1': Completed downloading bit file to device.
 INFO:iMPACT - '1': Checking done pin....done.
 '1': Programmed successfully.
 PROGRESS_END - End Operation.
-Elapsed time =      1 sec.
+Elapsed time =      0 sec.
 // *** BATCH CMD : setMode -pff
 // *** BATCH CMD : setMode -pff

@@ -7,7 +7,7 @@ sys-spi-base 3 + constant sys-spi-config
 
 \ serial flash routines
 
-50 constant sf-address \ spi address mask
+30 constant sf-address \ spi address mask
 
 variable sf-buf 256 allot
 
@@ -32,7 +32,7 @@ variable sf-buf 256 allot
         \ send command with data, keep selected after cmd byte has been sent
         swap false sf-start-transfer drop
         sf-buf swap
-        2 swap do
+        1 swap do
             dup dup c@ false sf-start-transfer swap c!
             1+
         -1 +loop
