@@ -21,7 +21,7 @@
 -- Write bits, CS:
 --
 -- START CS[0]:   Start transfer
--- END   CS[1]:   Deselect device after transfer
+-- END   CS[1]:   Deselect device after transfer (or immediately if START = '0')
 -- IRQEN CS[2]:   Generate IRQ at end of transfer
 -- SPIAD CS[6:4]: SPI device address
 -- 
@@ -172,6 +172,8 @@ begin
             shift_reg <= spi_data_buf;
             spi_cs    <= '1';
             state     <= s_running;
+          elsif deselect = '1' then
+            spi_cs <= '0';
           end if;
         when s_running =>
           if prev_spi_clk = '1' and spi_clk_buf = '0' then
