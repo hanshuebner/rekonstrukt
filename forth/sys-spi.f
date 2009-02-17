@@ -12,9 +12,8 @@ sys-spi-base 3 + constant sys-spi-config
 
 30 constant sf-address \ spi address mask
 
-variable sf-buf 256 allot
-
 : sf-initspi ( -- ) bn 0111 sys-spi-config c! ;
+: sf-deselect ( -- ) 2 sf-address or sys-spi-status c! ;
 : sf-waitspi ( -- )
     begin
         sys-spi-status c@
@@ -26,27 +25,73 @@ variable sf-buf 256 allot
     if 3 else 1 then sf-address or sys-spi-status c!
     sf-waitspi
     sys-spi-lsb c@ ;
-: sf-cmd ( cmd count -- )
-    dup 0= if
-        \ send command without data, deselect after transfer
-        drop
-        true sf-xfer drop
-    else
-        \ send command with data, keep selected after cmd byte has been sent
-        swap false sf-xfer drop
-        sf-buf swap
-        1 swap do
-            dup dup c@ false sf-xfer swap c!
-            1+
-        -1 +loop
-        dup c@ true sf-xfer c!
-    then ;
+
+\ sf-send - send byte to flash without deselecting
+: sf-send ( c -- )
+    false sf-xfer drop ;
+
+: sf-send-address ( page addr -- )
+    swap sf-send
+    100 /mod sf-send sf-send ;
+
+: sf-start-reading ( page adr -- )
+    03 sf-send
+    sf-send-address ;
+
+: sf-start-writing ( page adr -- )
+    02 sf-send
+    sf-send-address ;
+
+: sf-read-next-word ( -- word )
+    0 false sf-xfer 100 *
+    0 false sf-xfer + ;
+
+: sf-read-next-byte ( -- byte )
+    0 false sf-xfer ;
 
 : sf-rdid ( -- )
-    sf-initspi
-    9F 14 sf-cmd
-    sf-buf 14 dump
+    9F sf-send
+    sf-read-next-byte .
+    sf-read-next-byte .
+    sf-read-next-byte . cr
 ;
+
+: .sf ( -- )
+    05 sf-send sf-read-next-byte sf-deselect
+    ." flash status: "
+    dup 1 and if ." WIP " then
+    dup 2 and if ." WEL " then
+    dup 1C and 2 rshift ." BP:" . space
+    80 and if ." SRWD " then
+    cr ;
+
+: sf-wait ( -- )
+    05 sf-send
+    begin
+        sf-read-next-byte
+    1 and 0= until
+    sf-deselect ;
+
+: sf-write-enable ( -- )
+    06 sf-send sf-deselect ;
+
+: sf-erase-page ( page -- )
+    sf-write-enable
+    D8 sf-send
+    sf-send 0 sf-send 0 sf-send sf-deselect
+    sf-wait ;
+
+: sf-write-sector ( address length page flash-address -- )
+    sf-write-enable
+    sf-start-writing
+    0 do
+        dup c@ sf-send 1+
+    loop
+    drop
+    sf-deselect
+    sf-wait ;
+
+sf-initspi
 
 \ Block device driver for serial flash
 
@@ -84,14 +129,9 @@ variable sf-buf 256 allot
 decimal
 32 constant pages     \ Number of pages
 64 constant page-size \ Size of one page in 1K blocks
-
 hex
 
 variable active-page
-
-\ sf-send - send byte to flash without deselecting
-: sf-send ( c -- )
-    false sf-xfer drop ;
 
 : page-empty? ( n -- f )
     03 sf-send
@@ -106,33 +146,94 @@ variable active-page
     loop
     0 true sf-xfer drop ;
 
+: ?internal-error ( f -- )
+    true abort" Internal error, both directory pages occupied" ;
+
 : find-active-page ( -- )
     1 page-empty? if
         0 active-page !
     else
-        0 page-empty? if
-            1 active-page !
-        else
-            ." Internal error, both directory pages occupied "
-        then
+        0 page-empty? 0= ?internal-error
+        1 active-page !
     then ;
 
-\ Find current physical block number
-: find-free-block ( -- b )
-    03 sf-send
-    active-page @ sf-send
-    4 page-size *
-    100 /mod sf-send sf-send
-    FFFF
+: sf-directory-addr ( phys-block-no -- page addr )
+    active-page @ swap 1 lshift ;
+
+: sf-open-directory ( -- )
+    page-size 2 * sf-directory-addr sf-start-reading ;
+
+: scanning-directory ( -- end begin )
     pages page-size *
-    2 page-size * .s do
-        0 false sf-xfer 100 *
-        0 false sf-xfer +
+    page-size 2 * ;
+
+\ Find physical block number - n is the logical block number to find, returns -1 if not found
+: find-block ( log-block-no -- phys-block-no )
+    sf-open-directory
+    FFFF
+    scanning-directory do
+        sf-read-next-word
+        2 pick = if
+            drop i
+        then
+    loop
+    sf-deselect
+    swap drop ;
+
+: ?no-free-block ( f -- )
+    abort" no more free blocks" ;
+
+\ Find free physical block
+: find-free-block ( -- phys-block-no )
+    sf-open-directory
+    FFFF
+    scanning-directory do
+        sf-read-next-word
         FFFF = if
             drop i leave
         then
     loop
-    0 true sf-send drop \ deselect
+    sf-deselect
+    dup FFFF = ?no-free-block ;
+
+: ?entry-in-use ( f -- )
+    abort" can't overwrite directory entry that is in use" ;
+
+: assign-block ( log-block-no phys-block-no -- )
+    sf-write-enable
+    sf-directory-addr sf-start-writing
+    100 /mod sf-send sf-send sf-deselect sf-wait ;
+
+variable updated
+variable scr
+variable block-buf 400 allot
+
+: .block ( -- )
+    block-buf 100 dump \ only print first 256 bytes
+    ;
+
+: sf-read-block
+    sf-start-reading
+    block-buf 400 + block-buf do
+        sf-read-next-byte i c!
+    loop
+    sf-deselect ;
+
+: block-to-flash ( physblock -- page addr )
+    2 lshift 100 /mod swap 8 lshift ;
+
+: block ( block -- addr )
+    find-block
     dup FFFF = if
-        ." no free block found "
+        drop
+        block-buf 400 0 fill
+    else
+        block-to-flash sf-read-block
     then ;
+
+: update ( -- )
+    1 updated ! ;
+
+: flush ( -- )
+    updated @ if
+        scr @ 
