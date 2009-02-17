@@ -1,6 +1,6 @@
 iMPACT Version: 10.1.03
 
-iMPACT log file Started on Mon Feb 16 07:09:47 2009
+iMPACT log file Started on Tue Feb 17 10:16:18 2009
 
 // *** BATCH CMD : loadProjectFile -file "C:/hans/rekonstrukt/ise/ise.ipf"
 Connecting to cable (Usb Port - USB21).
@@ -41,7 +41,7 @@ INFO:iMPACT:501 - '3': Added Device xc2c64a successfully.
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 '1': Loading file 'C:/hans/rekonstrukt/ise/my_system09.bit' ...
-INFO:iMPACT - Elapsed time =      0 sec.
+INFO:iMPACT - Elapsed time =      1 sec.
 done.
 INFO:iMPACT:501 - '1': Added Device xc3s500e successfully.
 ----------------------------------------------------------------------
@@ -81,6 +81,40 @@ getSPISelected(): FALSE
 // *** BATCH CMD : setCurrentDesign -version 0
 // *** BATCH CMD : setMode -pff
 // *** BATCH CMD : setCurrentDeviceChain -index 0
+// *** BATCH CMD : setMode -pff
+// *** BATCH CMD : setSubmode -pffserial
+// *** BATCH CMD : setAttribute -configdevice -attr fillValue -value "FF"
+// *** BATCH CMD : setAttribute -configdevice -attr fileFormat -value "mcs"
+// *** BATCH CMD : setAttribute -configdevice -attr dir -value "UP"
+// *** BATCH CMD : setAttribute -configdevice -attr path -value"C:\hans\rekonstrukt\ise\/"
+// *** BATCH CMD : setAttribute -configdevice -attr name -value"my_system09.mcs"
+Total configuration bit size = 2270208 bits.
+// *** BATCH CMD : generate
+Total configuration byte size = 283776 bytes.
+Swap bit can only be disabled in Hex file format only.
+// *** BATCH CMD : setCurrentDesign -version 0
+0x45480 (283776) bytes loaded up from 0x0
+Using user-specified prom size of 512K
+Writing file "C:\hans\rekonstrukt\ise\//my_system09.mcs".
+Writing file "C:\hans\rekonstrukt\ise\//my_system09.prm".
+Writing file "C:\hans\rekonstrukt\ise\//my_system09.sig".
+// *** BATCH CMD : setMode -pff
+// *** BATCH CMD : setSubmode -pffserial
+// *** BATCH CMD : setAttribute -configdevice -attr fillValue -value "FF"
+// *** BATCH CMD : setAttribute -configdevice -attr fileFormat -value "mcs"
+// *** BATCH CMD : setAttribute -configdevice -attr dir -value "UP"
+// *** BATCH CMD : setAttribute -configdevice -attr path -value"C:\hans\rekonstrukt\ise\/"
+// *** BATCH CMD : setAttribute -configdevice -attr name -value"my_system09.mcs"
+Total configuration bit size = 2270208 bits.
+// *** BATCH CMD : generate
+Total configuration byte size = 283776 bytes.
+Swap bit can only be disabled in Hex file format only.
+// *** BATCH CMD : setCurrentDesign -version 0
+0x45480 (283776) bytes loaded up from 0x0
+Using user-specified prom size of 512K
+Writing file "C:\hans\rekonstrukt\ise\//my_system09.mcs".
+Writing file "C:\hans\rekonstrukt\ise\//my_system09.prm".
+Writing file "C:\hans\rekonstrukt\ise\//my_system09.sig".
 // *** BATCH CMD : setMode -pff
 // *** BATCH CMD : setSubmode -pffserial
 // *** BATCH CMD : setAttribute -configdevice -attr fillValue -value "FF"
@@ -154,7 +188,7 @@ done.
 '2': Putting device in ISP mode...done.
 '2': Verifying device...done.
 '2': Verification completed successfully.
-'2': Calculated checksum matches expected checksum, 003fac12c
+'2': Calculated checksum matches expected checksum, 003fb5bbe
 '2': Putting device in ISP mode...done.
 '2': Putting device in ISP mode...done.
 '2': Setting user-programmable bits...
@@ -164,36 +198,5 @@ done.
 '2': Programming completed successfully.
 PROGRESS_END - End Operation.
 Elapsed time =     14 sec.
-// *** BATCH CMD : Program -p 1 
-Maximum TCK operating frequency for this device chain: 10000000.
-Validating chain...
-Boundary-scan chain validated successfully.
-'1': Programming device...
-PROGRESS_START - Starting Operation.
-done.
-'1': Reading status register contents...
-CRC error                                         :         0
-Decryptor security set                            :         0
-DCM locked                                        :         1
-DCI matched                                       :         1
-legacy input error                                :         0
-status of GTS_CFG_B                               :         1
-status of GWE                                     :         1
-status of GHIGH                                   :         1
-value of MODE pin M0                              :         0
-value of MODE pin M1                              :         0
-value of MODE pin M2                              :         0
-value of CFG_RDY (INIT_B)                         :         1
-DONEIN input from DONE pin                        :         1
-IDCODE not validated while trying to write FDRI   :         0
-write FDRI issued before or after decrypt operation:         0
-Decryptor keys not used in proper sequence        :         0
-INFO:iMPACT:2219 - Status register values:
-INFO:iMPACT - 0011 0111 0001 1000 0000 0000 0000 0000 
-INFO:iMPACT:579 - '1': Completed downloading bit file to device.
-INFO:iMPACT - '1': Checking done pin....done.
-'1': Programmed successfully.
-PROGRESS_END - End Operation.
-Elapsed time =      0 sec.
 // *** BATCH CMD : setMode -pff
 // *** BATCH CMD : setMode -pff
