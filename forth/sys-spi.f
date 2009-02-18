@@ -129,9 +129,15 @@ sf-initspi
 decimal
 32 constant pages     \ Number of pages
 64 constant page-size \ Size of one page in 1K blocks
+
+\ Number of data pages
+30 constant data-page-count
+\ Page addresses of primary and secondary directory page
+31 constant primary-directory
+30 constant secondary-directory
 hex
 
-variable active-page
+variable active-directory-page
 
 : page-empty? ( n -- f )
     03 sf-send
@@ -149,23 +155,23 @@ variable active-page
 : ?internal-error ( f -- )
     true abort" Internal error, both directory pages occupied" ;
 
-: find-active-page ( -- )
-    1 page-empty? if
-        0 active-page !
+: find-active-directory-page ( -- )
+    secondary-directory page-empty? if
+        primary-directory active-directory-page !
     else
-        0 page-empty? 0= ?internal-error
-        1 active-page !
+        primary-directory page-empty? 0= ?internal-error
+        secondary-directory active-directory-page !
     then ;
 
 : sf-directory-addr ( phys-block-no -- page addr )
-    active-page @ swap 1 lshift ;
+    active-directory-page @ swap 1 lshift ;
 
 : sf-open-directory ( -- )
-    page-size 2 * sf-directory-addr sf-start-reading ;
+    0 sf-directory-addr sf-start-reading ;
 
 : scanning-directory ( -- end begin )
-    pages page-size *
-    page-size 2 * ;
+    data-page-count page-size *
+    0 ;
 
 \ Find physical block number - n is the logical block number to find, returns -1 if not found
 : find-block ( log-block-no -- phys-block-no )
@@ -195,6 +201,21 @@ variable active-page
     loop
     sf-deselect
     dup FFFF = ?no-free-block ;
+
+\ Show usage statistics
+: .sf-stat ( -- )
+    sf-open-directory
+    0 0
+    scanning-directory do
+        sf-read-next-word
+        dup FFFF = if
+            1+
+        else
+            swap 1+ swap
+        then
+    loop
+    sf-deselect
+    ." free: " . ." in use: " . cr ;
 
 : ?entry-in-use ( f -- )
     abort" can't overwrite directory entry that is in use" ;
@@ -234,6 +255,6 @@ variable block-buf 400 allot
 : update ( -- )
     1 updated ! ;
 
-: flush ( -- )
-    updated @ if
-        scr @ 
+\ : flush ( -- )
+\    updated @ if
+\        scr @
