@@ -81,10 +81,17 @@ sys-spi-base 3 + constant sys-spi-config
     sf-send 0 sf-send 0 sf-send sf-deselect
     sf-wait ;
 
-: sf-write-sector ( address length page flash-address -- )
+: sf-erase-bulk ( page -- )
+    ." about to erase the flash, continue? "
+    key 79 <> abort" aborted"
+    ." erasing serial flash..."
+    sf-write-enable
+    C7 sf-send sf-deselect sf-wait cr ;
+
+: sf-write-sector ( address page flash-address -- )
     sf-write-enable
     sf-start-writing
-    0 do
+    100 0 do
         dup c@ sf-send 1+
     loop
     drop
@@ -208,7 +215,7 @@ variable active-directory-page
     0 0
     scanning-directory do
         sf-read-next-word
-        dup FFFF = if
+        FFFF = if
             1+
         else
             swap 1+ swap
@@ -233,7 +240,7 @@ variable block-buf 400 allot
     block-buf 100 dump \ only print first 256 bytes
     ;
 
-: sf-read-block
+: sf-read-block ( page addr -- )
     sf-start-reading
     block-buf 400 + block-buf do
         sf-read-next-byte i c!
@@ -250,11 +257,30 @@ variable block-buf 400 allot
         block-buf 400 0 fill
     else
         block-to-flash sf-read-block
-    then ;
+    then
+    block-buf ;
 
 : update ( -- )
     1 updated ! ;
 
-\ : flush ( -- )
-\    updated @ if
-\        scr @
+: flush ( -- )
+    updated @ if
+        find-free-block
+        400 0 do
+            block-buf i +
+            over block-to-flash i +
+            sf-write-sector
+        100 +loop
+        scr @ swap ." assigning block " .s assign-block
+        false updated !
+    then ;
+
+\ ADC tests
+
+hex
+: adc-initspi ( -- ) bn 1111 sys-spi-config c! ;
+: adc-read ( -- word )
+    23 sys-spi-status c!
+    sys-spi-msb @ 8 rshift
+    sys-spi-lsb @ or ;
+: adc-loop ( -- ) begin adc-read . cr key 20 <> until ;
