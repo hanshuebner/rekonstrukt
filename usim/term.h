@@ -11,17 +11,17 @@
 #include <stdio.h>
 #include "typedefs.h"
 
-#ifdef __unix
+#if defined(__unix) || defined(__APPLE__)
 #include <termios.h>
 #endif
 
 class Terminal {
 
-#ifdef __unix
+#if defined(__unix) || defined(__APPLE__)
 	FILE			*input, *output;
 	int			 input_fd;
 	struct termios		 oattr, nattr;
-#endif // __unix
+#endif 
 
 public:
 

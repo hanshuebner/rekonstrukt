@@ -12,7 +12,7 @@
 #endif
 #include "mc6850.h"
 
-#ifdef __unix
+#if defined(__unix) || defined(__APPLE__)
 #include <unistd.h>
 #endif
 

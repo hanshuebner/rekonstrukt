@@ -53,6 +53,7 @@ class USim {
 
   void		 load_intelhex(const char *filename, bool read_start_from_file = true);
 
+  virtual ~USim() {};
 };
 
 class USimMotorola : virtual public USim {
