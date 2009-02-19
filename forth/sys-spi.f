@@ -19,7 +19,7 @@ sys-spi-base 3 + constant sys-spi-config
         sys-spi-status c@
     1 and 0= until
 ;
-: sf-xfer ( c f -- r ) \ transfer c over spi f = deselect flag, r = result byte
+: sf-xfer ( c f -- r ) \ transfer c over spi f = deselect r = result
     swap
     sys-spi-lsb c!
     if 3 else 1 then sf-address or sys-spi-status c!
@@ -183,7 +183,8 @@ variable active-directory-page
     data-page-count page-size *
     0 ;
 
-\ Find physical block number - n is the logical block number to find, returns -1 if not found
+\ Find physical block number - n is the logical block number to
+\ find, returns -1 if not found
 : find-block ( log-block-no -- phys-block-no )
     sf-open-directory
     FFFF
