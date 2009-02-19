@@ -105,7 +105,8 @@ sf-initspi
 \ Flash can be erase in units of a page, one page is larger than one
 \ block (i.e. 64K vs 1K).  Writes to the flash must be distributed to
 \ the whole device, as the number of write/erase cycles per cell is
-\ limited.
+\ limited.  Thus, the number of erase cycles should be evenly
+\ distributed across the device.
 
 \ We implement a directory scheme that works as follows:
 
@@ -125,6 +126,8 @@ sf-initspi
 \ reclaimed.  This is done by copying all entries from the currently
 \ active directory page to the secondary directory page and than erasing
 \ the currently active directory page.
+
+\ When all blocks have been allocated, a compaction cycle must be run.
 
 \ When starting, the primary and secondary directory page are scanned.
 \ If both pages are empty, the primary page becomes the active page.
