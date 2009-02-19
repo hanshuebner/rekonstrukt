@@ -926,9 +926,11 @@ proc restore { { project_dir "" } } {
       "A" "" "" "" "PROP_OverwriteSym" "false" 
       "A" "" "" "" "PROP_Parse_Edif_Module" "false" 
       "A" "" "" "" "PROP_Parse_Target" "synthesis" 
-      "A" "" "" "" "PROP_PartitionCreateDelete" "" 
+      "A" "" "" "" "PROP_PartitionCreateDelete" "Thu Feb 19 09:03:03 2009
+" 
       "A" "" "" "" "PROP_PartitionForcePlacement" "" 
-      "A" "" "" "" "PROP_PartitionForceSynth" "" 
+      "A" "" "" "" "PROP_PartitionForceSynth" "Thu Feb 19 08:19:28 2009
+" 
       "A" "" "" "" "PROP_PartitionForceTranslate" "" 
       "A" "" "" "" "PROP_PlsClockEnable" "true" 
       "A" "" "" "" "PROP_PostFitSimTop" "" 
@@ -1436,6 +1438,15 @@ proc restore { { project_dir "" } } {
 
    # partition names for recreation
    set partition_names {
+      "/my_system09/my_vdu"
+      "/my_system09/my_cpu"
+      "/my_system09/my_rom"
+      "/my_system09/my_ram"
+      "/my_system09/my_ACIA"
+      "/my_system09/my_ACIA_Clock"
+      "/my_system09/my_keyboard"
+      "/my_system09/my_spi_master"
+      "/my_system09/my_sys_spi_master"
    }
 
   HandleException {
