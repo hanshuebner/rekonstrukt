@@ -143,7 +143,7 @@ CREATE wordname 5 C, '$ C, '$ C, 0 C, 0 C, 0 C,
 : msg 0 20 AT-XY ." Are you sure? (Y/N) " ;
 : valid? DUP 'n = OVER 'y = OR ;
 : uppercase? DUP 'A 'Z 1+ WITHIN ;
-: lowercase DUP uppercase? IF $20 XOR THEN ;
+: lowercase DUP uppercase? IF 32 XOR THEN ;
 : validkey BEGIN KEY lowercase valid? UNTIL ;
 : clrmsg 0 20 AT-XY 64 SPACES ;
 : no? msg validkey clrmsg 'n = ;
@@ -175,9 +175,9 @@ CREATE wordname 5 C, '$ C, '$ C, 0 C, 0 C, 0 C,
 : cmd? mode @ 'c = ;
 : ins? mode @ 'i = mode @ 'r = OR ;
 : mode! ins? 'i AND cmd? 'c AND OR wordname 3 + C! ;
-: >hex DUP 9 > IF 7 + THEN '0 + ;
-: h! DUP $F0 AND 2/ 2/ 2/ 2/ >hex wordname 4 + C! ;
-: l! $0F AND >hex wordname 5 + C! ;
+: >hex DUP 9 > IF 7 + THEN 48 + ;
+: h! DUP 240 AND 2/ 2/ 2/ 2/ >hex wordname 4 + C! ;
+: l! 15 AND >hex wordname 5 + C! ;
 : name! mode! h! l! ;
 : nomapping DROP ['] beep cmd? AND ['] chr ins? AND OR ;
 : handlerword name! wordname FIND IF ELSE nomapping THEN ;
