@@ -73,7 +73,7 @@ entity my_system09 is
     -- LCD
     LCD_E, LCD_RS, LCD_RW : out std_logic;
     SF_D                  : out std_logic_vector(11 downto 8)
-    );
+   );
 end my_system09;
 
 -------------------------------------------------------------------------------
@@ -83,79 +83,68 @@ architecture my_computer of my_system09 is
   -----------------------------------------------------------------------------
   -- constants
   -----------------------------------------------------------------------------
-  constant SYS_CLK_FREQ  : integer := 50000000;  -- FPGA System Clock
-  constant VGA_CLK_FREQ  : integer := 25000000;  -- VGA Pixel Clock
-  constant CPU_CLK_FREQ  : integer := 25000000;  -- CPU Clock
-  constant BAUD_RATE     : integer := 38400;	  -- Baud Rate
+  constant CLKIN_FREQ    : integer := 50000000;  -- FPGA input System Clock
+  constant SYSCLK_FREQ   : integer := 25000000;  -- System clock frequency
+  constant BAUD_RATE     : integer := 19200;     -- Baud Rate
   constant ACIA_CLK_FREQ : integer := BAUD_RATE * 16;
 
   -----------------------------------------------------------------------------
   -- Signals
   -----------------------------------------------------------------------------
+
+  -- Buffered system clock, 25 Mhz
+  signal sysclk            : std_logic;
+  -- DCM locked signal
+  signal dcm_locked        : std_logic;
+  -- System reset, active low
+  signal reset_n           : std_logic;
   -- BOOT ROM
-  signal rom_data_out   : Std_Logic_Vector(7 downto 0);
-
+  signal rom_data_out      : std_logic_vector(7 downto 0);
   -- UART Interface signals
-  signal uart_data_out  : Std_Logic_Vector(7 downto 0);  
-  signal uart_cs        : Std_Logic;
-  signal uart_irq       : Std_Logic;
-  signal uart_clk       : Std_Logic;
-  signal rxbit          : Std_Logic;
-  signal txbit          : Std_Logic;
-  signal DCD_n          : Std_Logic;
-  signal RTS_n          : Std_Logic;
-  signal CTS_n          : Std_Logic;
-
+  signal uart_data_out     : std_logic_vector(7 downto 0);
+  signal uart_cs           : std_logic;
+  signal uart_irq          : std_logic;
+  signal uart_clk          : std_logic;
+  signal rxbit             : std_logic;
+  signal txbit             : std_logic;
+  signal DCD_n             : std_logic;
+  signal RTS_n             : std_logic;
+  signal CTS_n             : std_logic;
   -- keyboard port
   signal keyboard_data_out : std_logic_vector(7 downto 0);
   signal keyboard_cs       : std_logic;
   signal keyboard_irq      : std_logic;
-
   -- Video Display Unit
-  signal vga_clk      : std_logic;
-  signal vdu_cs       : std_logic;
-  signal vdu_data_out : std_logic_vector(7 downto 0);
-
+  signal vdu_cs            : std_logic;
+  signal vdu_data_out      : std_logic_vector(7 downto 0);
   -- RAM
-  signal ram_cs       : std_logic; -- memory chip select
-  signal ram_data_out : std_logic_vector(7 downto 0);
-
+  signal ram_cs            : std_logic;  -- memory chip select
+  signal ram_data_out      : std_logic_vector(7 downto 0);
   -- LED
-  signal led_cs       : std_logic;
-  signal led_reg      : std_logic_vector(7 downto 0);
-
+  signal led_cs            : std_logic;
+  signal led_reg           : std_logic_vector(7 downto 0);
   -- LCD
-  signal lcd_cs       : std_logic;
-  signal lcd_reg      : std_logic_vector(6 downto 0);
-
+  signal lcd_cs            : std_logic;
+  signal lcd_reg           : std_logic_vector(6 downto 0);
   -- SPI
-  signal spi_cs       : std_logic;
-  signal spi_data_out : std_logic_vector(7 downto 0);
-
+  signal spi_cs            : std_logic;
+  signal spi_data_out      : std_logic_vector(7 downto 0);
   -- System SPI
-  signal sys_spi_cs       : std_logic;
-  signal sys_spi_data_out : std_logic_vector(7 downto 0);
-  signal ad_conv_n        : std_logic;
-
+  signal sys_spi_cs        : std_logic;
+  signal sys_spi_data_out  : std_logic_vector(7 downto 0);
+  signal ad_conv_n         : std_logic;
   -- CPU Interface signals
-  signal cpu_reset    : Std_Logic;
-  signal cpu_clk      : Std_Logic;
-  signal cpu_rw       : std_logic;
-  signal cpu_vma      : std_logic;
-  signal cpu_halt     : std_logic;
-  signal cpu_hold     : std_logic;
-  signal cpu_firq     : std_logic;
-  signal cpu_irq      : std_logic;
-  signal cpu_nmi      : std_logic;
-  signal cpu_addr     : std_logic_vector(15 downto 0);
-  signal cpu_data_in  : std_logic_vector(7 downto 0);
-  signal cpu_data_out : std_logic_vector(7 downto 0);
-
-  -- CLK_50MHZ clock divide by 2
-  signal clock_div    : std_logic_vector(1 downto 0);
-  signal SysClk       : std_logic;
-  signal Reset_n      : std_logic;
-  signal CountL       : std_logic_vector(23 downto 0);
+  signal cpu_reset         : std_logic;
+  signal cpu_rw            : std_logic;
+  signal cpu_vma           : std_logic;
+  signal cpu_halt          : std_logic;
+  signal cpu_hold          : std_logic;
+  signal cpu_firq          : std_logic;
+  signal cpu_irq           : std_logic;
+  signal cpu_nmi           : std_logic;
+  signal cpu_addr          : std_logic_vector(15 downto 0);
+  signal cpu_data_in       : std_logic_vector(7 downto 0);
+  signal cpu_data_out      : std_logic_vector(7 downto 0);
   
 begin
   -----------------------------------------------------------------------------
@@ -163,7 +152,7 @@ begin
   -----------------------------------------------------------------------------
 
   my_cpu : entity cpu09 port map (
-    clk      => cpu_clk,
+    clk      => sysclk,
     rst      => cpu_reset,
     rw       => cpu_rw,
     vma      => cpu_vma,
@@ -175,25 +164,25 @@ begin
     irq      => cpu_irq,
     nmi      => cpu_nmi,
     firq     => cpu_firq
-    );
+   );
 
   my_rom : entity rom port map (
-    clk  => cpu_clk,
+    clk  => sysclk,
     rst  => cpu_reset,
     cs   => '1',
     addr => cpu_addr(13 downto 0),
     data => rom_data_out
-    );
+   );
 
   my_ram : entity ram_16k port map (
-    clk   => cpu_clk,
+    clk   => sysclk,
     rst   => cpu_reset,
     cs    => ram_cs,
     rw    => cpu_rw,
     addr  => cpu_addr(13 downto 0),
     rdata => ram_data_out,
     wdata => cpu_data_out
-    );
+   );
 
 ----------------------------------------
 --
@@ -201,7 +190,7 @@ begin
 --
 ----------------------------------------
   my_ACIA : entity ACIA_6850 port map (
-    clk     => cpu_clk,
+    clk     => sysclk,
     rst     => cpu_reset,
     cs      => uart_cs,
     rw      => cpu_rw,
@@ -216,7 +205,7 @@ begin
     DCD_n   => dcd_n,
     CTS_n   => cts_n,
     RTS_n   => rts_n
-    );
+   );
 
 ----------------------------------------
 --
@@ -225,13 +214,13 @@ begin
 ----------------------------------------
   my_ACIA_Clock : entity ACIA_Clock
     generic map(
-      SYS_CLK_FREQ  => SYS_CLK_FREQ,
+      SYS_CLK_FREQ  => SYSCLK_FREQ,
       ACIA_CLK_FREQ => ACIA_CLK_FREQ
-      ) 
+     ) 
     port map(
-      clk        => SysClk,
+      clk        => sysclk,
       acia_clk   => uart_clk
-      ); 
+     ); 
 
 
 
@@ -242,10 +231,10 @@ begin
 ----------------------------------------
   my_keyboard : entity keyboard
     generic map (
-      KBD_CLK_FREQ => CPU_CLK_FREQ
-      ) 
+      KBD_CLK_FREQ => SYSCLK_FREQ
+     ) 
     port map(
-      clk      => cpu_clk,
+      clk      => sysclk,
       rst      => cpu_reset,
       cs       => keyboard_cs,
       rw       => cpu_rw,
@@ -255,7 +244,7 @@ begin
       irq      => keyboard_irq,
       kbd_clk  => PS2_CLK,
       kbd_data => PS2_DATA
-      );
+     );
 
 ----------------------------------------
 --
@@ -264,8 +253,8 @@ begin
 ----------------------------------------
   my_vdu : entity vdu8 
     generic map(
-      VDU_CLK_FREQ           => CPU_CLK_FREQ, -- HZ
-      VGA_CLK_FREQ           => VGA_CLK_FREQ, -- HZ
+      VDU_CLK_FREQ           => SYSCLK_FREQ, -- HZ
+      VGA_CLK_FREQ           => SYSCLK_FREQ, -- HZ
       VGA_HOR_CHARS          => 80, -- CHARACTERS
       VGA_VER_CHARS          => 25, -- CHARACTERS
       VGA_PIX_PER_CHAR       => 8,  -- PIXELS
@@ -276,11 +265,11 @@ begin
       VGA_VER_BACK_PORCH     => 13, -- LINES
       VGA_VER_SYNC           => 1,  -- LINES
       VGA_VER_FRONT_PORCH    => 36  -- LINES
-      )
+     )
     port map(
 
       -- Control Registers
-      vdu_clk       => cpu_clk,					 -- 25 MHz System Clock in
+      vdu_clk       => sysclk,					 -- 25 MHz System Clock in
       vdu_rst       => cpu_reset,
       vdu_cs        => vdu_cs,
       vdu_rw        => cpu_rw,
@@ -289,13 +278,13 @@ begin
       vdu_data_out  => vdu_data_out,
 
       -- vga port connections
-      vga_clk       => vga_clk,					 -- 25 MHz VDU pixel clock
+      vga_clk       => sysclk,					 -- 25 MHz VDU pixel clock
       vga_red_o     => vga_red,
       vga_green_o   => vga_green,
       vga_blue_o    => vga_blue,
       vga_hsync_o   => vga_hsync,
       vga_vsync_o   => vga_vsync
-      );
+     );
 
 
 ----------------------------------------
@@ -304,7 +293,7 @@ begin
 --
 ----------------------------------------
   my_spi_master : entity spi_master port map (
-    clk                  => cpu_clk,
+    clk                  => sysclk,
     reset                => cpu_reset,
     cs                   => spi_cs,
     rw                   => cpu_rw,
@@ -317,10 +306,10 @@ begin
     spi_miso             => j4(2),
     spi_cs_n(0)          => j4(3),
     spi_cs_n(7 downto 1) => open
-    );
+   );
 
   my_sys_spi_master : entity spi_master port map (
-    clk                  => cpu_clk,
+    clk                  => sysclk,
     reset                => cpu_reset,
     cs                   => sys_spi_cs,
     rw                   => cpu_rw,
@@ -337,24 +326,20 @@ begin
     spi_cs_n(3)          => SPI_SS_B,
     spi_cs_n(4)          => SF_CE0,
     spi_cs_n(7 downto 5) => open
-    );
+   );
 
---
--- 25 MHz CPU clock
---
-  cpu_clk_buffer : BUFG port map(
-    i => clock_div(0),
-    o => cpu_clk
+  my_clock_synthesis : entity clock_synthesis port map (
+    CLKIN_IN   => CLK_50MHZ,
+    CLKDV_OUT  => sysclk,
+    LOCKED_OUT => dcm_locked
     );
-  
---
 ----------------------------------------------------------------------
 --
 -- Process to decode memory map
 --
 ----------------------------------------------------------------------
 
-  mem_decode: process( cpu_clk, Reset_n,
+  mem_decode: process(sysclk, reset_n,
                        cpu_addr, cpu_rw, cpu_vma,
                        rom_data_out, 
                        ram_data_out,
@@ -477,9 +462,9 @@ begin
 --
 -- Interrupts and other bus control signals
 --
-  interrupts : process( Reset_n, uart_irq, keyboard_irq )
+  interrupts : process(reset_n, uart_irq, keyboard_irq)
   begin
-    cpu_reset <= not Reset_n; -- CPU reset is active high
+    cpu_reset <= not reset_n; -- CPU reset is active high
     cpu_irq   <= uart_irq or keyboard_irq;
     cpu_nmi   <= '0';
     cpu_firq  <= '0';
@@ -487,12 +472,10 @@ begin
     cpu_hold  <= '0';
   end process;
 
---
---
   set_leds : process(sysclk)
   begin
     if falling_edge(sysclk) then
-      if Reset_n = '0' then
+      if reset_n = '0' then
         LED_reg <= (others => '0');
       elsif led_cs = '1' and cpu_rw = '0' then
         LED_reg <= cpu_data_out;
@@ -511,13 +494,12 @@ begin
     end if;
   end process;
 
---
--- Clock divider
---
-  my_clock_divider: process( SysClk )
+  reset_key : process(sysclk)
   begin
-    if SysClk'event and SysClk='0' then
-      clock_div <= clock_div + "01";
+    if dcm_locked = '0' then
+      reset_n <= '0';
+    elsif falling_edge(sysclk) then
+      reset_n <= not ROT_CENTER;        -- CPU reset is active high
     end if;
   end process;
 
@@ -528,8 +510,6 @@ begin
 
   DCD_n         <= '0';
   CTS_n         <= '0';
-  Reset_n       <= not ROT_CENTER;      -- CPU reset is active high
-  SysClk        <= CLK_50MHZ;
   rxbit         <= RS232_DCE_RXD;
   RS232_DCE_TXD <= txbit;
   led           <= led_reg;
