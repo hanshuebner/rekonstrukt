@@ -86,7 +86,7 @@ architecture my_computer of my_system09 is
   constant SYS_CLK_FREQ  : integer := 50000000;  -- FPGA System Clock
   constant VGA_CLK_FREQ  : integer := 25000000;  -- VGA Pixel Clock
   constant CPU_CLK_FREQ  : integer := 25000000;  -- CPU Clock
-  constant BAUD_RATE     : integer := 57600;	  -- Baud Rate
+  constant BAUD_RATE     : integer := 38400;	  -- Baud Rate
   constant ACIA_CLK_FREQ : integer := BAUD_RATE * 16;
 
   -----------------------------------------------------------------------------
@@ -162,25 +162,25 @@ begin
   -- Instantiation of internal components
   -----------------------------------------------------------------------------
 
-  my_cpu : entity cpu09  port map (    
-    clk	     => cpu_clk,
-    rst       => cpu_reset,
-    rw	     => cpu_rw,
-    vma       => cpu_vma,
-    address   => cpu_addr(15 downto 0),
-    data_in   => cpu_data_in,
-    data_out  => cpu_data_out,
-    halt      => cpu_halt,
-    hold      => cpu_hold,
-    irq       => cpu_irq,
-    nmi       => cpu_nmi,
-    firq      => cpu_firq
+  my_cpu : entity cpu09 port map (
+    clk      => cpu_clk,
+    rst      => cpu_reset,
+    rw       => cpu_rw,
+    vma      => cpu_vma,
+    address  => cpu_addr(15 downto 0),
+    data_in  => cpu_data_in,
+    data_out => cpu_data_out,
+    halt     => cpu_halt,
+    hold     => cpu_hold,
+    irq      => cpu_irq,
+    nmi      => cpu_nmi,
+    firq     => cpu_firq
     );
 
   my_rom : entity rom port map (
-    clk => cpu_clk,
-    rst => cpu_reset,
-    cs => '1',
+    clk  => cpu_clk,
+    rst  => cpu_reset,
+    cs   => '1',
     addr => cpu_addr(13 downto 0),
     data => rom_data_out
     );
@@ -200,22 +200,22 @@ begin
 -- ACIA/UART Serial interface
 --
 ----------------------------------------
-  my_ACIA  : entity ACIA_6850 port map (
-    clk	     => cpu_clk,
-    rst       => cpu_reset,
-    cs        => uart_cs,
-    rw        => cpu_rw,
-    irq       => uart_irq,
-    Addr      => cpu_addr(0),
-    Datain    => cpu_data_out,
-    DataOut   => uart_data_out,
-    RxC       => uart_clk,
-    TxC       => uart_clk,
-    RxD       => rxbit,
-    TxD       => txbit,
-    DCD_n     => dcd_n,
-    CTS_n     => cts_n,
-    RTS_n     => rts_n
+  my_ACIA : entity ACIA_6850 port map (
+    clk     => cpu_clk,
+    rst     => cpu_reset,
+    cs      => uart_cs,
+    rw      => cpu_rw,
+    irq     => uart_irq,
+    Addr    => cpu_addr(0),
+    Datain  => cpu_data_out,
+    DataOut => uart_data_out,
+    RxC     => uart_clk,
+    TxC     => uart_clk,
+    RxD     => rxbit,
+    TxD     => txbit,
+    DCD_n   => dcd_n,
+    CTS_n   => cts_n,
+    RTS_n   => rts_n
     );
 
 ----------------------------------------
@@ -245,16 +245,16 @@ begin
       KBD_CLK_FREQ => CPU_CLK_FREQ
       ) 
     port map(
-      clk          => cpu_clk,
-      rst          => cpu_reset,
-      cs           => keyboard_cs,
-      rw           => cpu_rw,
-      addr         => cpu_addr(0),
-      data_in      => cpu_data_out(7 downto 0),
-      data_out     => keyboard_data_out(7 downto 0),
-      irq          => keyboard_irq,
-      kbd_clk      => PS2_CLK,
-      kbd_data     => PS2_DATA
+      clk      => cpu_clk,
+      rst      => cpu_reset,
+      cs       => keyboard_cs,
+      rw       => cpu_rw,
+      addr     => cpu_addr(0),
+      data_in  => cpu_data_out(7 downto 0),
+      data_out => keyboard_data_out(7 downto 0),
+      irq      => keyboard_irq,
+      kbd_clk  => PS2_CLK,
+      kbd_data => PS2_DATA
       );
 
 ----------------------------------------
@@ -348,13 +348,6 @@ begin
     );
   
 --
--- 25 MHz VGA Pixel clock
---
-  vga_clk_buffer : BUFG port map(
-    i => clock_div(0),
-    o => vga_clk
-    );	 
-  
 ----------------------------------------------------------------------
 --
 -- Process to decode memory map
