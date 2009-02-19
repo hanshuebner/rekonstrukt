@@ -24,7 +24,7 @@ DECIMAL
 : ?INTERRUPTED ABORT"  Interrupted " ;        \ WAIT/GO :::MAIS:::
 : ?STACK      DEPTH 0< ABORT"  Empty stack " ; \ .STACK
 : ?USERSPACE  ABORT"  Not enough user space " ; 
-: ?PREFIX     ABORT"  Niet geschikt voor prefixes " ;
+: ?PREFIX     ABORT"  Not suitable for prefixes " ;
 : ?PAIR   ( x y - ) <> ABORT" Afgekeurd " ;
 
 \ Short for 'EXIT THEN'
