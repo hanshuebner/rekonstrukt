@@ -54,20 +54,20 @@ use ieee.std_logic_unsigned.all;
 -------------------------------------------------------------------------------
 entity ACIA_RX is
   port (
-    Clk    : in  Std_Logic;                    -- Clock signal
-    RxRst  : in  Std_Logic;                    -- Reset input
-    RxRd   : in  Std_Logic;                    -- Read data strobe
-    WdFmt  : in  Std_Logic_Vector(2 downto 0); -- word format
-    BdFmt  : in  Std_Logic_Vector(1 downto 0); -- baud format
-    RxClk  : in  Std_Logic;                    -- RS-232 clock input
-    RxDat  : in  Std_Logic;                    -- RS-232 data input
-    RxFErr : out Std_Logic;                    -- Framing Error status
-    RxOErr : out Std_Logic;                    -- Over Run Error Status
-    RxPErr : out Std_logic;                    -- Parity Error Status
-    RxRdy  : out Std_Logic;                    -- Data Ready Status
-    RxDout : out Std_Logic_Vector(7 downto 0)
+    Clk          : in  Std_Logic;                     -- Clock signal
+    RxRst        : in  Std_Logic;                     -- Reset input
+    RxRd         : in  Std_Logic;                     -- Read data strobe
+    WdFmt        : in  Std_Logic_Vector(2 downto 0);  -- word format
+    BdFmt        : in  Std_Logic_Vector(1 downto 0);  -- baud format
+    RxClk        : in  Std_Logic;                     -- RS-232 clock input
+    RxDat        : in  Std_Logic;                     -- RS-232 data input
+    RxFErr       : out Std_Logic;                     -- Framing Error status
+    RxOErr       : out Std_Logic;                     -- Over Run Error Status
+    RxPErr       : out Std_logic;                     -- Parity Error Status
+    RxRdy        : out Std_Logic;                     -- Data Ready Status
+    RxDout       : out Std_Logic_Vector(7 downto 0)
     );
-end ACIA_RX; --================== End of entity ==============================--
+end ACIA_RX;  --================== End of entity ==============================--
 
 -------------------------------------------------------------------------------
 -- Architecture for ACIA receiver
@@ -92,7 +92,6 @@ architecture rtl of ACIA_RX is
   signal RxClkCnt   : Std_Logic_Vector(5 downto 0) := (others => '0'); -- Rx Baud Clock Counter
   signal RxBdClk    : Std_Logic := '0';             -- Rx Baud Clock
   signal RxBdDel    : Std_Logic := '0';             -- Delayed Rx Baud Clock
-  signal RxBdEdge   : Std_Logic := '0';             -- Rx Baud Clock Edge pulse
 
   signal RxReady    : Std_Logic := '0';             -- Data Ready flag
   signal RxReq      : Std_Logic := '0';             -- Rx Data Valid
@@ -218,23 +217,6 @@ begin
   end process;
 
   ---------------------------------------------------------------------
-  -- Receiver Baud Clock Edge Detect
-  ---------------------------------------------------------------------
-  --
-  -- Generate one clock strobe on rising baud clock edge
-  --
-  acia_rx_baud_clock_edge : process( RxRst, Clk )
-  begin
-    if RxRst = '1' then
-      RxBdDel  <= '0';
-      RxBdEdge <= '0';
-    elsif falling_edge(clk) then
-      RxBdDel  <= RxBdClk;
-      RxBdEdge <= RxBdClk and (not RxBdDel);
-    end if;
-  end process;
-
-  ---------------------------------------------------------------------
   -- Receiver process
   ---------------------------------------------------------------------
   -- WdFmt - Bits[4..2]
@@ -246,36 +228,37 @@ begin
   -- 1 0 1   - 8 data, no   parity, 1 stop
   -- 1 1 0   - 8 data, even parity, 1 stop
   -- 1 1 1   - 8 data, odd  parity, 1 stop
-  acia_rx_receive : process( RxRst, Clk )
+  acia_rx_receive : process(RxRst, Clk)
   begin
     if RxRst = '1' then
       RxFErr     <= '0';
       RxOErr     <= '0';
       RxPErr     <= '0';
-      RxShiftReg <= (others => '0');         -- Resert Shift register
+      RxShiftReg <= (others => '0');        -- Resert Shift register
       RxDOut     <= (others => '0');
-      RxParity   <= '0';                     -- reset Parity bit
-      RxAck      <= '0';                     -- Receiving data
+      RxParity   <= '0';                    -- reset Parity bit
+      RxAck      <= '0';                    -- Receiving data
       RxBitCount <= (others => '0');
       RxState    <= RxStart_state;
     elsif falling_edge(clk) then
-      if RxBdEdge = '1' then
+      RxBdDel      <= RxBdClk;
+      if RxBdDel = '0' and RxBdClk = '1' then
         case RxState is
           when RxStart_state =>
-            RxShiftReg <= (others => '0');     -- Reset Shift register
-            RxParity   <= '0';                 -- Parity bit
-            if WdFmt(2) = '0' then           
+            RxShiftReg <= (others => '0');  -- Reset Shift register
+            RxParity   <= '0';              -- Parity bit
+            if WdFmt(2) = '0' then
               -- WdFmt(2) = '0' => 7 data
               RxBitCount <= "110";
             else
-              -- WdFmt(2) = '1' => 8 data				 
+              -- WdFmt(2) = '1' => 8 data                                
               RxBitCount <= "111";
             end if;
-            if RxDatDel2 = '0' then            -- look for start request
-              RxState <= RxData_state;         -- yes, read data
+            if RxDatDel2 = '0' then         -- look for start request
+              RxState <= RxData_state;      -- yes, read data
             end if;
             
-          when RxData_state => -- data bits 0 to 6
+          when RxData_state => -- data bits 
             RxShiftReg <= RxDatDel2 & RxShiftReg(7 downto 1);
             RxParity   <= RxParity xor RxDatDel2;
             RxAck      <= '1';   				  -- Flag receive in progress

@@ -72,7 +72,10 @@ entity my_system09 is
 
     -- LCD
     LCD_E, LCD_RS, LCD_RW : out std_logic;
-    SF_D                  : out std_logic_vector(11 downto 8)
+    SF_D                  : out std_logic_vector(11 downto 8);
+
+    -- Debug
+    FX2_IO : inout std_logic_vector(8 downto 5)
    );
 end my_system09;
 
@@ -519,6 +522,8 @@ begin
   FPGA_INIT_B   <= '0';
   SF_OE         <= '1';
   SF_WE         <= '1';
-  
+
+  fx2_io <= (others => '0');
+
 end my_computer;  --===================== End of architecture =======================--
 

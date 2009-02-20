@@ -62,10 +62,10 @@ NET "FPGA_INIT_B" LOC = "T3"  | IOSTANDARD = LVCMOS33 | SLEW = SLOW | DRIVE = 4 
 #-NET "FX2_IO<3>"   LOC = "D5"  | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 8
 #-NET "FX2_IO<4>"   LOC = "C5"  | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 8
 # These four connections are shared with the J2 6-pin accessory header
-#-NET "FX2_IO<5>"   LOC = "A6"  | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 8
-#-NET "FX2_IO<6>"   LOC = "B6"  | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 8
-#-NET "FX2_IO<7>"   LOC = "E7"  | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 8
-#-NET "FX2_IO<8>"   LOC = "F7"  | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 8
+NET "FX2_IO<5>"   LOC = "A6"  | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 8 ;
+NET "FX2_IO<6>"   LOC = "B6"  | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 8 ;
+NET "FX2_IO<7>"   LOC = "E7"  | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 8 ;
+NET "FX2_IO<8>"   LOC = "F7"  | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 8 ;
 # These four connections are shared with the J4 6-pin accessory header
 #-NET "FX2_IO<9>"   LOC = "D7"  | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 8
 #-NET "FX2_IO<10>"  LOC = "C7"  | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 8
