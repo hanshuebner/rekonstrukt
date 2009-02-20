@@ -1,6 +1,5 @@
-:::MAIS:::
-
-FORTH:
+vocabulary s3esk
+s3esk definitions
 
 hex
 B020 constant vdu
@@ -11,6 +10,7 @@ vdu 3 + constant vdu-vcursor
 vdu 4 + constant vdu-voffset
 
 decimal
+
 : vdu-save ( -- h v ) vdu-hcursor c@ vdu-vcursor c@ ;
 : vdu-restore ( h v -- ) vdu-vcursor c! vdu-hcursor c! ;
 : vdu-cr ( -- ) 0 vdu-hcursor c! ;
