@@ -269,6 +269,7 @@ begin
               else                             -- WdFmt(2) = '1' => 8 data				 
                 if WdFmt(1) = '0' then         
                   RxState <= RxStop_state;     -- WdFmt(1) = '0' no parity
+                  RxPErr <= '0';
                 else
                   RxState <= RxParity_state;   -- WdFmt(1) = '1' parity
                 end if;
