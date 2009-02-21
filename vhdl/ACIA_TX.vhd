@@ -75,7 +75,6 @@ architecture rtl of ACIA_TX is
   signal TxClkEdge  : Std_Logic := '0';             -- Tx Input Clock Edge pulse
   signal TxClkCnt   : Std_Logic_Vector(5 downto 0) := (others => '0'); -- Tx Baud Clock Counter
   signal TxBdDel    : Std_Logic := '0';             -- Delayed Tx Baud Clock
-  signal TxBdEdge   : Std_Logic := '0';             -- Tx Baud Clock Edge pulse
   signal TxBdClk    : Std_Logic := '0';             -- Tx Baud Clock
   signal TxShiftReg : Std_Logic_Vector(7 downto 0) := (others => '0'); -- Transmit shift register
   signal TxParity   : Std_logic := '0';             -- Parity Bit
@@ -97,7 +96,7 @@ begin
     if TxRst = '1' then
       TxClkDel  <= '0';
       TxClkEdge <= '0';
-    elsif Clk'event and Clk = '0' then
+    elsif falling_edge(clk) then
       TxClkDel  <= TxClk;
       TxClkEdge <= TxClkDel and (not TxClk);
     end if;
@@ -114,7 +113,7 @@ begin
   begin
     if TxRst = '1' then
       TxClkCnt <= "000000";
-    elsif Clk'event and Clk = '0' then
+    elsif falling_edge(clk) then
       if TxClkEdge = '1' then 
         TxClkCnt <= TxClkCnt + "000001";
       end if; -- TxClkEdge
@@ -144,51 +143,28 @@ begin
   end process;
 
   ---------------------------------------------------------------------
-  -- Transmit Baud Clock Edge Detector
-  ---------------------------------------------------------------------
-  --
-  -- Generate one clock pulse strobe on falling edge of Tx Baud Clock
-  --
---  acia_tx_baud_clock_edge : process(Clk, TxRst, TxBdClk, TxBdDel )
-  acia_tx_baud_clock_edge : process( TxRst, Clk )
-  begin
-    if TxRst = '1' then
-      TxBdDel  <= '0';
-      TxBdEdge <= '0';
-    elsif Clk'event and Clk = '0' then
-      TxBdDel  <= TxBdClk;
-      TxBdEdge <= (not TxBdClk) and TxBdDel;
-    end if;
-  end process;
-
-
-  ---------------------------------------------------------------------
   -- Transmitter activation process
   ---------------------------------------------------------------------
---  acia_tx_write : process(Clk, TxRst, TxWr, TxReq, TxAck )
   acia_tx_write : process( TxRst, Clk )
   begin
     if TxRst = '1' then
       TxReq <= '0';
       TxEmp <= '1';
-    elsif Clk'event and Clk = '0' then
+    elsif falling_edge(clk) then
       if TxWr = '1' then
-        -- Write requests transmit
-        -- and clears the Empty Flag 
+        -- Write requests transmit and clears the Empty Flag 
         TxReq <= '1';
         TxEmp <= '0';
       else
         if (TxReq = '1') and (TxAck = '1') then
-          -- Once the transmitter is started 
-          -- We can clear request.
+          -- Once the transmitter is started we can clear request.
           TxReq <= '0';
         elsif (TxReq = '0') and (TxAck = '0') then
-          -- When the transmitter is finished
-          -- We can flag transmit empty
+          -- When the transmitter is finished, we can flag transmit empty
           TxEmp <= '1';
         end if;
       end if;
-    end if; -- clk / reset
+    end if;
   end process;
 
   -----------------------------------------------------------------------------
@@ -203,9 +179,6 @@ begin
   -- 1 0 1   - 8 data, no   parity, 1 stop
   -- 1 1 0   - 8 data, even parity, 1 stop
   -- 1 1 1   - 8 data, odd  parity, 1 stop
---  acia_tx_transmit :  process(TxRst, Clk, TxState, TxDin, WdFmt,  
---                              TxShiftReg, TxBdEdge, TxParity, TxBitCount,
---	                             TxReq, TxAck )
   acia_tx_transmit :  process( TxRst, Clk )  
   begin
     if TxRst = '1' then
@@ -215,8 +188,9 @@ begin
       TxBitCount <= "000";
       TxAck      <= '0';
       TxState    <= Tx1Stop_State;
-    elsif Clk'event and Clk = '0' then
-      if TxBdEdge = '1' then
+    elsif falling_edge(clk) then
+      TxBdDel  <= TxBdClk;
+      if TxBdDel = '0' and TxBdClk = '1' then
         case TxState is
           when Tx1Stop_State =>           -- Last Stop bit state
             TxDat <= '1';
@@ -274,10 +248,10 @@ begin
             TxDat   <= '1';
             TxState <= Tx1Stop_State;
 
-        end case; -- TxState
+        end case;
 
-      end if; -- TxBdEdge
-    end if;	 -- clk / reset
+      end if;
+    end if;
 
   end process;
 
