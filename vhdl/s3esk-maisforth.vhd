@@ -40,6 +40,8 @@ entity my_system09 is
     -- Uart Interface
     RS232_DCE_RXD : in  std_logic;
     RS232_DCE_TXD : out std_logic;
+    RS232_DTE_RXD : in  std_logic;
+    RS232_DTE_TXD : out std_logic;
 
     -- J4 - external SPI Interface
     J4            : inout std_logic_vector(3 downto 0);
@@ -515,6 +517,8 @@ begin
   CTS_n         <= '0';
   rxbit         <= RS232_DCE_RXD;
   RS232_DCE_TXD <= txbit;
+  RS232_DTE_TXD <= rts_n;
+
   led           <= led_reg;
   AD_CONV       <= not ad_conv_n;
 
@@ -523,7 +527,7 @@ begin
   SF_OE         <= '1';
   SF_WE         <= '1';
 
-  fx2_io <= (others => '0');
+  fx2_io <= (5 => RS232_DCE_RXD, 6 => txbit, 7 => CTS_n, 8 => RTS_n, others => '0');
 
 end my_computer;  --===================== End of architecture =======================--
 

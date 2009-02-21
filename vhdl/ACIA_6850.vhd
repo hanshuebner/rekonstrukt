@@ -303,19 +303,15 @@ begin
   begin
     case CtrlReg(6 downto 5) is
       when "00" => -- Disable TX Interrupts, Assert RTS
-        RTS_n  <= '0';
         TxD    <= TxDbit;
         TxIEnb <= '0';
       when "01" => -- Enable TX interrupts, Assert RTS
-        RTS_n  <= '0';
         TxD    <= TxDbit;
         TxIEnb <= '1';
       when "10" => -- Disable Tx Interrupts, Clear RTS
-        RTS_n  <= '1';
         TxD    <= TxDbit;
         TxIEnb <= '0';
       when "11" => -- Disable Tx interrupts, Assert RTS, send break
-        RTS_n  <= '0';
         TxD    <= '0';
         TxIEnb <= '0';
       when others =>
@@ -428,6 +424,8 @@ begin
       end case;
     end if;
   end process;
+
+  rts_n <= RxDR;
 
 end rtl; --===================== End of architecture =======================--
 
