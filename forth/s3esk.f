@@ -1,5 +1,6 @@
 vocabulary s3esk
 s3esk definitions
+s3esk
 
 hex
 B020 constant vdu
