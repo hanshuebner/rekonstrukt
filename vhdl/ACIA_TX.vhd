@@ -47,16 +47,16 @@ use ieee.std_logic_unsigned.all;
 -------------------------------------------------------------------------------
 entity ACIA_TX is
   port (
-    Clk    : in  Std_Logic;                    -- CPU Clock signal
-    TxRst  : in  Std_Logic;                    -- Reset input
-    TxWr   : in  Std_Logic;                    -- Load transmit data
-    TxDin  : in  Std_Logic_Vector(7 downto 0);	-- Transmit data input.
-    WdFmt  : in  Std_Logic_Vector(2 downto 0); -- word format
-    BdFmt  : in  Std_Logic_Vector(1 downto 0); -- baud format
-    TxClk  : in  Std_Logic;                    -- Enable input
-    TxDat  : out Std_Logic;                    -- RS-232 data bit output
-    TxEmp  : out Std_Logic );                  -- Tx buffer empty
-end ACIA_TX; --================== End of entity ==============================--
+    Clk   : in  Std_Logic;                     -- CPU Clock signal
+    Reset : in  Std_Logic;                     -- Reset input
+    Wr    : in  Std_Logic;                     -- Load transmit data
+    Din   : in  Std_Logic_Vector(7 downto 0);  -- Transmit data input.
+    WdFmt : in  Std_Logic_Vector(2 downto 0);  -- word format
+    BdFmt : in  Std_Logic_Vector(1 downto 0);  -- baud format
+    TxClk : in  Std_Logic;                     -- Enable input
+    Dat   : out Std_Logic;                     -- RS-232 data bit output
+    Empty : out Std_Logic);                    -- Tx buffer empty
+end ACIA_TX;  --================== End of entity ==============================--
 
 -------------------------------------------------------------------------------
 -- Architecture for  ACIA_TX
@@ -64,24 +64,22 @@ end ACIA_TX; --================== End of entity ==============================--
 
 architecture rtl of ACIA_TX is
 
-  type TxStateType is ( Tx1Stop_State, TxStart_State, 
-                        TxData_State, TxParity_State, Tx2Stop_State );
+  type StateType is ( SIdle, SStart, SData, SParity, S2Stop );
 
   -----------------------------------------------------------------------------
   -- Signals
   -----------------------------------------------------------------------------
 
-  signal TxClkDel   : Std_Logic := '0';             -- Delayed Tx Input Clock
-  signal TxClkEdge  : Std_Logic := '0';             -- Tx Input Clock Edge pulse
-  signal TxClkCnt   : Std_Logic_Vector(5 downto 0) := (others => '0'); -- Tx Baud Clock Counter
-  signal TxBdDel    : Std_Logic := '0';             -- Delayed Tx Baud Clock
-  signal TxBdClk    : Std_Logic := '0';             -- Tx Baud Clock
-  signal TxShiftReg : Std_Logic_Vector(7 downto 0) := (others => '0'); -- Transmit shift register
-  signal TxParity   : Std_logic := '0';             -- Parity Bit
-  signal TxBitCount : Std_Logic_Vector(2 downto 0) := (others => '0'); -- Data Bit Counter
-  signal TxReq      : Std_Logic := '0';             -- Request Transmit
-  signal TxAck      : Std_Logic := '0';             -- Transmit Commenced
-  signal TxState    : TxStateType;						 -- Transmitter state
+  signal ClkDel    : Std_Logic                    := '0';  -- Delayed Tx Input Clock
+  signal TxClkEdge : Std_Logic                    := '0';  -- Tx Input Clock Edge pulse
+  signal ClkCnt    : Std_Logic_Vector(5 downto 0) := (others => '0');  -- Tx Baud Clock Counter
+  signal BdDel     : Std_Logic                    := '0';  -- Delayed Tx Baud Clock
+  signal BdClk     : Std_Logic                    := '0';  -- Tx Baud Clock
+  signal ShiftReg  : Std_Logic_Vector(7 downto 0) := (others => '0');  -- Transmit shift register
+  signal Parity    : Std_logic                    := '0';  -- Parity Bit
+  signal BitCount  : Std_Logic_Vector(2 downto 0) := (others => '0');  -- Data Bit Counter
+  signal State     : StateType;         -- Transmitter state
+  signal Start     : std_logic;         -- Start transmitter
 
 begin
 
@@ -90,40 +88,37 @@ begin
   -- A falling edge will produce a one clock cycle pulse
   ---------------------------------------------------------------------
 
---  acia_tx_clock_edge : process(Clk, TxRst, TxClk, TxClkDel )
-  acia_tx_clock_edge : process( TxRst, Clk )
+  acia_tx_clock_edge : process(Reset, Clk)
   begin
-    if TxRst = '1' then
-      TxClkDel  <= '0';
+    if Reset = '1' then
+      ClkDel    <= '0';
       TxClkEdge <= '0';
     elsif falling_edge(clk) then
-      TxClkDel  <= TxClk;
-      TxClkEdge <= TxClkDel and (not TxClk);
+      ClkDel    <= TxClk;
+      TxClkEdge <= ClkDel and (not TxClk);
     end if;
   end process;
-
 
   ---------------------------------------------------------------------
   -- Transmit Clock Divider
   -- Advance the count only on an input clock pulse
   ---------------------------------------------------------------------
 
---  acia_tx_clock_divide : process( Clk, TxRst, TxClkEdge, TxClkCnt )
-  acia_tx_clock_divide : process( TxRst, Clk )
+  acia_tx_clock_divide : process( Reset, Clk )
   begin
-    if TxRst = '1' then
-      TxClkCnt <= "000000";
+    if Reset = '1' then
+      ClkCnt <= "000000";
     elsif falling_edge(clk) then
       if TxClkEdge = '1' then 
-        TxClkCnt <= TxClkCnt + "000001";
-      end if; -- TxClkEdge
-    end if;	-- reset / clk
+        ClkCnt <= ClkCnt + "000001";
+      end if;
+    end if;
   end process;
 
   ---------------------------------------------------------------------
   -- Transmit Baud Clock Selector
   ---------------------------------------------------------------------
-  acia_tx_baud_clock_select : process( BdFmt, TxClk, TxClkCnt )
+  acia_tx_baud_clock_select : process( BdFmt, Clk, ClkCnt )
   begin
     -- BdFmt
     -- 0 0     - Baud Clk divide by 1
@@ -132,39 +127,14 @@ begin
     -- 1 1     - reset
     case BdFmt is
       when "00" =>	  -- Div by 1
-        TxBdClk <= TxClk;
+        BdClk <= TxClk;
       when "01" =>	  -- Div by 16
-        TxBdClk <= TxClkCnt(3);
+        BdClk <= ClkCnt(3);
       when "10" =>	  -- Div by 64
-        TxBdClk <= TxClkCnt(5);
+        BdClk <= ClkCnt(5);
       when others =>  -- reset
-        TxBdClk <= '0';
+        BdClk <= '0';
     end case;
-  end process;
-
-  ---------------------------------------------------------------------
-  -- Transmitter activation process
-  ---------------------------------------------------------------------
-  acia_tx_write : process( TxRst, Clk )
-  begin
-    if TxRst = '1' then
-      TxReq <= '0';
-      TxEmp <= '1';
-    elsif falling_edge(clk) then
-      if TxWr = '1' then
-        -- Write requests transmit and clears the Empty Flag 
-        TxReq <= '1';
-        TxEmp <= '0';
-      else
-        if (TxReq = '1') and (TxAck = '1') then
-          -- Once the transmitter is started we can clear request.
-          TxReq <= '0';
-        elsif (TxReq = '0') and (TxAck = '0') then
-          -- When the transmitter is finished, we can flag transmit empty
-          TxEmp <= '1';
-        end if;
-      end if;
-    end if;
   end process;
 
   -----------------------------------------------------------------------------
@@ -179,80 +149,101 @@ begin
   -- 1 0 1   - 8 data, no   parity, 1 stop
   -- 1 1 0   - 8 data, even parity, 1 stop
   -- 1 1 1   - 8 data, odd  parity, 1 stop
-  acia_tx_transmit :  process( TxRst, Clk )  
+  acia_tx_transmit : process(Reset, Clk)
   begin
-    if TxRst = '1' then
-      TxDat      <= '1';
-      TxShiftReg <= "00000000";
-      TxParity   <= '0';
-      TxBitCount <= "000";
-      TxAck      <= '0';
-      TxState    <= Tx1Stop_State;
+    if Reset = '1' then
+
+      Dat      <= '1';
+      ShiftReg <= "00000000";
+      Parity   <= '0';
+      BitCount <= "000";
+      State    <= SIdle;
+
     elsif falling_edge(clk) then
-      TxBdDel  <= TxBdClk;
-      if TxBdDel = '0' and TxBdClk = '1' then
-        case TxState is
-          when Tx1Stop_State =>           -- Last Stop bit state
-            TxDat <= '1';
-            TxAck <= '0';				       -- Transmitter halted
-            if TxReq = '1' then
-              TxState <= TxStart_State;
+
+      if Wr = '1' then
+        ShiftReg <= Din;            -- Load Shift reg with Tx Data
+      end if;
+      
+      BdDel <= BdClk;
+      -- On rising edge of baud clock, run the state machine
+      if BdDel = '0' and BdClk = '1' then
+
+        case State is
+          when SIdle =>
+            Dat <= '1';
+            if Start = '1' then
+              State <= SStart;
             end if;
 
-          when TxStart_State =>
-            TxDat      <= '0';            -- Start bit
-            TxShiftReg <= TxDin;		    -- Load Shift reg with Tx Data
-            TxParity   <= '0';
+          when SStart =>
+            Dat      <= '0';            -- Start bit
+            Parity   <= '0';
             if WdFmt(2) = '0' then
-              TxBitCount <= "110";       -- 7 data + parity
+              BitCount <= "110";        -- 7 data + parity
             else
-              TxBitCount <= "111";       -- 8 data
+              BitCount <= "111";        -- 8 data
             end if;
-            TxAck      <= '1';				 -- Flag transmit started
-            TxState    <= TxData_State;
+            State <= SData;
 
-          when TxData_State =>
-            TxDat       <= TxShiftReg(0);
-            TxShiftReg  <= '1' & TxShiftReg(7 downto 1);
-            TxParity    <= TxParity xor TxShiftReg(0);
-            TxBitCount  <= TxBitCount - "001";
-            if TxBitCount = "000" then
+          when SData =>
+            Dat      <= ShiftReg(0);
+            ShiftReg <= '1' & ShiftReg(7 downto 1);
+            Parity   <= Parity xor ShiftReg(0);
+            BitCount <= BitCount - "001";  
+            if BitCount = "000" then
               if (WdFmt(2) = '1') and (WdFmt(1) = '0') then
-                if WdFmt(0) = '0' then          -- 8 data bits
-                  TxState <= Tx2Stop_State;     -- 2 stops
+                if WdFmt(0) = '0' then  -- 8 data bits
+                  State <= S2Stop;      -- 2 stops
                 else
-                  TxState <= Tx1Stop_State;     -- 1 stop
+                  State <= SIdle;      -- 1 stop
                 end if;
               else
-                TxState <= TxParity_State;      -- parity
+                State <= SParity;       -- parity
               end if;
             end if;
 
-          when TxParity_State =>                -- 7/8 data + parity bit
+          when SParity =>               -- 7/8 data + parity bit
             if WdFmt(0) = '0' then
-              TxDat <= not( TxParity );        -- even parity
+              Dat <= not(Parity);       -- even parity
             else
-              TxDat <= TxParity;               -- odd parity
+              Dat <= Parity;            -- odd parity
             end if;
             if WdFmt(1) = '0' then
-              TxState <= Tx2Stop_State;         -- 2 stops
+              State <= S2Stop;          -- 2 stops
             else
-              TxState <= Tx1Stop_State;         -- 1 stop
+              State <= SIdle;          -- 1 stop
             end if;
 
-          when Tx2Stop_State =>                 -- first of two stop bits
-            TxDat   <= '1';
-            TxState <= Tx1Stop_State;
-
-          when others =>  -- Undefined
-            TxDat   <= '1';
-            TxState <= Tx1Stop_State;
+          when S2Stop =>                -- first of two stop bits
+            Dat   <= '1';
+            State <= SIdle;
 
         end case;
-
       end if;
     end if;
-
   end process;
 
-end rtl; --=================== End of architecture ====================--
+  start_state_machine : process(clk, reset)
+  begin
+    if reset = '1' then
+      Start <= '0';
+    elsif falling_edge(clk) then
+      if State = SStart then
+        Start <= '0';
+      elsif Wr = '1' and State = SIdle then
+        Start <= '1';
+      end if;
+    end if;
+  end process;
+
+  generate_empty : process(Start, State)
+  begin
+    if (Start = '1') or (State /= SIdle) then
+      Empty <= '0';
+    else
+      Empty <= '1';
+    end if;
+  end process;
+                                                            
+end rtl;

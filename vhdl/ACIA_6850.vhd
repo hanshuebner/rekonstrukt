@@ -36,14 +36,14 @@
 --                                                 Now has external TX 7 RX Baud Clock
 --                                                 inputs like the MC6850... 
 --                                                 also supports x1 clock and DCD. 
--- 3.4		John Kent			13 September 2005		Removed LoadCS signal. 
---																	Fixed ReadCS and Read in "if" in
---																	miniuart_DCD_Init process
+-- 3.4      John Kent        13 September 2005     Removed LoadCS signal. 
+--                                                 Fixed ReadCS and Read in "if" in
+--                                                 miniuart_DCD_Init process
 -- 3.5      John Kent         28 November 2006     Cleaned up code.
 --
 -- 4.0      John Kent         3 February 2007      renamed ACIA6850
 -- 4.1      John Kent         6 February 2007      Made software reset synchronous
---	4.2      John Kent         25 February 2007     Changed sensitivity lists
+-- 4.2      John Kent         25 February 2007     Changed sensitivity lists
 --                                                 Rearranged Reset process.
 --        dilbert57@opencores.org
 --
@@ -51,7 +51,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 --library unisim;
---	use unisim.vcomponents.all;
+--      use unisim.vcomponents.all;
 
 -----------------------------------------------------------------------
 -- Entity for ACIA_6850                                              --
@@ -62,25 +62,26 @@ entity ACIA_6850 is
     --
     -- CPU signals
     --
-    clk      : in  Std_Logic;  -- System Clock
-    rst      : in  Std_Logic;  -- Reset input (active high)
-    cs       : in  Std_Logic;  -- miniUART Chip Select
-    rw       : in  Std_Logic;  -- Read / Not Write
-    irq      : out Std_Logic;  -- Interrupt
-    Addr     : in  Std_Logic;  -- Register Select
-    DataIn   : in  Std_Logic_Vector(7 downto 0); -- Data Bus In 
-    DataOut  : out Std_Logic_Vector(7 downto 0); -- Data Bus Out
+    clk     : in  std_logic;                     -- System Clock
+    rst     : in  std_logic;                     -- Reset input (active high)
+    cs      : in  std_logic;                     -- miniUART Chip Select
+    rw      : in  std_logic;                     -- Read / Not Write
+    irq     : out std_logic;                     -- Interrupt
+    Addr    : in  std_logic;                     -- Register Select
+    DataIn  : in  std_logic_vector(7 downto 0);  -- Data Bus In 
+    DataOut : out std_logic_vector(7 downto 0);  -- Data Bus Out
 
     -- Uart Signals
     --
-    RxC      : in  Std_Logic;  -- Receive Baud Clock
-    TxC      : in  Std_Logic;  -- Transmit Baud Clock
-    RxD      : in  Std_Logic;  -- Receive Data
-    TxD      : out Std_Logic;  -- Transmit Data
-    DCD_n    : in  Std_Logic;  -- Data Carrier Detect
-    CTS_n    : in  Std_Logic;  -- Clear To Send
-    RTS_n    : out Std_Logic);  -- Request To send
-end ACIA_6850; --================== End of entity ==============================--
+    RxC   : in  std_logic;              -- Receive Baud Clock
+    TxC   : in  std_logic;              -- Transmit Baud Clock
+    RxD   : in  std_logic;              -- Receive Data
+    TxD   : out std_logic;              -- Transmit Data
+    DCD_n : in  std_logic;              -- Data Carrier Detect
+    CTS_n : in  std_logicc;              -- Clear To Send
+    RTS_n : out std_logic               -- Request To send
+    );
+end ACIA_6850;  --================== End of entity ==============================--
 
 -------------------------------------------------------------------------------
 -- Architecture for ACIA_6850 Interface registees
@@ -112,7 +113,7 @@ architecture rtl of ACIA_6850 is
   -- TxBE - Bit[1] - Transmit Buffer Empty (ready to accept next transmit character)
   -- RxDR - Bit[0] - Receive Data Ready (character received)
   -- 
-  signal StatReg : Std_Logic_Vector(7 downto 0) := (others => '0'); -- status register
+  signal StatReg : std_logic_vector(7 downto 0) := (others => '0'); -- status register
 
   ----------------------------------------------------------------------
   --  Control Register: CtrlReg
@@ -143,113 +144,78 @@ architecture rtl of ACIA_6850 is
   -- 0 1     - Baud Clk divide by 16
   -- 1 0     - Baud Clk divide by 64
   -- 1 1     - reset
-  signal CtrlReg : Std_Logic_Vector(7 downto 0) := (others => '0'); -- control register
+  signal CtrlReg : std_logic_vector(7 downto 0) := (others => '0'); -- control register
 
   ----------------------------------------------------------------------
   -- Receive Register
   ----------------------------------------------------------------------
   --
-  -- IO address + 1	Read
+  -- IO address + 1     Read
   --
-  signal RecvReg : Std_Logic_Vector(7 downto 0) := (others => '0');
+  signal RecvReg : std_logic_vector(7 downto 0) := (others => '0');
   ----------------------------------------------------------------------
   -- Transmit Register
   ----------------------------------------------------------------------
   --
-  -- IO address + 1	Write
+  -- IO address + 1     Write
   --
-  signal TranReg : Std_Logic_Vector(7 downto 0) := (others => '0');
+  signal TxReg : std_logic_vector(7 downto 0) := (others => '0');
   
-  signal Reset    : Std_Logic;          -- Reset (Software & Hardware)
-  signal RxRst    : Std_Logic;          -- Receive Reset (Software & Hardware)
-  signal TxRst    : Std_Logic;          -- Transmit Reset (Software & Hardware)
-  signal TxDbit   : Std_Logic;          -- Transmit data bit
-  signal RxDR     : Std_Logic := '0';   -- Receive Data ready
-  signal TxBE     : Std_Logic := '0';   -- Transmit buffer empty
+  signal Reset    : std_logic;          -- Reset (Software & Hardware)
+  signal RxRst    : std_logic;          -- Receive Reset (Software & Hardware)
+  signal TxRst    : std_logic;          -- Transmit Reset (Software & Hardware)
+  signal TxDbit   : std_logic;          -- Transmit data bit
+  signal RxDR     : std_logic := '0';   -- Receive Data ready
+  signal TxIdle   : std_logic;          -- Transmitter idle
+  signal TxBE     : std_logic := '0';   -- Transmit buffer empty
+  signal TxAck    : std_logic;          -- Byte transmitted to transmitter
   --
-  signal FErr     : Std_Logic := '0';   -- Frame error
-  signal OErr     : Std_Logic := '0';   -- Output error
-  signal PErr     : Std_Logic := '0';   -- Parity Error
+  signal FErr     : std_logic := '0';   -- Frame error
+  signal OErr     : std_logic := '0';   -- Output error
+  signal PErr     : std_logic := '0';   -- Parity Error
   --
-  signal TxIEnb   : Std_Logic := '0';   -- Transmit interrupt enable
-  signal RxIEnb   : Std_Logic := '0';   -- Receive interrupt enable
+  signal TxIEnb   : std_logic := '0';   -- Transmit interrupt enable
+  signal RxIEnb   : std_logic := '0';   -- Receive interrupt enable
   --
-  signal ReadRR   : Std_Logic := '0';   -- Read receive buffer
-  signal WriteTR  : Std_Logic := '0';   -- Write transmit buffer
-  signal ReadSR   : Std_Logic := '0';   -- Read Status register
+  signal ReadRR   : std_logic := '0';   -- Read receive buffer
+  signal WriteTR  : std_logic := '0';   -- Write transmit buffer
+  signal ReadSR   : std_logic := '0';   -- Read Status register
   --
   signal DCDState : DCD_State_Type;     -- DCD Reset state sequencer
-  signal DCDDel   : Std_Logic := '0';   -- Delayed DCD_n
-  signal DCDEdge  : Std_Logic := '0';   -- Rising DCD_N Edge Pulse
-  signal DCDInt   : Std_Logic := '0';   -- DCD Interrupt
-
-  -----------------------------------------------------------------------------
-  -- ACIA Receiver
-  -----------------------------------------------------------------------------
-  component ACIA_RX
-    port (
-      Clk          : in  Std_Logic;     -- Bus Clock signal
-      RxRst        : in  Std_Logic;     -- Reset input
-      RxRd         : in  Std_Logic;     -- Read data strobe
-      WdFmt        : in  Std_Logic_Vector(2 downto 0);  -- word format
-      BdFmt        : in  Std_Logic_Vector(1 downto 0);  -- baud format
-      RxClk        : in  Std_Logic;     -- Receive clock input
-      RxDat        : in  Std_Logic;     -- Receive data bit input
-      RxFErr       : out Std_Logic;     -- Framing Error Status signal
-      RxOErr       : out Std_Logic;     -- Overrun Error Status signal
-      RxPErr       : out Std_logic;     -- Parity Error Status signal
-      RxRdy        : out Std_Logic;     -- Data Ready Status signal
-      RxDout       : out Std_Logic_Vector(7 downto 0)  -- Receive data bus output
-      );
-  end component;
-
-  -----------------------------------------------------------------------------
-  -- ACIA Transmitter
-  -----------------------------------------------------------------------------
-  component ACIA_TX
-    port (
-      Clk    : in  Std_Logic;                    -- Bus Clock signal
-      TxRst  : in  Std_Logic;                    -- Reset input
-      TxWr   : in  Std_Logic;                    -- Load transmit data strobe
-      TxDin  : in  Std_Logic_Vector(7 downto 0); -- Transmit data bus input
-      WdFmt  : in  Std_Logic_Vector(2 downto 0); -- Word format Control signal
-      BdFmt  : in  Std_Logic_Vector(1 downto 0); -- Baud format Control signal
-      TxClk  : in  Std_Logic;                    -- Transmit clock input
-      TxDat  : out Std_Logic;                    -- Transmit data bit output
-      TxEmp  : out Std_Logic);                  -- Tx buffer empty status signal
-  end component;
+  signal DCDDel   : std_logic := '0';   -- Delayed DCD_n
+  signal DCDEdge  : std_logic := '0';   -- Rising DCD_N Edge Pulse
+  signal DCDInt   : std_logic := '0';   -- DCD Interrupt
 
 begin
   -----------------------------------------------------------------------------
   -- Instantiation of internal components
   -----------------------------------------------------------------------------
 
-  RxDev : ACIA_RX port map (
-    Clk          => clk,
-    RxRst        => RxRst,
-    RxRd         => ReadRR,
-    WdFmt        => CtrlReg(4 downto 2),
-    BdFmt        => CtrlReg(1 downto 0),
-    RxClk        => RxC,
-    RxDat        => RxD,
-    RxFErr       => FErr,
-    RxOErr       => OErr,
-    RxPErr       => PErr,
-    RxRdy        => RxDR,
-    RxDout       => RecvReg
+  RxDev : entity ACIA_RX port map (
+    Clk    => clk,
+    RxRst  => RxRst,
+    RxRd   => ReadRR,
+    WdFmt  => CtrlReg(4 downto 2),
+    BdFmt  => CtrlReg(1 downto 0),
+    RxClk  => RxC,
+    RxDat  => RxD,
+    RxFErr => FErr,
+    RxOErr => OErr,
+    RxPErr => PErr,
+    RxRdy  => RxDR,
+    RxDout => RecvReg
    );
 
-  
-  TxDev   : ACIA_TX  port map (
-    Clk      => clk,
-    TxRst    => TxRst,
-    TxWr     => WriteTR,
-    TxDin    => TranReg,
-    WdFmt    => CtrlReg(4 downto 2),
-    BdFmt    => CtrlReg(1 downto 0),
-    TxClk    => TxC,
-    TxDat    => TxDbit,
-    TxEmp    => TxBE
+  TxDev : entity ACIA_TX port map (
+    Clk   => clk,
+    Reset => TxRst,
+    Wr    => WriteTR,
+    Din   => TxReg,
+    WdFmt => CtrlReg(4 downto 2),
+    BdFmt => CtrlReg(1 downto 0),
+    TxClk => TxC,
+    Dat   => TxDbit,
+    Empty => TxIdle
    );
 
 ---------------------------------------------------------------
@@ -263,7 +229,7 @@ begin
     elsif falling_edge(clk) then
       -- Synchronous Software reset
       Reset <= CtrlReg(1) and CtrlReg(0);
-    end if;	  	 
+    end if;              
 
   end process;
 
@@ -302,16 +268,16 @@ begin
   ACIA_Control : process(CtrlReg, TxDbit)
   begin
     case CtrlReg(6 downto 5) is
-      when "00" => -- Disable TX Interrupts, Assert RTS
+      when "00" =>                      -- Disable TX Interrupts, Assert RTS
         TxD    <= TxDbit;
         TxIEnb <= '0';
-      when "01" => -- Enable TX interrupts, Assert RTS
+      when "01" =>                      -- Enable TX interrupts, Assert RTS
         TxD    <= TxDbit;
         TxIEnb <= '1';
-      when "10" => -- Disable Tx Interrupts, Clear RTS
+      when "10" =>                      -- Disable Tx Interrupts, Clear RTS
         TxD    <= TxDbit;
         TxIEnb <= '0';
-      when "11" => -- Disable Tx interrupts, Assert RTS, send break
+      when "11" =>                      -- Disable Tx interrupts, Assert RTS, send break
         TxD    <= '0';
         TxIEnb <= '0';
       when others =>
@@ -319,9 +285,23 @@ begin
     end case;
 
     RxIEnb <= CtrlReg(7);
-    
   end process;
 
+  tx_process : process(clk, reset)
+  begin
+    if reset = '1' then
+      WriteTR <= '0';
+      TxAck   <= '0';
+    elsif falling_edge(clk) then
+      WriteTR <= '0';
+      TxAck   <= '0';
+      if TxBE = '0' and TxIdle = '1' then
+        WriteTR <= '1';
+        TxAck   <= '1';
+      end if;
+    end if;
+  end process;
+        
 -----------------------------------------------------------------------------
 -- Generate Read / Write strobes.
 -----------------------------------------------------------------------------
@@ -330,14 +310,16 @@ begin
   begin
     if reset = '1' then
       CtrlReg <= (others => '0');
-      TranReg <= (others => '0');
+      TxReg   <= (others => '0');
       ReadRR  <= '0';
-      WriteTR <= '0';
       ReadSR  <= '0';
+      TxBE    <= '1';
     elsif falling_edge(clk) then
-      ReadRR  <= '0';
-      WriteTR <= '0';
-      ReadSR  <= '0';
+      ReadRR <= '0';
+      ReadSR <= '0';
+      if TxAck = '1' then
+        TxBE <= '1';
+      end if;
       if cs = '1' then
         if Addr = '0' then              -- Control / Status register
           if rw = '0' then              -- write control register
@@ -347,8 +329,8 @@ begin
           end if;
         else                            -- Data Register
           if rw = '0' then              -- write transmiter register
-            TranReg <= DataIn;
-            WriteTR <= '1';
+            TxReg <= DataIn;
+            TxBE  <= '0';
           else                          -- read receiver register
             ReadRR <= '1';
           end if;
@@ -361,7 +343,7 @@ begin
 -- Set Data Output Multiplexer
 --------------------------------------------------------------
 
-  ACIA_Data_Mux : process(Addr, RecvReg)
+  ACIA_Data_Mux : process(Addr, RecvReg, StatReg)
   begin
     if Addr = '1' then
       DataOut <= RecvReg;               -- read receiver register
@@ -392,7 +374,7 @@ begin
 ---------------------------------------------------------------
 -- If Data Carrier is lost, an interrupt is generated
 -- To clear the interrupt, first read the status register
---	then read the data receive register
+--      then read the data receive register
 
   ACIA_DCD_Int : process(reset, clk)
   begin
@@ -427,5 +409,5 @@ begin
 
   rts_n <= RxDR;
 
-end rtl; --===================== End of architecture =======================--
+end rtl;
 

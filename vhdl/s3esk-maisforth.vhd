@@ -77,7 +77,7 @@ entity my_system09 is
     SF_D                  : out std_logic_vector(11 downto 8);
 
     -- Debug
-    FX2_IO : inout std_logic_vector(8 downto 5)
+    FX2_IO : inout std_logic_vector(8 downto 1)
    );
 end my_system09;
 
@@ -150,7 +150,6 @@ architecture my_computer of my_system09 is
   signal cpu_addr          : std_logic_vector(15 downto 0);
   signal cpu_data_in       : std_logic_vector(7 downto 0);
   signal cpu_data_out      : std_logic_vector(7 downto 0);
-  
 begin
   -----------------------------------------------------------------------------
   -- Instantiation of internal components
@@ -527,7 +526,7 @@ begin
   SF_OE         <= '1';
   SF_WE         <= '1';
 
-  fx2_io <= (5 => RS232_DCE_RXD, 6 => txbit, 7 => CTS_n, 8 => RTS_n, others => '0');
+  fx2_io <= (5 => RS232_DCE_RXD, 6 => txbit, others => '0');
 
 end my_computer;  --===================== End of architecture =======================--
 
