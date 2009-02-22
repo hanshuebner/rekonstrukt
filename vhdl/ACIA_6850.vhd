@@ -78,7 +78,7 @@ entity ACIA_6850 is
     RxD   : in  std_logic;              -- Receive Data
     TxD   : out std_logic;              -- Transmit Data
     DCD_n : in  std_logic;              -- Data Carrier Detect
-    CTS_n : in  std_logicc;              -- Clear To Send
+    CTS_n : in  std_logic;              -- Clear To Send
     RTS_n : out std_logic               -- Request To send
     );
 end ACIA_6850;  --================== End of entity ==============================--
