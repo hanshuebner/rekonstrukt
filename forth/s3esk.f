@@ -1,5 +1,6 @@
 \ Software for the Spartan-3E Starter Kit
 
+\ VDU driver
 hex
 B020 constant vdu
 vdu constant vdu-char
@@ -59,6 +60,8 @@ decimal
 
 : to-vdu ['] vdu-emit 'emit ! ;
 : to-uart [ inside ] ['] uart-emit [ forth ] 'emit ! ;
+
+\ LCD/Keys/LEDs
 
 hex
 B030 constant leds
@@ -183,6 +186,8 @@ hex
         key?
     until
     key drop ;
+
+\ MAX7221 tests
 
 : matrix-init
     C00 spi-send \ shutdown
