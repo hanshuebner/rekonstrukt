@@ -1,6 +1,4 @@
-vocabulary s3esk
-s3esk definitions
-s3esk
+\ Software for the Spartan-3E Starter Kit
 
 hex
 B020 constant vdu

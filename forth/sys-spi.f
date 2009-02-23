@@ -1,3 +1,7 @@
+\ Software and driver for the Spartan-3E Starter Kit's peripheral
+\ chips connected to the SPI bus.  Contains (the beginnings of)
+\ block memory words backed by the serial Flash chip.
+
 vocabulary rekonstrukt
 rekonstrukt definitions
 

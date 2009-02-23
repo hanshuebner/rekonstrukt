@@ -1,4 +1,4 @@
-\ Hans' stuff
+\ Software for the old SECD interface hardware, now obsolete
 
 \ SECD interface
 EXTRA:

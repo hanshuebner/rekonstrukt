@@ -1,0 +1,14 @@
+This is the top level source directory of the Rekonstrukt Forth
+system.  See http://rekonstrukt.googlecode.com/ for the official
+project pages.
+
+This file documents the top level directory structure:
+
+forth     Software written in Forth for Rekonstrukt.
+ise       Xilinx ISE project directory
+maisforth Source code for the Maisforth kernel
+mkfiles   David Burnett's make library for Xilinx ISE
+testbench VHDL test benches for some IP cores
+tools     Various tools used to recompile Rekonstrukt
+usim      Ray Brellis' MC6809 simulator written in C++
+vhdl      VHDL sources for the Rekonstrukt hardware
