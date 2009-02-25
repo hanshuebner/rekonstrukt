@@ -156,12 +156,12 @@ decimal
 \ assembler tests
 
 hex
-code set-leds
-    B030 # ldx
-    reg d puls
-    x ) stb
-    next
-end-code
+CODE SET-LEDS
+    B030 # LDX
+    X ) STB
+    REG D PULS
+    NEXT
+END-CODE
 
 hex
 B040 constant spi-lsb
