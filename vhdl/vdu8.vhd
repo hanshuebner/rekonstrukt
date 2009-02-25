@@ -19,26 +19,26 @@
 --
 
 Library IEEE;
-  use IEEE.std_logic_1164.all;
-  use IEEE.numeric_std.all;
+use IEEE.std_logic_1164.all;
+use IEEE.numeric_std.all;
 Library unisim;
-  use unisim.vcomponents.all;
+use unisim.vcomponents.all;
 
 Entity vdu8 is
   generic(
-        VDU_CLK_FREQ           : integer := 12500000; -- HZ
-        VGA_CLK_FREQ           : integer := 25000000; -- HZ
-	     VGA_HOR_CHARS          : integer := 80; -- CHARACTERS
-	     VGA_VER_CHARS          : integer := 25; -- CHARACTERS
-	     VGA_PIX_PER_CHAR       : integer := 8;  -- PIXELS
-	     VGA_LIN_PER_CHAR       : integer := 16; -- LINES
-	     VGA_HOR_BACK_PORCH     : integer := 40; -- PIXELS
-	     VGA_HOR_SYNC           : integer := 96; -- PIXELS
-	     VGA_HOR_FRONT_PORCH    : integer := 24; -- PIXELS
-	     VGA_VER_BACK_PORCH     : integer := 13; -- LINES
-	     VGA_VER_SYNC           : integer := 1;  -- LINES
-	     VGA_VER_FRONT_PORCH    : integer := 36  -- LINES
-  );
+    VDU_CLK_FREQ           : integer := 12500000; -- HZ
+    VGA_CLK_FREQ           : integer := 25000000; -- HZ
+    VGA_HOR_CHARS          : integer := 80; -- CHARACTERS
+    VGA_VER_CHARS          : integer := 25; -- CHARACTERS
+    VGA_PIX_PER_CHAR       : integer := 8;  -- PIXELS
+    VGA_LIN_PER_CHAR       : integer := 16; -- LINES
+    VGA_HOR_BACK_PORCH     : integer := 40; -- PIXELS
+    VGA_HOR_SYNC           : integer := 96; -- PIXELS
+    VGA_HOR_FRONT_PORCH    : integer := 24; -- PIXELS
+    VGA_VER_BACK_PORCH     : integer := 13; -- LINES
+    VGA_VER_SYNC           : integer := 1;  -- LINES
+    VGA_VER_FRONT_PORCH    : integer := 36  -- LINES
+    );
   port(
     -- control register interface
     vdu_clk      : in  std_logic;       -- 12.5/25 MHz CPU Clock
@@ -177,11 +177,11 @@ begin
 --
 -- instantiate Character generator ROM
 --
-vdu_char_rom : char_rom port map(
+  vdu_char_rom : char_rom port map(
     clk   => vga_clk,
-	 rst   => vdu_rst,
-	 cs    => '1',
-	 rw    => '1',
+    rst   => vdu_rst,
+    cs    => '1',
+    rw    => '1',
     addr  => char_addr,
     wdata => "00000000",
     rdata => char_data_out
@@ -190,7 +190,7 @@ vdu_char_rom : char_rom port map(
 --
 -- Character buffer RAM
 --
-char_buff_ram : ram_2k port map(
+  char_buff_ram : ram_2k port map(
     clk   => vga_clk,
     rst   => vdu_rst,
     cs    => vga_cs,
@@ -256,8 +256,8 @@ char_buff_ram : ram_2k port map(
 -- CPU Read interface
 --
   vga_cpu_read : process(vdu_addr, vdu_cs,
-                          reg_character, reg_colour,
-                          reg_hcursor, reg_vcursor, reg_voffset)
+                         reg_character, reg_colour,
+                         reg_hcursor, reg_vcursor, reg_voffset)
   begin
     case vdu_addr is
       when "000" =>
