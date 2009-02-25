@@ -498,7 +498,7 @@ begin
     end if;
   end process;
 
-  reset_key : process(sysclk)
+  reset_key : process(sysclk, dcm_locked)
   begin
     if dcm_locked = '0' then
       reset_n <= '0';
@@ -526,7 +526,7 @@ begin
   SF_OE         <= '1';
   SF_WE         <= '1';
 
-  fx2_io <= (5 => RS232_DCE_RXD, 6 => txbit, others => '0');
+  fx2_io <= (5 => RS232_DCE_RXD, 6 => txbit, 7 => cpu_irq, 8 => cpu_firq, others => '0');
 
 end my_computer;  --===================== End of architecture =======================--
 

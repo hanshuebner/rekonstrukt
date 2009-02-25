@@ -12,6 +12,7 @@ wave -noreg data_in
 wave -noreg data_out
 wave -noreg clk_1mhz
 wave -noreg midi_clk
+wave -noreg timer_irq
 # The following lines can be used for timing simulation
 # acom <backannotated_vhdl_file_name>
 # comp -include "C:\hans\rekonstrukt\testbench\timer_TB_tim_cfg.vhd" 
