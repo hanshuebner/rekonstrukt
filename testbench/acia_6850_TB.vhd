@@ -25,8 +25,7 @@ architecture TB_ARCHITECTURE of acia_6850_tb is
       TxD     : out STD_LOGIC;
       DCD_n   : in  STD_LOGIC;
       CTS_n   : in  STD_LOGIC;
-      RTS_n   : out STD_LOGIC;
-      debug   : out STD_LOGIC);
+      RTS_n   : out STD_LOGIC);
   end component;
 
   -- Stimulus signals - signals mapped to the input and inout ports of tested entity
@@ -46,7 +45,6 @@ architecture TB_ARCHITECTURE of acia_6850_tb is
   signal DataOut : STD_LOGIC_VECTOR(7 downto 0);
   signal TxD     : STD_LOGIC;
   signal RTS_n   : STD_LOGIC;
-  signal debug   : STD_LOGIC;
 
   -- Add your code here ...
 
@@ -69,8 +67,7 @@ begin
       TxD     => TxD,
       DCD_n   => DCD_n,
       CTS_n   => CTS_n,
-      RTS_n   => RTS_n,
-      debug   => debug
+      RTS_n   => RTS_n
       );
 
   -- Add your stimulus here ...
