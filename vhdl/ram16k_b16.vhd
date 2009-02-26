@@ -37,8 +37,8 @@ end ram_16k;
 architecture rtl of ram_16k is
 
   signal we    : std_logic;
-  signal dp    : std_logic_vector(15 downto 0);
-  signal ce    : std_logic_vector(15 downto 0);
+  signal dp    : std_logic_vector(7 downto 0);
+  signal ce    : std_logic_vector(7 downto 0);
   signal rdata_0 : std_logic_vector(7 downto 0);
   signal rdata_1 : std_logic_vector(7 downto 0);
   signal rdata_2 : std_logic_vector(7 downto 0);

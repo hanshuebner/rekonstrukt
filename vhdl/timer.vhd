@@ -85,7 +85,7 @@ begin
     end if;
   end process;
 
-  handle_host_read : process(midi_div, timer_state)
+  handle_host_read : process(midi_div, timer_state, addr)
   begin
     case addr is
       -- Midi clock readback

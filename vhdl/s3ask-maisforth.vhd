@@ -511,7 +511,7 @@ begin
 --
   my_clock_divider: process( SysClk )
   begin
-    if SysClk'event and SysClk='0' then
+    if falling_edge(SysClk) then
       clock_div <= clock_div + "01";
     end if;
   end process;

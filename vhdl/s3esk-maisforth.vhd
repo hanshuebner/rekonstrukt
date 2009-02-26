@@ -160,6 +160,8 @@ architecture my_computer of my_system09 is
   signal cpu_addr          : std_logic_vector(15 downto 0);
   signal cpu_data_in       : std_logic_vector(7 downto 0);
   signal cpu_data_out      : std_logic_vector(7 downto 0);
+  -- Unused SPI CS signals need to be connected to something, so here:
+  signal unused_cs         : std_logic_vector(15 downto 0);
 begin
   -----------------------------------------------------------------------------
   -- Instantiation of internal components
@@ -319,7 +321,7 @@ begin
     spi_mosi             => j4(1),
     spi_miso             => j4(2),
     spi_cs_n(0)          => j4(3),
-    spi_cs_n(7 downto 1) => open
+    spi_cs_n(7 downto 1) => unused_cs(6 downto 0)
    );
 
   my_sys_spi_master : entity spi_master port map (
@@ -339,8 +341,15 @@ begin
     spi_cs_n(2)          => ad_conv_n,
     spi_cs_n(3)          => SPI_SS_B,
     spi_cs_n(4)          => SF_CE0,
-    spi_cs_n(7 downto 5) => open
+    spi_cs_n(7 downto 5) => unused_cs(9 downto 7)
    );
+
+  my_clock_div : entity clock_div port map (
+    clk        => sysclk,
+    reset      => cpu_reset,
+    clk_1mhz   => clk_1mhz,
+    clk_500khz => open
+    );
 
   my_timer : entity timer port map (
     clk       => sysclk,
@@ -368,15 +377,16 @@ begin
 ----------------------------------------------------------------------
 
   mem_decode: process(sysclk, reset_n,
-                       cpu_addr, cpu_rw, cpu_vma,
-                       rom_data_out, 
-                       ram_data_out,
-                       uart_data_out,
-                       keyboard_data_out,
-                       vdu_data_out,
-                       led_reg, sw, rot_a, rot_b, rot_center,
-                       btn_north, btn_west, btn_east, btn_south,
-                       spi_data_out, sys_spi_data_out)
+                      cpu_addr, cpu_rw, cpu_vma,
+                      rom_data_out, 
+                      ram_data_out,
+                      uart_data_out,
+                      keyboard_data_out,
+                      vdu_data_out,
+                      led_reg, sw, rot_a, rot_b, rot_center,
+                      btn_north, btn_west, btn_east, btn_south,
+                      spi_data_out, sys_spi_data_out,
+                      timer_data_out, irq_buffer)
     variable decode_addr : std_logic_vector(1 downto 0);
   begin
     decode_addr := cpu_addr(15 downto 14);
@@ -390,6 +400,7 @@ begin
     uart_cs     <= '0';
     keyboard_cs <= '0';
     vdu_cs      <= '0';
+    timer_cs    <= '0';
 
     case decode_addr is
 
@@ -503,7 +514,7 @@ begin
 --
 -- Interrupts and other bus control signals
 --
-  interrupts : process(reset_n, uart_irq, keyboard_irq)
+  interrupts : process(reset_n, uart_irq, keyboard_irq, timer_irq, spi_irq, sys_spi_irq)
   begin
     cpu_reset <= not reset_n; -- CPU reset is active high
     cpu_irq   <= uart_irq or keyboard_irq or timer_irq or spi_irq or sys_spi_irq;

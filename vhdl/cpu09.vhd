@@ -402,7 +402,7 @@ begin
 --                           return_state, fetch_state  )
   state_stack_proc : process(clk, state_stack)
   begin
-    if clk'event and clk = '0' then
+    if falling_edge(clk) then
       if hold = '1' then
         state_stack(0) <= state_stack(0);
         state_stack(1) <= state_stack(1);
@@ -440,7 +440,7 @@ begin
 --pc_reg: process( clk, pc_ctrl, hold, pc, out_alu, data_in )
   pc_reg : process(clk)
   begin
-    if clk'event and clk = '0' then
+    if falling_edge(clk) then
       if hold = '1' then
         pc <= pc;
       else
@@ -473,7 +473,7 @@ begin
   ea_reg : process(clk)
   begin
 
-    if clk'event and clk = '0' then
+    if falling_edge(clk) then
       if hold = '1' then
         ea <= ea;
       else
@@ -504,7 +504,7 @@ begin
 --acca_reg : process( clk, acca_ctrl, hold, out_alu, acca, data_in )
   acca_reg : process(clk)
   begin
-    if clk'event and clk = '0' then
+    if falling_edge(clk) then
       if hold = '1' then
         acca <= acca;
       else
@@ -533,7 +533,7 @@ begin
 --accb_reg : process( clk, accb_ctrl, hold, out_alu, accb, data_in )
   accb_reg : process(clk)
   begin
-    if clk'event and clk = '0' then
+    if falling_edge(clk) then
       if hold = '1' then
         accb <= accb;
       else
@@ -560,7 +560,7 @@ begin
 --ix_reg : process( clk, ix_ctrl, hold, out_alu, xreg, data_in )
   ix_reg : process(clk)
   begin
-    if clk'event and clk = '0' then
+    if falling_edge(clk) then
       if hold = '1' then
         xreg <= xreg;
       else
@@ -589,7 +589,7 @@ begin
 --iy_reg : process( clk, iy_ctrl, hold, out_alu, yreg, data_in )
   iy_reg : process(clk)
   begin
-    if clk'event and clk = '0' then
+    if falling_edge(clk) then
       if hold = '1' then
         yreg <= yreg;
       else
@@ -618,7 +618,7 @@ begin
 --sp_reg : process( clk, sp_ctrl, hold, sp, out_alu, data_in, nmi_enable )
   sp_reg : process(clk)
   begin
-    if clk'event and clk = '0' then
+    if falling_edge(clk) then
       if hold = '1' then
         sp         <= sp;
         nmi_enable <= nmi_enable;
@@ -653,7 +653,7 @@ begin
 --up_reg : process( clk, up_ctrl, hold, up, out_alu, data_in )
   up_reg : process(clk)
   begin
-    if clk'event and clk = '0' then
+    if falling_edge(clk) then
       if hold = '1' then
         up <= up;
       else
@@ -682,7 +682,7 @@ begin
 --md_reg : process( clk, md_ctrl, hold, out_alu, data_in, md )
   md_reg : process(clk)
   begin
-    if clk'event and clk = '0' then
+    if falling_edge(clk) then
       if hold = '1' then
         md <= md;
       else
@@ -719,7 +719,7 @@ begin
 --cc_reg: process( clk, cc_ctrl, hold, cc_out, cc, data_in )
   cc_reg : process(clk)
   begin
-    if clk'event and clk = '0' then
+    if falling_edge(clk) then
       if hold = '1' then
         cc <= cc;
       else
@@ -747,7 +747,7 @@ begin
 --dp_reg: process( clk, dp_ctrl, hold, out_alu, dp, data_in )
   dp_reg : process(clk)
   begin
-    if clk'event and clk = '0' then
+    if falling_edge(clk) then
       if hold = '1' then
         dp <= dp;
       else
@@ -775,7 +775,7 @@ begin
 --iv_mux: process( clk, iv_ctrl, hold, iv )
   iv_mux : process(clk)
   begin
-    if clk'event and clk = '0' then
+    if falling_edge(clk) then
       if hold = '1' then
         iv <= iv;
       else
@@ -813,7 +813,7 @@ begin
 --op_reg: process( clk, op_ctrl, hold, op_code, data_in )
   op_reg : process(clk)
   begin
-    if clk'event and clk = '0' then
+    if falling_edge(clk) then
       if hold = '1' then
         op_code <= op_code;
       else
@@ -840,7 +840,7 @@ begin
 --pre_reg: process( clk, pre_ctrl, hold, pre_code, data_in )
   pre_reg : process(clk)
   begin
-    if clk'event and clk = '0' then
+    if falling_edge(clk) then
       if hold = '1' then
         pre_code <= pre_code;
       else
@@ -866,7 +866,7 @@ begin
 --change_state: process( clk, rst, state, hold, next_state )
   change_state : process(clk)
   begin
-    if clk'event and clk = '0' then
+    if falling_edge(clk) then
       if rst = '1' then
         state <= reset_state;
       else
@@ -889,7 +889,7 @@ begin
 --nmi_reg: process( clk, nmi_ctrl, hold, nmi_ack )
   nmi_reg : process(clk)
   begin
-    if clk'event and clk = '0' then
+    if falling_edge(clk) then
       if hold = '1' then
         nmi_ack <= nmi_ack;
       else
@@ -917,7 +917,7 @@ begin
   begin
     if rst = '1' then
       nmi_req <= '0';
-    elsif clk'event and clk = '0' then
+    elsif falling_edge(clk) then
       if (nmi = '1') and (nmi_ack = '0') and (nmi_enable = '1') then
         nmi_req <= '1';
       else

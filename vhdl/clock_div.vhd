@@ -27,7 +27,7 @@ begin
     if reset = '1' then
       count1 <= (others => '0');
       count2 <= (others => '0');
-    elsif rising_edge(clk) then
+    elsif falling_edge(clk) then
       count1 <= count1 + 1;
       if unsigned(count1) = 24 then
         count1 <= (others => '0');
@@ -38,7 +38,7 @@ begin
 
   gen_clk_1mhz : process(clk)
   begin
-    if rising_edge(clk) then
+    if falling_edge(clk) then
       if unsigned(count1) = 1 then
         clk_1mhz <= '1';
       elsif unsigned(count1) = 13 then

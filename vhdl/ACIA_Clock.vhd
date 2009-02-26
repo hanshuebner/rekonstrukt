@@ -43,7 +43,7 @@ begin
 --
   my_acia_clock: process( clk  )
   begin
-    if(clk'event and clk = '0') then
+    if falling_edge(clk) then
       if( acia_count = (FULL_CYCLE - 1) )	then
         acia_clk   <= '0';
         acia_count <= (others => '0'); --"000000";

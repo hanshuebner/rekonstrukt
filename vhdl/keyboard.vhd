@@ -100,7 +100,7 @@ keyboard_strobe : process( clk, rst, cs, rw, kbd_stat  )
 begin
 	if( rst = '1' ) then
 		kbd_read <= '0';
-	elsif( clk'event and clk='0' ) then
+	elsif falling_edge(clk) then
 		if( cs='1' and rw='1' and addr='1' ) then
 			kbd_read <= '1';
 		elsif( kbd_stat(0)='1' ) then
@@ -133,7 +133,7 @@ begin
 	   kbd_ctrl   <= "00";
 	   kbd_tx_data <= "00000000";
 		kbd_write  <= '0';
-	elsif( clk'event and clk='0' ) then
+	elsif falling_edge(clk) then
 		if( cs='1' and rw='0' ) then
 			if( addr='1' ) then
 				kbd_tx_data  <= data_in;

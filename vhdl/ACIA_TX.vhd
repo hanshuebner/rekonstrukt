@@ -118,7 +118,7 @@ begin
   ---------------------------------------------------------------------
   -- Transmit Baud Clock Selector
   ---------------------------------------------------------------------
-  acia_tx_baud_clock_select : process( BdFmt, Clk, ClkCnt )
+  acia_tx_baud_clock_select : process( BdFmt, Clk, ClkCnt, TxClk )
   begin
     -- BdFmt
     -- 0 0     - Baud Clk divide by 1

@@ -226,7 +226,7 @@ begin
       reg_voffset   <= "00000";
       req_write     <= '0';
 
-    elsif vdu_clk'event and vdu_clk = '0' then
+    elsif falling_edge(vdu_clk) then
       if (vdu_cs = '1') and (vdu_rw = '0') then
         case vdu_addr is
           when "000" =>
@@ -299,7 +299,7 @@ begin
       vga_rw    <= '1';
       vga_addr  <= "00000000000";
 
-    elsif vga_clk'event and vga_clk = '0' then
+    elsif falling_edge(vga_clk) then
       --
       -- on h_count = 0 initiate character write.
       -- all other cycles are reads.
@@ -360,7 +360,7 @@ begin
       vga_blue_o    <= '0';
       -- Put all video signals through DFFs to elminate any delays that cause a blurry image
 
-    elsif vga_clk'event and vga_clk = '0' then
+    elsif falling_edge(vga_clk) then
       -- Character Data valid on 1 count
       if h_count(2 downto 0) = "000" then
         if (req_write = '1') and (ack_write = '0') then
@@ -421,7 +421,7 @@ begin
 --
   vga_sync : process(vga_clk)
   begin
-    if vga_clk'event and vga_clk = '0' then
+    if falling_edge(vga_clk) then
       --
       -- H_count counts pixels (640 + extra time for sync signals)
       --

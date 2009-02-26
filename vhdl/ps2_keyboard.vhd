@@ -308,7 +308,7 @@ end process;
 -- spurious state machine transitions.
 ps2_synch : process(clk, ps2_clk, ps2_data)
 begin
-  if clk'event and clk='0' then
+  if falling_edge(clk) then
     ps2_clk_s <= ps2_clk;
     ps2_data_s <= ps2_data;
   end if;
@@ -317,7 +317,7 @@ end process;
 -- State register
 m1_state_register : process( clk, reset, m1_state )
 begin
-  if clk'event and clk='0' then
+  if falling_edge(clk) then
     if (reset = '1') then
 	    m1_state <= m1_rx_clk_h;
     else 
@@ -465,7 +465,7 @@ end process;
 -- This is the bit counter
 bit_counter: process(clk, reset, m1_state, bit_count )
 begin
-  if clk'event and clk = '0' then
+  if falling_edge(clk) then
     if ( reset = '1' ) or
        ( rx_shifting_done = '1' ) or
        (m1_state = m1_tx_wait_keyboard_ack) then       -- After tx is done.
@@ -516,7 +516,7 @@ tx_parity_bit <= not( tx_data(7) xor tx_data(6) xor tx_data(5) xor tx_data(4) xo
 q_shift : process(clk, tx_write_ack_o, tx_parity_bit, tx_data,
                   m1_state, q, ps2_data_s, rx_shifting_done )
 begin
-  if clk'event and clk='0' then
+  if falling_edge(clk) then
     if (reset = '1') then
 	    q <= "00000000000";
     elsif (tx_write_ack_o = '1') then
@@ -544,7 +544,7 @@ end process;
 -- This is the 60usec timer counter
 timer60usec: process(clk, enable_timer_60usec, timer_60usec_count)
 begin
-  if clk'event and clk = '0' then
+  if falling_edge(clk) then
     if (enable_timer_60usec = '0') then
 	    timer_60usec_count <= (others => '0');
     elsif (timer_60usec_done = '0') then
@@ -562,7 +562,7 @@ end process;
 -- This is the 5usec timer counter
 timer5usec : process(clk, enable_timer_5usec, timer_5usec_count )
 begin
-  if clk'event and clk = '0' then
+  if falling_edge(clk) then
     if (enable_timer_5usec = '0') then
 	   timer_5usec_count <= (others => '0');
     elsif (timer_5usec_done = '0') then
@@ -583,7 +583,7 @@ end process;
 -- until the entire set of output data can be assembled.
 special_scan : process(clk, reset, rx_output_event, rx_shifting_done, extended, released )
 begin
-  if clk'event and clk='0' then
+  if falling_edge(clk) then
     if (reset = '1') or (rx_output_event = '1')	then
       hold_extended <= '0';
       hold_released <= '0';
@@ -602,7 +602,7 @@ end process;
 -- These bits contain the status of the two shift keys
 left_shift_proc : process(clk, reset, q, rx_shifting_done, hold_released )
 begin
-  if clk'event and clk = '0' then
+  if falling_edge(clk) then
     if (reset = '1') then
 	   left_shift_key <= '0';
     elsif (q(8 downto 1) = LEFT_SHIFT) and 
@@ -619,7 +619,7 @@ end process;
 
 right_shift_proc : process(clk, reset, q, rx_shifting_done, hold_released )
 begin
-  if clk'event and clk = '0' then
+  if falling_edge(clk) then
     if (reset = '1') then
 	   right_shift_key <= '0';
     elsif (q(8 downto 1) = RIGHT_SHIFT) and
@@ -642,7 +642,7 @@ rx_shift_key_on <= shift_key_on;
 --
 ctrl_proc : process(clk, reset, q, rx_shifting_done, hold_released )
 begin
-  if clk'event and clk = '0' then
+  if falling_edge(clk) then
     if (reset = '1') then
 	   ctrl_key_on <= '0';
     elsif (q(8 downto 1) = CTRL_CODE) and
@@ -662,7 +662,7 @@ end process;
 --
 caps_proc : process(clk, reset, q, rx_shifting_done, hold_released, caps_key_on )
 begin
-  if clk'event and clk = '0' then
+  if falling_edge(clk) then
     if (reset = '1') then
 	   caps_key_on <= '0';
     elsif (q(8 downto 1) = CAPS_CODE) and
@@ -678,7 +678,7 @@ special_scan_proc : process(clk, reset,
 									 hold_extended, hold_released, 
 									 q, ascii, ctrl_key_on )
 begin
-  if clk'event and clk = '0' then
+  if falling_edge(clk) then
     if (reset = '1')	then
       rx_extended <= '0';
       rx_released <= '0';
@@ -712,7 +712,7 @@ begin
     rx_output_event <= '0';
   end if;
 
-  if clk'event and clk = '0' then
+  if falling_edge(clk) then
     if reset = '1' then
 	   rx_output_strobe <= '0';
     elsif (rx_shifting_done = '1') and
