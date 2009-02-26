@@ -20,7 +20,7 @@ architecture TB_ARCHITECTURE of timer_tb is
       data_in   : in  STD_LOGIC_VECTOR(7 downto 0);
       data_out  : out STD_LOGIC_VECTOR(7 downto 0);
       clk_1mhz  : in  STD_LOGIC;
-      midi_clk  : out STD_LOGIC;
+      clk_midi  : out STD_LOGIC;
       timer_irq : out STD_LOGIC);
   end component;
 
@@ -34,7 +34,7 @@ architecture TB_ARCHITECTURE of timer_tb is
   signal clk_1mhz  : STD_LOGIC;
   -- Observed signals - signals mapped to the output ports of tested entity
   signal data_out  : STD_LOGIC_VECTOR(7 downto 0);
-  signal midi_clk  : STD_LOGIC;
+  signal clk_midi  : STD_LOGIC;
   signal timer_irq : STD_LOGIC;
 
   -- Add your code here ...
@@ -52,7 +52,7 @@ begin
       data_in   => data_in,
       data_out  => data_out,
       clk_1mhz  => clk_1mhz,
-      midi_clk  => midi_clk,
+      clk_midi  => clk_midi,
       timer_irq => timer_irq
       );
 
@@ -85,16 +85,33 @@ begin
       wait until rising_edge(clk);
     end procedure;
 
+    procedure wait_for_timer is
+      variable busy : std_logic;
+    begin
+      loop
+        wait until rising_edge(clk);
+        cs   <= '1';
+        rw   <= '1';
+        addr <= "100";
+        busy := data_out(0);
+        wait until rising_edge(clk);
+        cs   <= '0';
+        wait until rising_edge(clk);
+        exit when busy = '0';
+      end loop;
+    end procedure;
+    
   begin
     wait for 600 ns;
     set_reg("001", X"FF");
     set_reg("010", X"FF");
     set_reg("000", X"01");
-    
+
+    wait for 1ms;
     set_reg("101", X"00");
     set_reg("110", X"0A");              -- 10 ms
     set_reg("100", X"01");              -- timer running now
-    wait for 14ms;
+    wait_for_timer;
     set_reg("100", X"00");              -- acknowledge IRQ
     wait;
   end process;

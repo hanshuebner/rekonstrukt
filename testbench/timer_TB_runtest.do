@@ -11,7 +11,7 @@ wave -noreg addr
 wave -noreg data_in
 wave -noreg data_out
 wave -noreg clk_1mhz
-wave -noreg midi_clk
+wave -noreg clk_midi
 wave -noreg timer_irq
 # The following lines can be used for timing simulation
 # acom <backannotated_vhdl_file_name>

@@ -232,3 +232,14 @@ decimal
     59 emit
     s>d d.string type
     72 emit ;
+
+\ timer
+hex
+B050 constant midi-control
+B051 constant midi-clock-msb
+B052 constant midi-clock-lsb
+B054 constant timer-control
+B055 constant timer-msb
+B056 constant timer-lsb
+
+CODE wait-irq SYNC NEXT END-CODE

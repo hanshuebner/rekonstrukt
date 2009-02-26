@@ -81,6 +81,8 @@ architecture rtl of spi_master is
   signal deselect        : std_logic;
   -- Flag to indicate that an IRQ should be generated at the end of a transfer
   signal irq_enable      : std_logic;
+  -- Signal to clear IRQ
+  signal irqack          : std_logic;
   -- Internal chip select signal, will be demultiplexed through the cs_mux
   signal spi_cs          : std_logic;
   -- Current SPI device address
@@ -98,7 +100,8 @@ begin
       transfer_length <= "11";
       spi_data_buf    <= (others => '0');
     elsif falling_edge(clk) then
-      start <= '0';
+      start  <= '0';
+      irqack <= '0';
       if cs = '1' and rw = '0' then
         case addr is
           when "00" =>
@@ -110,6 +113,7 @@ begin
             deselect   <= data_in(1);
             irq_enable <= data_in(2);
             spi_addr   <= data_in(6 downto 4);
+            irqack     <= '1';
           when "11" =>
             spi_clk_divide  <= data_in(1 downto 0);
             transfer_length <= data_in(3 downto 2);
@@ -161,10 +165,10 @@ begin
       spi_clk_out  <= '0';
       spi_cs       <= '0';
       state        <= s_idle;
-      irq          <= 'Z';
+      irq          <= '0';
     elsif falling_edge(clk) then
       prev_spi_clk <= spi_clk_buf;
-      irq          <= 'Z';
+      irq          <= '0';
       case state is
         when s_idle =>
           if start = '1' then
@@ -188,12 +192,17 @@ begin
                 spi_cs <= '0';
               end if;
               if irq_enable = '1' then
-                irq <= '1';
+                irq   <= '1';
+                state <= s_done;
               end if;
               state <= s_idle;
             end if;
           elsif prev_spi_clk = '0' and spi_clk_buf = '1' then
             spi_clk_out <= '1';
+          end if;
+        when s_done =>
+          if irqack = '1' then
+            state <= s_idle;
           end if;
         when others =>
           null;

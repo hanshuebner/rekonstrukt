@@ -134,10 +134,20 @@ architecture my_computer of my_system09 is
   -- SPI
   signal spi_cs            : std_logic;
   signal spi_data_out      : std_logic_vector(7 downto 0);
+  signal spi_irq           : std_logic;
   -- System SPI
   signal sys_spi_cs        : std_logic;
   signal sys_spi_data_out  : std_logic_vector(7 downto 0);
+  signal sys_spi_irq       : std_logic;
   signal ad_conv_n         : std_logic;
+  -- Timer / MIDI
+  signal timer_cs          : std_logic;
+  signal timer_irq         : std_logic;
+  signal timer_data_out    : std_logic_vector(7 downto 0);
+  signal clk_1mhz          : std_logic;
+  signal clk_midi          : std_logic;
+  -- IRQ buffer
+  signal irq_buffer        : std_logic_vector(7 downto 0);
   -- CPU Interface signals
   signal cpu_reset         : std_logic;
   signal cpu_rw            : std_logic;
@@ -304,7 +314,7 @@ begin
     addr                 => cpu_addr(1 downto 0),
     data_in              => cpu_data_out,
     data_out             => spi_data_out,
-    irq                  => open,
+    irq                  => spi_irq,
     spi_clk              => j4(0),
     spi_mosi             => j4(1),
     spi_miso             => j4(2),
@@ -320,7 +330,7 @@ begin
     addr                 => cpu_addr(1 downto 0),
     data_in              => cpu_data_out,
     data_out             => sys_spi_data_out,
-    irq                  => open,
+    irq                  => sys_spi_irq,
     spi_clk              => SPI_SCK,
     spi_mosi             => SPI_MOSI,
     spi_miso             => SPI_MISO,
@@ -331,6 +341,20 @@ begin
     spi_cs_n(4)          => SF_CE0,
     spi_cs_n(7 downto 5) => open
    );
+
+  my_timer : entity timer port map (
+    clk       => sysclk,
+    rst       => cpu_reset,
+    cs        => timer_cs,
+    rw        => cpu_rw,
+    addr      => cpu_addr(2 downto 0),
+    data_in   => cpu_data_in,
+    data_out  => timer_data_out,
+    --
+    clk_1mhz  => clk_1mhz,
+    clk_midi  => clk_midi,
+    timer_irq => timer_irq
+    );
 
   my_clock_synthesis : entity clock_synthesis port map (
     CLKIN_IN   => CLK_50MHZ,
@@ -448,6 +472,19 @@ begin
                   null;
               end case;
 
+            --
+            -- Timers & MIDI clock generation $B050-$B057
+            --
+            when X"5" =>
+              cpu_data_in <= timer_data_out;
+              timer_cs    <= cpu_vma;
+
+            --
+            -- IRQ buffer readout $B0F0
+            --
+            when X"F" =>
+              cpu_data_in <= irq_buffer;
+
             when others =>
               null;
 
@@ -469,12 +506,19 @@ begin
   interrupts : process(reset_n, uart_irq, keyboard_irq)
   begin
     cpu_reset <= not reset_n; -- CPU reset is active high
-    cpu_irq   <= uart_irq or keyboard_irq;
+    cpu_irq   <= uart_irq or keyboard_irq or timer_irq or spi_irq or sys_spi_irq;
     cpu_nmi   <= '0';
     cpu_firq  <= '0';
     cpu_halt  <= '0';
     cpu_hold  <= '0';
   end process;
+
+  irq_buffer <= (0 => uart_irq,
+                 1 => keyboard_irq,
+                 2 => timer_irq,
+                 3 => spi_irq,
+                 4 => sys_spi_irq,
+                 others => '0');
 
   set_leds : process(sysclk)
   begin
