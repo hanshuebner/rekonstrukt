@@ -54,7 +54,7 @@ end;
 architecture rtl of spi_master is
 
   -- State type of the SPI transfer state machine
-  type   state_type is (s_idle, s_running);
+  type   state_type is (s_idle, s_running, s_done);
   signal state           : state_type;
   -- Shift register
   signal shift_reg       : std_logic_vector(15 downto 0);
