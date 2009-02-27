@@ -1868,6 +1868,9 @@ FORTH:
 EXTRA:
 CREATE BUILD-INFO BUILD-INFO
 
+CODE SYNC-IRQ ( -- byte ) \ puts IRQ source onto the stack
+    SYNC NEXT END-CODE
+
 CODE COLD ( ? -- )   \ cold start Forth system (AN) 2004
   CLRA      A DP TFR          \ initial DP, direct page
   ' S0 >BODY @ # LDS           \ initial SP
@@ -2136,10 +2139,27 @@ INSIDE:
 ONLY:
 : [ELSE]  ( -- )     0 [CONDITIONAL] ; IMMEDIATE
 : [AHEAD] ( -- )     POSTPONE [ELSE] ; IMMEDIATE
-: [IF] ( vlag -- )   ?EXIT POSTPONE [ELSE] ; IMMEDIATE
+: [IF] ( flag -- )   ?EXIT POSTPONE [ELSE] ; IMMEDIATE
 
 FORTH:
-: MS ( x -- ) 0 ?DO 12 0 DO LOOP LOOP ;
+HX B050 CONSTANT MIDI-CONTROL
+HX B051 CONSTANT MIDI-COUNT
+HX B054 CONSTANT TIMER-CONTROL
+HX B055 CONSTANT TIMER-COUNT
+HX B0F0 CONSTANT IRQ-SOURCE
+
+01 CONSTANT IRQ-UART
+02 CONSTANT IRQ-KEYBOARD
+04 CONSTANT IRQ-TIMER
+08 CONSTANT IRQ-SPI
+10 CONSTANT IRQ-SYS-SPI
+
+: WAIT-IRQ ( msk -- ) BEGIN IRQ-SOURCE C@ DUP AND UNTIL DROP ;
+: MS ( x -- )
+    TIMER-COUNT !                       \ set timer count
+    1 TIMER-CONTROL C!                  \ enable timer
+    IRQ-TIMER WAIT-IRQ                  \ wait for timer interrupt
+    0 TIMER-CONTROL C! ;                \ clear interrupt
 
 \ =========== ASSEMBLER CODE ==========
 

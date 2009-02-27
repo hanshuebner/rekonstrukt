@@ -25,7 +25,7 @@ DECIMAL
 : ?STACK      DEPTH 0< ABORT"  Empty stack " ; \ .STACK
 : ?USERSPACE  ABORT"  Not enough user space " ; 
 : ?PREFIX     ABORT"  Not suitable for prefixes " ;
-: ?PAIR   ( x y - ) <> ABORT" Afgekeurd " ;
+: ?PAIR   ( x y - ) <> ABORT" Rejected " ;
 
 \ Short for 'EXIT THEN'
 : } POSTPONE EXIT POSTPONE THEN ; IMMEDIATE

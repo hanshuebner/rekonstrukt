@@ -16,7 +16,7 @@ $(TARGET).bin: meta601.f cras601.f targ601.f
 $(TARGET).hex: $(TARGET).bin
 	objcopy -I binary $(TARGET).bin -O ihex --adjust-vma 0xc000 $(TARGET).hex
 
-$(TARGET).bit: $(TARGET).mem
+$(TARGET).bit: $(TARGET).mem $(BITSTREAM)
 	-data2mem -bm $(BMM) -bt $(BITSTREAM) -bd an601.mem -o b $(TARGET).bit
 
 $(TARGET).mem: $(TARGET).bin
