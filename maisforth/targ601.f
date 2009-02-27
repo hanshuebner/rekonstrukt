@@ -12,10 +12,6 @@ HEX \ throughout
 Put a TRACE before and a NOTRACE after a piece of code if you
 wish to study the details of what happens when that code is metacompiled.
 
-Zet TRACE voor en NOTRACE achter een stukje code als je wilt
-bekijken wat er gebeurt tijdens het metacompileren van die code.
-
-
 -- Direct-Threaded Forth model for Motorola 6809
    16 bit cell, 8 bit char, 8 bit (byte) adrs unit
    X = Forth W    free
@@ -43,12 +39,12 @@ bekijken wat er gebeurt tijdens het metacompileren van die code.
 300     = HERE at Cold Start
 
         --- --- moving up:
-        HERE ~      Ruimte voor BL-WORD (hx 20 bytes)
-             ~ PAD  HOLD Buffer         (hx 20 bytes) (dalend)
+        HERE ~      Space for BL-WORD (hx 20 bytes)
+             ~ PAD  HOLD Buffer       (hx 20 bytes) (decreasing)
         PAD = HERE + hx 40
         --- ---
 
-HIMEM   = Einde van de RAM
+HIMEM   = End of RAM
 
 --  TOPNFA = NFA of the most recently created Word
 
@@ -149,8 +145,8 @@ CODE DODOES   \ (an) 2004
   REG X PULS  REG D PSHS  X D TFR   ( body ? -- ? body )
   NEXT END-CODE
 DOER: DODOER   HERE-IS THINGUMAJIG EXIT ;
-\ Voorwaartse referentie. De EXIT wordt later gepatcht. Zie !DOER
-\ Het uiteindelijke resultaat:   DOER: DODOER !DOER ;
+\ Forward reference. EXIT is patched later. See !DOER
+\ Final result:   DOER: DODOER !DOER ;
 DOERCODE DO:      REG Y PSHU   REG Y PULS                   NEXT END-CODE
 DOERCODE DOCREATE REG X PULS   REG D PSHS   X D TFR         NEXT END-CODE
 DOERCODE DOVAR    REG X PULS   REG D PSHS   X D TFR         NEXT END-CODE
@@ -353,29 +349,29 @@ INSIDE:  0 IVAL TOPVOC   \  See WORDLIST VOC>NAMA (FORGET
        303 IVAL TOPNFA   \  Last created header in dictionary.
          0 IVAL HLD      \  See HOLD <# #>
          0 IVAL CONTEXT  \ 
-       01F IVAL CS#      \  Relatieve CS-pointer. See CSP >CS CS>
+       01F IVAL CS#      \  Relative CS-pointer. See CSP >CS CS>
          0 IVAL MSG#-2   \  See ABORT"(S) .MSG
         30 IVAL MODE     \  Assembler adressing mode: 0=immed, 10=direct, 20=indexed, 30=extended
          0 IVAL SECTION  \  Marks compiler discontinuity (for 0=IF)
          0 IVAL #TIMES   \  See TIMES
          0 IVAL #IB      \  Inputbuffer len
          0 IVAL IB       \  Inputbuffer adr
-       200 IVAL THERE    \  Tijdelijke HERE -- See FLYER
-EXTRA:   0 IVAL HOR      \  Telt karakter output, 0 = begin vd regel.
+       200 IVAL THERE    \  Temporary HERE -- See FLYER
+EXTRA:   0 IVAL HOR      \  Horizonal character position, 0 = beginning of line
          0 IVAL VER      \ 
-         0 IVAL HIMEM    \  hoogste RAMadres+1
+         0 IVAL HIMEM    \  highest RAM addres+1
          3 IVAL OK       \  See .OK
          0 IVAL DOT?     \  See DNUMBER? EVAL
 FORTH: 300 IVAL HERE     \  See ALLOT
-\ indirecte variabelen
+\ Indirect variables
 INSIDE:  0 IVAR WRD  2 UALLOT   \ see WORD
 FORTH:   0 IVAR >IN      \ ( -- adr )
         0A IVAR BASE     \ ( -- adr )
          0 IVAR STATE    \ ( -- adr )
 EXTRA:   0 IVAR 'EMIT    \ ( -- xt )
 
-\ Interrupt en Exception vectoren.
-\ De pointers in FFF0-FFFF wijzen naar deze adressen.
+\ Interrupt and exception vectores
+\ The pointers in FFF0-FFFF point to these addresses.
 
 EXTRA:
 \ For ROM version
@@ -388,14 +384,15 @@ ORIGINHOSTA -10 +              \  later: FFF0
 2 + UOFFSET  OVER ! IVEC 'IRQ  \  FFF8
 2 + UOFFSET  OVER ! IVEC 'SWI  \  FFFA
 2 + UOFFSET  OVER ! IVEC 'NMI  \  FFFC
-DROP  -2 UALLOT   \ Alleen de byte met RTI wordt meegenomen.
-\ Een vector neemt 3 userbytes ruimte in.
+DROP  -2 UALLOT   \ Only the byte with RTI is included.
+\ A vector uses 3 bytes of user space.
 
-\ 'NMI is de laatste "user"!
-\ Als je meer indirecte waarden wilt definiëren, voeg die dan in
-\ voor de vectoren. De value USERBYTES in de metacompiler moet
-\ dan aangepast worden:
-\ userbytes  =  (aantal i-waarden)*2  +  (aantal vectoren)*3  -  2
+\ 'NMI is the last "user"!  If you want to create more indirect
+\ variables, add them behind the interrupt vectors.  The USERBYTES
+\ value in the meta compiler then needs to be adjusted according to
+\ this formula:
+\ 
+\ (number of indirect variables)*2 + (number of vectors)*3 - 2
 
 
 \ --- constanten ---
@@ -408,7 +405,7 @@ INSIDE: 075 CONSTANT FINDSTACK \ Begin of search-order stack
         17E CONSTANT S0        \ End of parameter stack
         1FE CONSTANT R0        \ End of return stack
         200 CONSTANT FLYBUF    \ Flyer buffer
-        2FC CONSTANT CS0       \ End of compilerstack
+        2FC CONSTANT CS0       \ End of compiler stack
         07E CONSTANT TIBSIZE
 EXTRA:    2 CONSTANT CELL
 FORTH:   -1 CONSTANT TRUE
@@ -428,7 +425,7 @@ CODE RP@   REG D PSHS   U D TFR   NEXT END-CODE   \ Not used
 \ CODE SP!   D S TFR   REG D PULS   NEXT END-CODE   \ Not used
 \ CODE RP!   D U TFR   REG D PULS   NEXT END-CODE   \ Not used
 
-\ Store en Fetch
+\ Store and Fetch
 FORTH:
 CODE C!   D X TFR   REG D PULS   X ) STB     REG D PULS   NEXT END-CODE
 CODE !    D X TFR   REG D PULS   X ) STD     REG D PULS   NEXT END-CODE
@@ -760,8 +757,8 @@ CODE >NAME   D X TFR
   X D TFR   NEXT END-CODE
 
 INSIDE:
-: !DOER ( DOERa -- )   TOPNFA NAME> 1+ ! ; \ de JSR staat er al
-' !DOER THINGUMAJIG COMPILE! \ Patch in DODOER (Voorwaartse referentie)
+: !DOER ( DOERa -- )   TOPNFA NAME> 1+ ! ; \ the JSR is already here
+' !DOER THINGUMAJIG COMPILE! \ Patch in DODOER (forward reference)
 \ : @IMM   ( nfa -- -1/+1 )   1- C@ 1 AND 2* 1- ;
 \ : HOM?   ( nfa -- 0/-1 )   1- C@ 80 AND 0<> ;
 \ : @VOC   ( nfa -- wid )   1- C@ 7E AND ;
@@ -775,12 +772,12 @@ CODE WITHIN (  a x y -- t/f )   \ a-x y-x u<?
   S ) SUBD   D X TFR            \ y-x
   S 2 #) LDD   S )++ SUBD       \ a-x
   S ) STX   S )++ SUBD          \ a-x - y-x
-  0 # LDB                       \ dit beinvloedt U<? niet?
+  0 # LDB                       \ this does not influence U<? ?
   U<? IF   DECB   THEN   SEX   NEXT END-CODE
 
 \ ----- 08 -----
 
-\ Compilerstack [HIMEM-80..HIMEM) (dalend) (AN) 2004
+\ Compiler stack [HIMEM-80..HIMEM) (decreasing) (AN) 2004
 INSIDE:
 : CSP ( -- a )        CS0 CS# CELLS 2* 7C AND - ;
 : >CS ( x1 x2 -- )    INCR CS# CSP 2! ;
@@ -793,10 +790,10 @@ FORTH:
   R> TO CS# >CS ;  
 : CS-ROLL ( q -- )  \ q in 0..1F
   >R
-  R@ 0 ?DO CS> LOOP \ Haal elementen 0..n-1 van CS-stack
-  R> CS> 2>R        \ Verplaats element nr n van CS-stack naar R
-  0 ?DO >CS LOOP    \ Zet elementen n-1..0 terug op CS-stack
-  2R> >CS ;         \ Verplaats element nr n van R naar CS-stack
+  R@ 0 ?DO CS> LOOP \ Remove elements 0 .. N-1 from CS-stack
+  R> CS> 2>R        \ Move element nr. N of the CS stack to R
+  0 ?DO >CS LOOP    \ Set elements N-1 .. 0 back to CS-stack
+  2R> >CS ;         \ Move element nr. N of R to CS stack
 
 FORTH:
 \ : S>D      DUP 0< ;
@@ -805,7 +802,7 @@ CODE S>D   REG D PSHS   A B TFR   SEX   A B TFR   NEXT END-CODE
 <----
 : M* ( n1 n2 -- d ) \ signed 16*16->32 multiply (BJR)
   2DUP XOR >R
-  SWAP ABS SWAP ABS UM* \ eerste SWAP kan weg
+  SWAP ABS SWAP ABS UM* \ is the first SWAP needed?
   R> ?DNEGATE ;
 : SM/REM ( d1 n1 -- n2 n3 ) \ symmetric signed division (BJR)
   2DUP XOR >R
@@ -956,8 +953,8 @@ CODE CATCH( ( xt -- ? )
   U -2 #) LEAX   REG X PSHU     \ RP-2 >R
   NEXT END-CODE
 CODE )CATCH ( -- 0 )
-  U 4 #) LEAU              \ wis gesavede RP en SP
-  REG D PSHS   CLRA   CLRB \ goedkeuringsnul
+  U 4 #) LEAU              \ delete saved RP and SP
+  REG D PSHS   CLRA   CLRB \ return zero as approval
   NEXT END-CODE
 
 FORTH:
@@ -1028,7 +1025,7 @@ FORTH:
   R> SCAN                   \ rest a wordz zrest     r: --
   >R                        \ rest a wordz           r: zrest
   OVER -                    \ rest a wordz-a
-  2DUP WRD 2!               \ Voor QUIT en voor DNUMBER? in EVAL
+  2DUP WRD 2!               \ For QUIT and DNUMBER? in EVAL
   HERE PLACE                \ rest
   R> DUP 0<> +              \ rest zrest*            r: --
   - >IN +!
@@ -1072,17 +1069,17 @@ INSIDE:
   40 THERE FLYBUF - U<
   IF FLYBUF TO THERE
   THEN THERE ; 
-: FLYER ( -- ) \ R: caller --  THERE  rest-van-FLY  Caller
+: FLYER ( -- ) \ R: caller --  THERE  rest-of-FLY  Caller
   STATE @ ?EXIT
   SAFE-THERE
     HERE TO THERE
   DUP TO HERE
-  R> 2>R               \ Adres van tijdelijke code
-  ] DIVE               \ Maak nu de Caller af en keer terug naar hier.
-  POSTPONE EXIT        \ Plak EXIT achter de tijdelijke code.
+  R> 2>R               \ Address of temporary code
+  ] DIVE               \ Create the Caller and return here.
+  POSTPONE EXIT        \ Paste EXIT behind the temporary code.
   POSTPONE [
-  HERE THERE TO HERE TO THERE      \ Herstel HERE
-  ;                    \ Spring nu naar de tijdelijke code.
+  HERE THERE TO HERE TO THERE      \ Restoration HERE
+  ;                    \ Jump to the temporary code.
 
 <----
 INSIDE:
@@ -1134,12 +1131,12 @@ FORTH:
 : DEPTH ( -- n ) SP@ S0 SWAP - 2/ ;
 
 \ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-\ ----------------- assembler hulpwoordjes --------------------
+\ ----------------- assembler helper words --------------------
 
 INSIDE:
 : 8BIT?   -80 80 WITHIN ;
 : INITMODE ( -- )   \ Default value before starting an instruction
-  30 TO MODE ;      \ zie ?ILLEGAL & Doers
+  30 TO MODE ;      \ see ?ILLEGAL & DOERS
 : ?ILLEGAL ( flag -- )   0= ?EXIT -3F (THROW ;
 : INDEXREG ( regnr postbyte1 -- postbyte2 )   \ zie  DO)MODE  #)
    20 TO MODE
@@ -1149,7 +1146,7 @@ INSIDE:
     ,  A  B  D  X  Y  U  S
     0  2  4  6  10 20 40 40
 ---->
-:  REGCODE ( ch -- regcode)            \ zie  REG
+:  REGCODE ( ch -- regcode)            \ see  REG
    [CHAR] Z OVER < BL AND - >R         \ UPPER
    S" ,ABDXYUS87654321"
    [ -8 ALLOT 2 , 406 , 1020 , 4040 , ]
@@ -1223,9 +1220,9 @@ DOER: DOBRA   \ 16 bit in body, Unconditional branches
 \ DOER: DOCCON C@ ;   \ 8 bit in body, Conditions, Registers
 DOER: DO-) C@ INDEXREG ;   \ 8 bit in body \ Modes
 
-\ -------- De assemblerwoordjes ------
+\ -------- Assembler words ------
 
-\ Zet geen commentaren binnen in een lijst!
+\ Do not place comments into this list:
 ASSEMBLER:
 NEG:
 0  40 NEG                             0  43 COM
@@ -1270,7 +1267,7 @@ BEQ:     21 BRN  22 BHI  23 BLS
 28 BVC   29 BVS  2A BPL  2B BMI
 2C BGE   2D BLT  2E BGT  2F BLE  -1
 <----
-\ 6809 conditions  (Constanten)
+\ 6809 conditions  (Constants)
 CON:
  20 NVR  21 ALW  22 LS   23 HI
  24 LO   25 HS
@@ -1279,8 +1276,8 @@ CON:
  2C LT   2D GE   2E LE   2F GT   -1
 ---->
 \ 6809 conditions, (AN):
-\ Forth-achtige 6809 assembler condities.
-\ Deze woordjes dekken ALLE condities.
+\ Forth-like conditions in 6809 assembler.
+\ These words cover ALL conditions.
 CON:      23 U>?
  24 U<?   24 CS?
  26 =?
@@ -1288,7 +1285,7 @@ CON:      23 U>?
  2C <?    2F >?    -1
 : NO ( cond# -- cond#2 )   1 XOR ;
 
-\ 6809 registers (Constanten)
+\ 6809 registers (Constants)
 CON:
 0 D       1 X      2 Y      3 U
 4 S       5 PC     8 A      9 B
@@ -1299,7 +1296,7 @@ CON:
 80 )+     81 )++   82 -)    83 --)
 84 )      85 B)    86 A)    8B D)     -1
 
-\ ================ EINDE ASSEMBLER DEEL I ==================
+\ ================ END OF ASSEMBLER ==================
 
 
 INSIDE:
@@ -1350,7 +1347,7 @@ INSIDE:
             BASE @ DUP DECIMAL 0 .R BASE ! ." ) " ;
 
 \ ----- 12 -----
-\ Inputstream
+\ Input stream
 
 FORTH:
 : QUERY ( -- a n )
@@ -1368,13 +1365,13 @@ EXTRA:
   AGAIN (;)
 
 INSIDE:
-CODE THREAD ( blword -- draadadres )   \ Len 2* Z xor 2* A xor
-  D X TFR               \ Counted stringadres
+CODE THREAD ( blword -- threadaddress )   \ Len 2* Z xor 2* A xor
+  D X TFR               \ Counted string addres
   X ) LDA   A B TFR     \ count
-  ASLB   X A) EORB      \ laatste karakter erbij
-  ASLB   X 1 #) EORB    \ eerste karakter erbij
-  HX 0F # ANDB   ASLB   \ offset in dradenlijst
-  3 # ADDB   SEX        \ dictionary adres = 0003
+  ASLB   X A) EORB      \ last character available
+  ASLB   X 1 #) EORB    \ first character available
+  HX 0F # ANDB   ASLB   \ offset in thread list
+  3 # ADDB   SEX        \ dictionary addres = 0003
   NEXT END-CODE
 : FINDNAME ( blword -- nfa? )   \ nfa? is a valid nfa or zero.  (AN) 2004
   DUP C@ 1+ 20 MIN            \ blword len+1
@@ -1399,7 +1396,7 @@ CODE THREAD ( blword -- draadadres )   \ Len 2* Z xor 2* A xor
              R> OVER - >R
              IF   NIP DUP        \ a NFA* nfa ( this one is OK )
              THEN
-             DUP HOM? R@ AND     \ a NFA? nfa meer?
+             DUP HOM? R@ AND     \ a NFA? nfa more?
        0= UNTIL
      DROP                       \ a NFA?
      DUP IF NIP                 \ NFA
@@ -1448,8 +1445,8 @@ EXTRA:
   9 OVER U<
   IF      10 OVER U<
     WHILE 7 -
-  THEN    DUP BASE @ U< IF TRUE RDROP }   \ tot de 9 en vanaf de A
-    THEN  DROP R> FALSE ;                 \ het ongeldige stukje tussen de 9 en de A
+  THEN    DUP BASE @ U< IF TRUE RDROP }   \ up to 9 and from A
+    THEN  DROP R> FALSE ;                 \ the invalid part between the 9 and the A
 
 FORTH:
 : >NUMBER ( dx adr u -- dx2 adr2 u2 )
@@ -1461,7 +1458,7 @@ FORTH:
   THEN DROP ;
 
 INSIDE:
-: MINUS-SIGN? ( a n -- a n false | a+1 n-1 true )   \ Behandel een eventueel minteken.
+: MINUS-SIGN? ( a n -- a n false | a+1 n-1 true )   \ Treat any sign.
   DUP
   IF   OVER C@ [CHAR] - = IF 1 /STRING TRUE }
   THEN FALSE ;
@@ -1542,7 +1539,7 @@ FORTH:
   >IN @ #IB U< ?EXIT
   >IN @ IF SOURCE + 1- C@ [CHAR] ) = ?EXIT THEN
   REFILL ?RE ; IMMEDIATE
-: \ ( <tekst> -- )   #IB >IN ! ;  IMMEDIATE
+: \ ( <text> -- )   #IB >IN ! ;  IMMEDIATE
 
 \ ----- 14 -----
 \ ---
@@ -1656,7 +1653,7 @@ PFXLIST ] DOVAL    TO()  +TO()  INCR() [
             FLYER
           \ DUP >NAME @IMM 0< IF EXECUTE }
             , , }
-        CELL- @  DUP 0=         \ volgende pfx-list
+        CELL- @  DUP 0=         \ following pfx-list
   UNTIL -20 (THROW (;)
 
 FORTH:
@@ -1829,9 +1826,9 @@ EXTRA:
 
 INSIDE:
 DOER: DOMARKER
-  DUP @ (FORGET                   \ vergeet vanaf oldhere
-  CELL+ COUNT DUP TO CONTEXT      \ herstel CONTEXT = adres < 100
-  CURRENT OVER - 1+ MOVE ;        \ herstel zoekstack-vocs
+  DUP @ (FORGET                   \ forget from oldhere
+  CELL+ COUNT DUP TO CONTEXT      \ create CONTEXT = adres < 100
+  CURRENT OVER - 1+ MOVE ;        \ create search stack-vocs
 
 FORTH:
 : MARKER ( <name> -- )   \ (AN) 2004
@@ -1839,7 +1836,7 @@ FORTH:
   ,                                  \ oldhere
   CONTEXT DUP C,                     \ save CONTEXT = adres < 100
   HERE CURRENT CONTEXT - 1+
-  DUP ALLOT MOVE ;                   \ save zoekstack-vocs
+  DUP ALLOT MOVE ;                   \ save search stack-vocs
 
 EXTRA:
 : ANEW   ( <name> -- )   \ (AN) 2004
@@ -1853,7 +1850,7 @@ EXTRA:
 \ ----- 17 -----
 
 INSIDE:
-: !HIMEM ( -- )   \ test eerste cell per 2K RAM (AN) 2004
+: !HIMEM ( -- )   \ test first cell of every 2K RAM (AN) 2004
   -800 TO HIMEM
   BEGIN  800 +TO HIMEM
          HIMEM @             ( x )     \ read
@@ -1874,7 +1871,7 @@ CODE COLD ( ? -- )   \ cold start Forth system (AN) 2004
   ' S0 >BODY @ # LDS           \ initial SP
            REG D PULS
   ' R0 >BODY @ # LDU           \ initial RP
-  ' DO: 3 + TARGA JSR          \ Overgang naar hilevel code
+  ' DO: 3 + TARGA JSR          \ jump to high level code
  END-CODE
  ]
  ORIGIN 0 [ UOFFSET ] LITERAL CMOVE
@@ -1929,10 +1926,10 @@ EXTRA:
 \ IGNORE AAA ZZZ  \ ZZZ is Case sensitive!
 ---->
 
-\ Interrupt vectoren
+\ Interrupt vectos
 
 EXTRA:
-: !VECTOR ( routineadres vec -- )   1+ ! ;   \ vb: C4A5 'SWI3 !VECTOR 
+: !VECTOR ( routineaddres vec -- )   1+ ! ;   \ vb: C4A5 'SWI3 !VECTOR 
 : ENABLE  ( vec -- )   07E SWAP C! ;   \ ( JMP )   'SWI3  ENABLE
 : DISABLE ( vec -- )   03B SWAP C! ;   \ ( RTI )   'SWI3  DISABLE
 
@@ -1951,7 +1948,7 @@ EXTRA:
 \ ----- 18 -----
 
 <----
-: /WORDS \ Per draad (an) 2004
+: /WORDS \ Per thread (an) 2004
   3 10 0                     \ 3 = DICTIONARYadr
   DO CR I .                 \ .DRAADNR
      DUP @     0 >R
@@ -1988,28 +1985,28 @@ INSIDE:
   DO   I THERE 2@ EXECUTE I !  \ Skipper
        CELL
   +LOOP
-  CR 0 >R                      \ Woordenteller
+  CR 0 >R                      \ Word counter
   BEGIN              \ T24 T4
-     FALSE -1                  \ Voor Relatieve-NFA en Draadadres
+     FALSE -1                  \ For relative-NFA and thread address
      2OVER
      DO I @                               \ NFA?
-           IF   OVER I @ ORIGIN - U<      \ Hoogste?
-                IF   2DROP I @ ORIGIN - I \ RelatiEve-NFA Draada
+           IF   OVER I @ ORIGIN - U<      \ highest?
+                IF   2DROP I @ ORIGIN - I \ Relative-NFA Thread
                 THEN
            THEN CELL
-     +LOOP           \ Grootste-relatieve-NFA Draadadres | 0 -1
-     NIP                      \ T24 T4 Draadadres-or-True
-     S>D STOP?                \ Klaar of Stoppen?
+     +LOOP           \ highest-relative-NFA thread address | 0 -1
+     NIP                      \ T24 T4 thread-address-or-True
+     S>D STOP?                \ More or stop?
      OR IF DROP 2DROP CR R> PARENTHESIZE 0 .R }       \ \ \ \ \ e x i t
-     3C HOR U< IF CR THEN     \ Positie op de regel
-     R> 1+ >R                 \ Woordenteller
-     DUP @                    \ Draada NFA
-     DUP COUNT                \ Draada NFA a n
+     3C HOR U< IF CR THEN     \ Position on the line
+     R> 1+ >R                 \ Word counter
+     DUP @                    \ Thread NFA
+     DUP COUNT                \ Thread NFA a n
      DUP 20 < IF   BL
               ELSE 1F AND [CHAR] ~
               THEN EMIT TYPE SPACE
-     NAME>LINK                \ Draada Lfa
-     THERE 2@ EXECUTE         \ Draada Next-NFA
+     NAME>LINK                \ Thread Lfa
+     THERE 2@ EXECUTE         \ Thread Next-NFA
      SWAP !
   AGAIN (;)
 
@@ -2025,7 +2022,7 @@ INSIDE:
 : .ADR ( a -- )   THERE C@ 2* U.R ;
 : .BYTE ( c -- )  THERE C@ .R ;
 : .ASC  ( ch -- ) DUP 7F < AND BL MAX EMIT ;
-\ DUMP voor alle grondtallen, met noodstop.
+\ DUMP basis for all numbers, with emergency stop.
 FORTH:
 : DUMP ( a n -- )   \ (AN) 2004
   X.R!                                     \ Zie .ADR
@@ -2043,18 +2040,18 @@ FORTH:
 
 \ Decompiler (AN) 2004
 INSIDE:
-: CFA?? ( adr -- vlag )
+: CFA?? ( adr -- flag )
   300 OVER U<
   OVER ORIGIN HERE WITHIN AND
   SWAP 1- DUP C@ 21 7F WITHIN AND AND  DUP 0= ?EXIT
-  1                         ( adr teller )
-  BEGIN >R 1- R> OVER C@    ( adr-1 teller char )
+  1                         ( adr counter )
+  BEGIN >R 1- R> OVER C@    ( adr-1 counter char )
         2DUP = IF 2DROP 0<> }  \ exit with true-flag
         21 7F WITHIN
-  WHILE 1+ BL OVER AND       ( adr teller+1  x )
+  WHILE 1+ BL OVER AND       ( adr counter+1  x )
   UNTIL
   THEN  2DROP FALSE ;
-: CFA? ( adr -- vlag )
+: CFA? ( adr -- flag )
   DUP CFA?? AND   DUP 0= ?EXIT
   >NAME   TOPVOC C@ OVER @VOC < 0= AND
   DUP 0= ?EXIT
@@ -2062,7 +2059,7 @@ INSIDE:
   DUP C@ 0 20 WITHIN IF NAME> CFA?? }
   DROP FALSE ;
 
-: .HEAD ( a -- )   \ hier begint een header
+: .HEAD ( a -- )   \ header starts here
   DUP S"   --  " 2>R 2R@ TYPE
   >NAME COUNT TYPE
   2R@ TYPE
@@ -2073,7 +2070,7 @@ INSIDE:
   THEN
   DROP 2R> TYPE
   >NAME @VOC .VOC ."  Word" ;
-: .TOKEN ( a cfa -- a )   \ Gecompileerd token
+: .TOKEN ( a cfa -- a )   \ compiled token
   OVER 1 AND 2* 2* 4 + SPACES
   >NAME COUNT TYPE ;
 : DECOM ( a -- )
@@ -2098,7 +2095,7 @@ FORTH:
 : SEE   ' MSEE ;
 
 \ ----- 19 -----
-\  tijdelijke BASE (AN) 2004
+\  temporary BASE (AN) 2004
 
 INSIDE:
 DOER: DOFFBASE
@@ -2143,20 +2140,20 @@ ONLY:
 FORTH:
 : MS ( x -- ) 0 ?DO 12 0 DO LOOP LOOP ;
 
-\ =========== ASSEMBLER CODA ==========
+\ =========== ASSEMBLER CODE ==========
 
 \ 6809 addressing modes
 ASSEMBLER:
 : #   0 TO MODE ;
-: REG ( "lijst" -- regbyte )   \ voorbeelden:  REG D,X  REG X  REG X,Y
+: REG ( "list" -- regbyte )   \ examples:  REG D,X  REG X  REG X,Y
   0 BL WORD
   COUNT 0                    ( 0=regbyte  adres  count )
   ?DO                        ( regbyte  adres )
        COUNT
-       REGCODE SWAP >R OR R> ( regbyte2 adres ) \ Bouw reg byte op
+       REGCODE SWAP >R OR R> ( regbyte2 adres ) \ Assemble reg byte
   LOOP
   DROP FLYER LIT, POSTPONE # ; IMMEDIATE
-: ALLREG   0FF # ;             \ voor push/pull van alle registers
+: ALLREG   0FF # ;             \ For push/pull of all registers
 : DP)   10 TO MODE ;        \ DP relative
 : #)     SWAP 89 INDEXREG ;   ( rval n -- n postbyte ) \ indexregister + offset
 : PC)   20 TO MODE 8D ;      ( n -- n postbyte ) \ pc relative
@@ -2167,7 +2164,7 @@ ASSEMBLER:
            10 + }             \ Indexed:  postbyte -- postbyte
   20 TO MODE 9F ;             \ Extended: n -- n postbyte
 
-\ 6809  structured conditionals with compiler controll
+\ 6809  structured conditionals with compiler control
 : IF    ( cond# -- cs: ifadr 6 )   C, 0 C, HERE 6 >CS ;
 : AHEAD ( -- cs: aheadadr 6 )      20 ( NVR ) IF ;
 : THEN  ( cs: adr 6 -- )
@@ -2208,10 +2205,10 @@ FORTH:
 ( -63 ) -3F MSG" Illegal addressing mode"
 \ ( -64 ) -40 MSG" Invalid Baud rate"
 
-\ store starting adres on last memory address - 2 
+\ store starting addres on last memory address - 2 
 
-' COLD ORIGINHOSTA -2 + COMPILE!     \ Resetvector vullen 
-' COLD ORIGINHOSTA 1 + COMPILE!      \ Jump naar COLD (op ORIGIN)
+' COLD ORIGINHOSTA -2 + COMPILE!     \ fill Resetvector
+' COLD ORIGINHOSTA 1 + COMPILE!      \ jump to COLD
 
 ;;;MAIS;;;
 
