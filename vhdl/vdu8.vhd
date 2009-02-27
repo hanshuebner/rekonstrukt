@@ -12,7 +12,7 @@
 --
 -- Modified by Bert Cuzeau for compliance and code cleanliness
 -- The effort is not over.
--- There are still signal initialized, which is BAD.\
+-- There are still signal initialized, which is BAD.
 --
 -- 7th Februaury 2007 - John Kent
 -- Added generics for VGA Timing
@@ -26,7 +26,6 @@ use unisim.vcomponents.all;
 
 Entity vdu8 is
   generic(
-    VDU_CLK_FREQ           : integer := 12500000; -- HZ
     VGA_CLK_FREQ           : integer := 25000000; -- HZ
     VGA_HOR_CHARS          : integer := 80; -- CHARACTERS
     VGA_VER_CHARS          : integer := 25; -- CHARACTERS
