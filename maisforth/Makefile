@@ -2,7 +2,7 @@ GFORTH = gforth
 TARGET = an601
 BITSTREAM = ../ise/my_system09.bit
 BMM = ../vhdl/maisforth_rom_bd.bmm
-PRODUCTS = $(TARGET).vhd $(TARGET).bin $(TARGET).hex
+PRODUCTS = $(TARGET).vhd $(TARGET).bin $(TARGET).hex $(TARGET).bit $(TARGET).mem
 MAISFORTH_BUILD = build: `date '+%F %T%z'` svn: `svnversion . | sed -e 's/.*://'`
 
 all:	$(PRODUCTS)
