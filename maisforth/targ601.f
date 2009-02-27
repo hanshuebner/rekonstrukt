@@ -1866,6 +1866,8 @@ FORTH:
 : UNUSED ( -- n )   HIMEM 20 - HERE - ;
 
 EXTRA:
+CREATE BUILD-INFO BUILD-INFO
+
 CODE COLD ( ? -- )   \ cold start Forth system (AN) 2004
   CLRA      A DP TFR          \ initial DP, direct page
   ' S0 >BODY @ # LDS           \ initial SP
@@ -1882,8 +1884,7 @@ CODE COLD ( ? -- )   \ cold start Forth system (AN) 2004
  ['] UART-EMIT 'EMIT !
  7F !USART
  CR 0 .MSG
- CR ." Copyright (c) 2005 HCC Forth-gg"
- CR ." System09 port by Hans Huebner"
+ CR ." Copyright (c) 2005 HCC Forth-gg " BUILD-INFO COUNT TYPE
  CR HIMEM 0A RSHIFT  9 .R ."  kB RAM"
  CR CR QUIT [
 
@@ -1926,7 +1927,7 @@ EXTRA:
 \ IGNORE AAA ZZZ  \ ZZZ is Case sensitive!
 ---->
 
-\ Interrupt vectos
+\ Interrupt vectors
 
 EXTRA:
 : !VECTOR ( routineaddres vec -- )   1+ ! ;   \ vb: C4A5 'SWI3 !VECTOR 

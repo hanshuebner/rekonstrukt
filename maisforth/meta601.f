@@ -230,7 +230,7 @@ VARIABLE FID \ filehandle,  file id
 VOCABULARY META
 
 <---- EINDE VAN META1 ---->
-CR .(  Nu wordt de crossassembler geladen ) \ sss
+CR .( The cross assembler is being loaded ) \ sss
 
 <----
  S" maiswork\cras601.F" INCLUDED \ mmm  voor Windows minforth
@@ -410,7 +410,7 @@ DECIMAL
 : xBN POSTPONE BN xLITERAL ; IMMEDIATE
 
 
-CR  .(   EINDE VAN META II )
+CR  .( META II finished ) CR
 
 \ -----------------------------  meta III -------------------------
 \ Meta III - an - 19mei04
@@ -584,6 +584,14 @@ ONLY:
 
 : x" ( <ccc"> -- ) KOMPILE "(S) HX 22 PARSE xSTRING, ;
 : x." ( <ccc"> -- ) KOMPILE ."(S) HX 22 PARSE xSTRING, ;
+
+: BUILD-INFO ( -- adr n )
+    s" MAISFORTH_BUILD" GETENV
+    DUP 0= if
+        2DROP S" [no build info]"
+    then
+    xSTRING,
+;
 
 : xCHAR ( -- ch )
   BL-WORD DUP .NAAM
@@ -892,7 +900,7 @@ META-WORDS:
   RSHIFT     RSHIFT
   ACIA-CONTROL ACIA-CONTROL   ( -- targa )
   ACIA-DATA    ACIA-DATA ( -- targa )
-  INCLUDE INCLUDE
+  BUILD-INFO BUILD-INFO
   ;;;MAIS;;;   ;;;MAIS;;;
 
 \  (JMP)      (JMP)        ( -- hosta )
