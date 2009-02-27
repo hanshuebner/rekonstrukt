@@ -56,6 +56,7 @@ begin
     if rst = '1' then
       midi_div        <= (others => '0');
       clk_midi_enable <= '0';
+      timer_start     <= '0';
     elsif falling_edge(clk) then
       if cs = '1' and rw = '0' then
         timer_start  <= '0';
@@ -70,7 +71,7 @@ begin
             midi_div(7 downto 0) <= data_in;
           -- Millisecond timer register write
           when "100" =>
-            timer_start  <= data_in(0);
+            timer_start <= data_in(0);
             if data_in(0) = '0' then
               timer_irqack <= '1';
             end if;

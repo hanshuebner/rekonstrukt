@@ -269,7 +269,6 @@ begin
 ----------------------------------------
   my_vdu : entity vdu8 
     generic map(
-      VDU_CLK_FREQ           => SYSCLK_FREQ, -- HZ
       VGA_CLK_FREQ           => SYSCLK_FREQ, -- HZ
       VGA_HOR_CHARS          => 80, -- CHARACTERS
       VGA_VER_CHARS          => 25, -- CHARACTERS
@@ -357,7 +356,7 @@ begin
     cs        => timer_cs,
     rw        => cpu_rw,
     addr      => cpu_addr(2 downto 0),
-    data_in   => cpu_data_in,
+    data_in   => cpu_data_out,
     data_out  => timer_data_out,
     --
     clk_1mhz  => clk_1mhz,
@@ -581,7 +580,9 @@ begin
   SF_OE         <= '1';
   SF_WE         <= '1';
 
-  fx2_io <= (5 => RS232_DCE_RXD, 6 => txbit, 7 => cpu_irq, 8 => cpu_firq, others => '0');
+  fx2_io <= (5 => RS232_DCE_RXD, 6 => txbit, 7 => cpu_irq, 8 => cpu_firq,
+             1 => timer_irq, 2 => clk_midi,
+             others => '0');
 
 end my_computer;  --===================== End of architecture =======================--
 
