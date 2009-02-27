@@ -1,7 +1,9 @@
 GFORTH = gforth
 TARGET = an601
+BITSTREAM = ../ise/my_system09.bit
+BMM = ../vhdl/maisforth_rom_bd.bmm
 PRODUCTS = $(TARGET).vhd $(TARGET).bin $(TARGET).hex
-MAISFORTH_BUILD = build: `date '+%F %T %z'` svn version: `svnversion . | sed -e 's/.*://'`
+MAISFORTH_BUILD = build: `date '+%F %T%z'` svn: `svnversion . | sed -e 's/.*://'`
 
 all:	$(PRODUCTS)
 
@@ -14,8 +16,8 @@ $(TARGET).bin: meta601.f cras601.f targ601.f
 $(TARGET).hex: $(TARGET).bin
 	objcopy -I binary $(TARGET).bin -O ihex --adjust-vma 0xc000 $(TARGET).hex
 
-$(TARGET).bit:
-	-data2mem -bm maisforth_rom_bd.bmm -bt my_system09.bit -bd an601.mem -o b final.bit
+$(TARGET).bit: $(TARGET).mem
+	-data2mem -bm $(BMM) -bt $(BITSTREAM) -bd an601.mem -o b $(TARGET).bit
 
 $(TARGET).mem: $(TARGET).bin
 	perl ../tools/bin-to-mem.pl $(TARGET).bin
