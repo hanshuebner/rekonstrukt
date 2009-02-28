@@ -144,7 +144,14 @@ architecture my_computer of my_system09 is
   signal timer_cs          : std_logic;
   signal timer_irq         : std_logic;
   signal timer_data_out    : std_logic_vector(7 downto 0);
+  -- Rotary encoders
+  signal rotary_cs         : std_logic;
+  signal rotary_data_out   : std_logic_vector(7 downto 0);
+  signal rotary_left       : std_logic_vector(15 downto 0);
+  signal rotary_right      : std_logic_vector(15 downto 0);
+  -- Clocks
   signal clk_1mhz          : std_logic;
+  signal clk_500khz        : std_logic;
   signal clk_midi          : std_logic;
   -- IRQ buffer
   signal irq_buffer        : std_logic_vector(7 downto 0);
@@ -347,7 +354,7 @@ begin
     clk        => sysclk,
     reset      => cpu_reset,
     clk_1mhz   => clk_1mhz,
-    clk_500khz => open
+    clk_500khz => clk_500khz
     );
 
   my_timer : entity timer port map (
@@ -363,6 +370,22 @@ begin
     clk_midi  => clk_midi,
     timer_irq => timer_irq
     );
+
+  my_rotary_encoder : entity rotary_encoder port map (
+    clk       => sysclk,
+    rst       => cpu_reset,
+    cs        => rotary_cs,
+    rw        => cpu_rw,
+    addr      => cpu_addr(4 downto 0),
+    data_out  => rotary_data_out,
+    --
+    clk_1mhz  => clk_1mhz,
+    rot_left  => rotary_left,
+    rot_right => rotary_right
+    );
+
+  rotary_left  <= (0 => ROT_A, others => '0');
+  rotary_right <= (0 => ROT_B, others => '0');
 
   my_clock_synthesis : entity clock_synthesis port map (
     CLKIN_IN   => CLK_50MHZ,
@@ -382,7 +405,7 @@ begin
                       uart_data_out,
                       keyboard_data_out,
                       vdu_data_out,
-                      led_reg, sw, rot_a, rot_b, rot_center,
+                      led_reg, sw, rot_center,
                       btn_north, btn_west, btn_east, btn_south,
                       spi_data_out, sys_spi_data_out,
                       timer_data_out, irq_buffer)
@@ -400,6 +423,7 @@ begin
     keyboard_cs <= '0';
     vdu_cs      <= '0';
     timer_cs    <= '0';
+    rotary_cs   <= '0';
 
     case decode_addr is
 
@@ -446,7 +470,7 @@ begin
               vdu_cs      <= cpu_vma;
 
             --
-            -- LEDs, switches, buttons, encoder, LCD $B030
+            -- LEDs, switches, buttons, LCD $B030
             --
             when X"3" =>
               case cpu_addr(3 downto 0) is
@@ -459,8 +483,6 @@ begin
                                  & BTN_SOUTH
                                  & BTN_WEST
                                  & SW;
-                when "0010" =>
-                  cpu_data_in <= "000000" & ROT_A & ROT_B;
                 when "0011" =>
                   lcd_cs <= cpu_vma;
                 when others =>
@@ -488,6 +510,13 @@ begin
             when X"5" =>
               cpu_data_in <= timer_data_out;
               timer_cs    <= cpu_vma;
+
+            --
+            -- Rotary encoder $B060-$B07F
+            --
+            when X"6" | X"7" =>
+              cpu_data_in <= rotary_data_out;
+              rotary_cs   <= cpu_vma;
 
             --
             -- IRQ buffer readout $B0F0

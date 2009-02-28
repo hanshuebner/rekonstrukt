@@ -37,7 +37,7 @@ entity rotary_encoder is
     data_out  : out std_logic_vector(7 downto 0);
     -- Polling base clock
     clk_1mhz  : in  std_logic;
-    -- 
+    -- Rotary encoder inputs
     rot_left  : in  std_logic_vector(15 downto 0);
     rot_right : in  std_logic_vector(15 downto 0)
     );
@@ -45,18 +45,18 @@ end;
 
 architecture rtl of rotary_encoder is
 
-  type   value_registers is array(0 to 15) of std_logic_vector(2 downto 0);
+  type   value_registers is array(0 to 15) of std_logic_vector(3 downto 0);
   signal values          : value_registers;
   signal errors          : std_logic_vector(15 downto 0);
-  signal rot_left_buf        : std_logic_vector(15 downto 0);
-  signal rot_right_buf       : std_logic_vector(15 downto 0);
+  signal rot_left_buf    : std_logic_vector(15 downto 0);
+  signal rot_right_buf   : std_logic_vector(15 downto 0);
   -- Clear signal
   signal clear_errors_hi : std_logic;
   signal clear_errors_lo : std_logic;
   signal clear_reg       : std_logic_vector(15 downto 0);
   signal clear_ack       : std_logic;
   -- Clock division
-  signal clock_count     : std_logic_vector(10 downto 0);
+  signal clock_count     : std_logic_vector(9 downto 0);
   signal clk_1mhz_buf    : std_logic;
   signal poll_clock      : std_logic;
   signal poll_clock_buf  : std_logic;
@@ -64,17 +64,20 @@ begin
 
   handle_host_read : process(clk, rst)
     variable encoder_no : integer;
-    variable value      : std_logic_vector(2 downto 0);
+    variable value      : std_logic_vector(3 downto 0);
   begin
     if rst = '1' then
-      errors <= (others => '0');
+      errors          <= (others => '0');
+      clear_errors_lo <= '0';
+      clear_errors_hi <= '0';
+      clear_reg       <= (others => '0');
     elsif falling_edge(clk) then
       if clear_ack = '1' then
         clear_errors_lo <= '0';
         clear_errors_hi <= '0';
         clear_reg       <= (others => '0');
       end if;
-      if cs = '1' then
+      if cs = '1' and rw = '1'then
         if addr(4) = '0' then
           case addr(3 downto 0) is
             when "0000" =>
@@ -91,7 +94,8 @@ begin
           value      := values(encoder_no);
           data_out <= (0      => value(0),
                        1      => value(1),
-                       others => value(2));
+                       2      => value(2),
+                       others => value(3));
           clear_reg(encoder_no) <= '1';
         end if;
       end if;
@@ -116,7 +120,7 @@ begin
     variable state : std_logic_vector(3 downto 0);
   begin
     if rst = '1' then
-      for i in 0 to 16 loop
+      for i in 0 to 15 loop
         values(i) <= (others => '0');
       end loop;
       errors        <= (others => '0');
@@ -127,7 +131,7 @@ begin
       clear_ack      <= '0';
       if poll_clock = '1' and poll_clock_buf = '0' then
         -- On the rising edge, poll the encoders
-        for i in 0 to 16 loop
+        for i in 0 to 15 loop
           rot_left_buf(i)  <= rot_left(i);
           rot_right_buf(i) <= rot_right(i);
           if rot_left(i) /= rot_left_buf(i) or rot_right(i) /= rot_right_buf(i) then
@@ -156,7 +160,7 @@ begin
         if clear_errors_hi = '1' then
           errors(15 downto 8) <= (others => '0');
         end if;
-        for i in 0 to 16 loop
+        for i in 0 to 15 loop
           if clear_reg(i) = '1' then
             values(i) <= (others => '0');
           end if;

@@ -1,3 +1,6 @@
+-- General purpose clock divider, generates base clocks used by the MIDI and
+-- real time components.
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
