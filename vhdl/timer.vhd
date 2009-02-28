@@ -1,7 +1,7 @@
 -- timer.vhd
 
 -- Timer module, provides for high resolution timestamps, down counters and the
--- like
+-- like.
 
 -- Bugs: 1khz clock is not precise
 
