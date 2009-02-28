@@ -233,8 +233,21 @@ decimal
     s>d d.string type
     72 emit ;
 
-\ timer
+\ timer, interrupts etc.
 hex
+
+B0F0 constant irq-reg
+: next-bit? ( b -- b f )
+    1 rshift dup 1 and ;
+: .irq ( -- )
+    irq-reg c@
+    dup 1 and if ." UART" then
+    next-bit? if ." KEYBOARD" then
+    next-bit? if ." TIMER" then
+    next-bit? if ." SPI" then
+    next-bit? if ." SYS-SPI" then
+    drop cr ;
+
 B050 constant midi-control
 B051 constant midi-clock-msb
 B052 constant midi-clock-lsb
@@ -243,3 +256,13 @@ B055 constant timer-msb
 B056 constant timer-lsb
 
 CODE wait-irq SYNC NEXT END-CODE
+
+\ rotary encoders
+hex
+: read-enc
+    begin
+        B070 c@ .
+\        B060 c@ if ." OVERRUN" then
+        20 ms
+    key? until
+    key drop ;
