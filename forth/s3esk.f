@@ -260,9 +260,22 @@ CODE wait-irq SYNC NEXT END-CODE
 \ rotary encoders
 hex
 : read-enc
+    0
     begin
-        B070 c@ .
-\        B060 c@ if ." OVERRUN" then
+        B061 c@ if
+            ." OVERRUN" CR
+        else
+            B070 c@ dup if
+                dup 80 and if
+                    FF00 or
+                then
+                + dup .
+                1B emit 5B emit 4B emit 0D emit
+            else
+                drop
+            then
+        then
         20 ms
     key? until
     key drop ;
+decimal
