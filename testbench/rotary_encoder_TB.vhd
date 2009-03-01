@@ -59,10 +59,6 @@ begin
 
   rst <= '1', '0' after 500 ns;
 
-  cs <= '0';
-  rw <= '0';
-  addr <= (others => '0');
-
   gen_clk : process
   begin
     clk <= '0'; wait for 20 ns;
@@ -78,30 +74,53 @@ begin
   gen_encoder0 : process
   begin
     rot_left(0) <= '0';
-    wait for 50 ms;
+    wait for 3 ms;
     rot_right(0) <= '0';
-    wait for 50 ms;
+    wait for 3 ms;
     rot_left(0) <= '1';
-    wait for 50 ms;
+    wait for 7 ms;
     rot_right(0) <= '1';
-    wait for 50 ms;
+    wait for 7 ms;
   end process;
 
   gen_encoder1 : process
   begin
     rot_right(1) <= '0';
-    wait for 50 ms;
+    wait for 4 ms;
     rot_left(1) <= '0';
-    wait for 50 ms;
+    wait for 4 ms;
     rot_right(1) <= '1';
-    wait for 50 ms;
+    wait for 8 ms;
     rot_left(1) <= '1';
-    wait for 50 ms;
+    wait for 8 ms;
   end process;
 
   rot_left(15 downto 2) <= (others => '0');
   rot_right(15 downto 2) <= (others => '0');
 
+  test : process
+
+    procedure read_reg(a : in std_logic_vector(addr'range)) is
+    begin
+      wait until rising_edge(clk);
+      cs      <= '1';
+      rw      <= '1';
+      addr    <= a;
+      wait until rising_edge(clk);
+      cs      <= '0';
+      wait until rising_edge(clk);
+    end procedure;
+
+  begin
+    cs <= '0';
+    rw <= '0';
+    addr <= (others => '0');
+    wait for 100 ms;
+    read_reg("10000");
+    read_reg("10001");
+    read_reg("00001");
+  end process;
+    
 end TB_ARCHITECTURE;
 
 configuration TESTBENCH_FOR_rotary_encoder of rotary_encoder_tb is
