@@ -180,7 +180,8 @@ entity cpu09 is
     hold     : in  std_logic;
     irq      : in  std_logic;
     firq     : in  std_logic;
-    nmi      : in  std_logic
+    nmi      : in  std_logic;
+    halted   : out std_logic
     );
 end cpu09;
 
@@ -1483,6 +1484,8 @@ begin
     st_ctrl      <= idle_st;
     return_state <= fetch_state;
     next_state   <= fetch_state;
+
+    halted <= '0';
 
     case state is
       when reset_state =>               --  released from reset
@@ -5510,9 +5513,10 @@ begin
         end case;
 
         --
-        -- wait here for an inteerupt
+        -- wait here for an interrupt
         --
       when int_cwai_state =>
+        halted <= '1';
         if (nmi_req = '1') and (nmi_ack = '0') then
           iv_ctrl    <= nmi_iv;
           nmi_ctrl   <= set_nmi;
@@ -5564,6 +5568,7 @@ begin
         -- John Kent 11th July 2006
         --
       when sync_state =>
+        halted     <= '1';
         if (nmi_req = '1') and (nmi_ack = '0') then
           iv_ctrl    <= nmi_iv;
           nmi_ctrl   <= set_nmi;

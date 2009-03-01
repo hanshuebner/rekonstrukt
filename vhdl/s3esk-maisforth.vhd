@@ -169,6 +169,8 @@ architecture my_computer of my_system09 is
   signal cpu_data_out      : std_logic_vector(7 downto 0);
   -- Unused SPI CS signals need to be connected to something, so here:
   signal unused_cs         : std_logic_vector(15 downto 0);
+  -- CPU status signal(s)
+  signal halted            : std_logic;
 begin
   -----------------------------------------------------------------------------
   -- Instantiation of internal components
@@ -186,7 +188,8 @@ begin
     hold     => cpu_hold,
     irq      => cpu_irq,
     nmi      => cpu_nmi,
-    firq     => cpu_firq
+    firq     => cpu_firq,
+    halted   => halted
    );
 
   my_rom : entity rom port map (
@@ -408,7 +411,7 @@ begin
                       led_reg, sw, rot_center,
                       btn_north, btn_west, btn_east, btn_south,
                       spi_data_out, sys_spi_data_out,
-                      timer_data_out, irq_buffer)
+                      timer_data_out, irq_buffer, rotary_data_out)
     variable decode_addr : std_logic_vector(1 downto 0);
   begin
     decode_addr := cpu_addr(15 downto 14);
@@ -565,7 +568,7 @@ begin
       if reset_n = '0' then
         LED_reg <= (others => '0');
       elsif led_cs = '1' and cpu_rw = '0' then
-        LED_reg <= cpu_data_out;
+        LED_reg(6 downto 0) <= cpu_data_out(6 downto 0);
       end if;
     end if;
   end process;
@@ -601,8 +604,9 @@ begin
   RS232_DCE_TXD <= txbit;
   RS232_DTE_TXD <= rts_n;
 
-  led           <= led_reg;
-  AD_CONV       <= not ad_conv_n;
+  led(7)          <= halted;
+  led(6 downto 0) <= led_reg(6 downto 0);
+  AD_CONV         <= not ad_conv_n;
 
   -- disable devices that would otherwise cause conflicts on the SPI bus
   FPGA_INIT_B   <= '0';
@@ -610,7 +614,7 @@ begin
   SF_WE         <= '1';
 
   fx2_io <= (5 => RS232_DCE_RXD, 6 => txbit, 7 => cpu_irq, 8 => cpu_firq,
-             1 => timer_irq, 2 => clk_midi,
+             1 => timer_irq, 2 => clk_midi, 3 => rot_a, 4 => rot_b,
              others => '0');
 
 end my_computer;  --===================== End of architecture =======================--

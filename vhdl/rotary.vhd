@@ -56,18 +56,39 @@ architecture rtl of rotary_encoder is
   signal clear_reg       : std_logic_vector(15 downto 0);
   signal clear_ack       : std_logic;
   -- Clock division
-  signal clock_count     : std_logic_vector(9 downto 0);
+  signal clock_count     : std_logic_vector(6 downto 0);
   signal clk_1mhz_buf    : std_logic;
   signal poll_clock      : std_logic;
   signal poll_clock_buf  : std_logic;
 begin
 
-  handle_host_read : process(clk, rst)
+  data_out_mux : process(addr, errors, values)
     variable encoder_no : integer;
     variable value      : std_logic_vector(3 downto 0);
   begin
+    if addr(4) = '0' then
+      case addr(3 downto 0) is
+        when "0000" =>
+          data_out        <= errors(15 downto 8);
+        when "0001" =>
+          data_out        <= errors(7 downto 0);
+        when others =>
+          data_out <= (others => '0');
+      end case;
+    else
+      encoder_no := to_integer(unsigned(addr(3 downto 0)));
+      value      := values(encoder_no);
+      data_out <= (0      => value(0),
+                   1      => value(1),
+                   2      => value(2),
+                   others => value(3));
+    end if;
+  end process;
+
+  handle_host_read : process(clk, rst)
+    variable encoder_no : integer;
+  begin
     if rst = '1' then
-      errors          <= (others => '0');
       clear_errors_lo <= '0';
       clear_errors_hi <= '0';
       clear_reg       <= (others => '0');
@@ -77,32 +98,25 @@ begin
         clear_errors_hi <= '0';
         clear_reg       <= (others => '0');
       end if;
-      if cs = '1' and rw = '1'then
+      if cs = '1' and rw = '1' then
         if addr(4) = '0' then
           case addr(3 downto 0) is
             when "0000" =>
-              data_out        <= errors(15 downto 8);
               clear_errors_hi <= '1';
             when "0001" =>
-              data_out        <= errors(7 downto 0);
               clear_errors_lo <= '1';
             when others =>
               null;
           end case;
         else
           encoder_no := to_integer(unsigned(addr(3 downto 0)));
-          value      := values(encoder_no);
-          data_out <= (0      => value(0),
-                       1      => value(1),
-                       2      => value(2),
-                       others => value(3));
           clear_reg(encoder_no) <= '1';
         end if;
       end if;
     end if;
   end process;
 
-  divide_clock : process(clk)
+  divide_clock : process(clk, rst)
   begin
     if rst = '1' then
       clock_count <= (others => '0');
@@ -138,14 +152,16 @@ begin
             state := rot_left(i) & rot_left_buf(i) & rot_right(i) & rot_right_buf(i);
             case state is
               when "1011" | "0010" | "0100" | "1101" =>
-                values(i) <= values(i) + 1;
-                if values(i) = "011" then
+                if values(i) = "0111" then
                   errors(i) <= '1';
+                else
+                  values(i) <= values(i) + 1;
                 end if;
               when "1110" | "1000" | "0001" | "0111" =>
-                values(i) <= values(i) - 1;
-                if values(i) = "100" then
+                if values(i) = "1000" then
                   errors(i) <= '1';
+                else
+                  values(i) <= values(i) - 1;
                 end if;
               when others =>
                 null;
@@ -156,16 +172,18 @@ begin
         -- On the falling edge, handle clear signals
         if clear_errors_lo = '1' then
           errors(7 downto 0) <= (others => '0');
+          clear_ack <= '1';
         end if;
         if clear_errors_hi = '1' then
           errors(15 downto 8) <= (others => '0');
+          clear_ack <= '1';
         end if;
         for i in 0 to 15 loop
           if clear_reg(i) = '1' then
             values(i) <= (others => '0');
+            clear_ack <= '1';
           end if;
         end loop;
-        clear_ack <= '1';
       end if;
     end if;
   end process;
