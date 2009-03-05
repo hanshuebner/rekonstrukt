@@ -264,7 +264,6 @@ begin
 ----------------------------------------
   my_vdu : entity vdu8 
     generic map(
-      VDU_CLK_FREQ           => CPU_CLK_FREQ, -- HZ
       VGA_CLK_FREQ           => VGA_CLK_FREQ, -- HZ
       VGA_HOR_CHARS          => 80, -- CHARACTERS
       VGA_VER_CHARS          => 25, -- CHARACTERS
