@@ -5,7 +5,7 @@
 
 -- Bugs: 1khz clock is not precise
 
-Library IEEE;
+library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.std_logic_unsigned.all;
 use IEEE.numeric_std.all;
@@ -22,20 +22,11 @@ entity timer is
     data_out  : out std_logic_vector(7 downto 0);
     -- 
     clk_1mhz  : in  std_logic;
-    clk_midi  : out std_logic;
     timer_irq : out std_logic
     );
 end timer;
 
 architecture rtl of timer is
-
-  -- Counter and divider for MIDI clock
-  signal midi_count      : std_logic_vector(15 downto 0);
-  signal midi_div        : std_logic_vector(15 downto 0);
-  signal clk_midi_enable : std_logic;
-  signal buf_1mhz        : std_logic;
-  signal clk_midi_stb    : std_logic;
-  signal clk_midi_buf    : std_logic;
 
   -- General purpose timer, 1ms resolution, counts down, then interrupts
   signal timer_count  : std_logic_vector(15 downto 0);
@@ -48,27 +39,19 @@ architecture rtl of timer is
   signal timer_irqack : std_logic;
   signal clk_1khz     : std_logic;
   signal timer_zero   : std_logic;
+  signal buf_1mhz     : std_logic;
 
 begin
 
   handle_host_write : process(clk, rst)
   begin
     if rst = '1' then
-      midi_div        <= (others => '0');
-      clk_midi_enable <= '0';
       timer_start     <= '0';
     elsif falling_edge(clk) then
       if cs = '1' and rw = '0' then
         timer_start  <= '0';
         timer_irqack <= '0';
         case addr is
-          -- Midi clock register write
-          when "000" =>
-            clk_midi_enable <= data_in(0);
-          when "001" =>
-            midi_div(15 downto 8) <= data_in;
-          when "010" =>
-            midi_div(7 downto 0) <= data_in;
           -- Millisecond timer register write
           when "100" =>
             timer_start <= data_in(0);
@@ -86,14 +69,9 @@ begin
     end if;
   end process;
 
-  handle_host_read : process(midi_div, timer_state, addr)
+  handle_host_read : process(timer_state, addr)
   begin
     case addr is
-      -- Midi clock readback
-      when "001" =>
-        data_out <= midi_div(15 downto 8);
-      when "010" =>
-        data_out <= midi_div(7 downto 0);
       -- Timer finished
       when "100" =>
         if timer_state = TSRunning then
@@ -105,41 +83,6 @@ begin
       when others =>
         data_out <= (others => '0');
     end case;
-  end process;
-
-  -- generate midi clock
-  gen_midi_stb : process(clk, rst)
-  begin
-    if rst = '1' then
-      midi_count <= (others => '0');
-      clk_midi_stb <= '0';
-    elsif falling_edge(clk) then
-      if clk_midi_enable = '1' then
-        if buf_1mhz = '0' and clk_1mhz = '1' then
-          midi_count   <= midi_count + 1;
-          clk_midi_stb <= '0';
-          if midi_count = midi_div then
-            midi_count   <= (0 => '1', others => '0');
-            clk_midi_stb <= '1';
-          end if;
-        end if;
-      end if;
-    end if;
-  end process;
-
-  -- generate one clk cycle midi clock pulses
-  gen_clk_midi : process(clk, rst)
-  begin
-    if rst = '1' then
-      clk_midi     <= '0';
-      clk_midi_buf <= '0';
-    elsif falling_edge(clk) then
-      clk_midi_buf <= clk_midi_stb;
-      clk_midi     <= '0';
-      if clk_midi_buf = '0' and clk_midi_stb = '1' then
-        clk_midi <= '1';
-      end if;
-    end if;
   end process;
 
   -- Buffer 1 Mhz clock to be used as clock by timer modules
