@@ -103,7 +103,7 @@ begin
     for a in 0 to 127 loop
       set_reg(a, std_logic_vector(to_unsigned(pattern(a), 8)));
     end loop;
-    set_reg(16#89#, X"10");
+    set_reg(16#89#, X"F0");
     set_reg(16#8A#, X"00");
     set_reg(16#8B#, X"01");
     wait;
