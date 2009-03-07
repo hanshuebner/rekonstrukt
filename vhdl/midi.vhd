@@ -78,7 +78,7 @@ architecture rtl of midi is
   signal buf_clk_midi    : std_logic;
   signal count_96th      : std_logic_vector(2 downto 0);
   -- Sequencer state
-  type   sequencer_state_type is (s_waiting, s_play_note, s_pause);
+  type   sequencer_state_type is (s_waiting, s_play_note, s_wait_uart, s_pause);
   signal sequencer_state : sequencer_state_type;
 
 begin
@@ -151,7 +151,6 @@ begin
       clk_midi_stb <= '0';
     elsif falling_edge(clk) then
       if clk_midi_enable = '1' then
-        buf_1mhz <= clk_1mhz;
         if buf_1mhz = '0' and clk_1mhz = '1' then
           midi_count   <= midi_count + 1;
           clk_midi_stb <= '0';
@@ -237,7 +236,9 @@ begin
     if rst = '1' then
       channel     <= (others => '0');
       pattern_pos <= (others => '0');
+      uart_we <= '0';
     elsif falling_edge(clk) then
+      uart_we <= '0';
       case sequencer_state is
         when s_waiting =>
           if clk_midi_enable = '0' then
@@ -248,12 +249,17 @@ begin
         when s_play_note =>
           if uart_empty = '1' then
             channel <= channel + 1;
-            uart_we <= '1';
+            if ram_uart_data /= X"00" then
+              uart_we <= '1';
+              sequencer_state <= s_wait_uart;
+            end if;
             if channel = "111" then
               sequencer_state <= s_waiting;
               pattern_pos     <= pattern_pos + 1;
             end if;
           end if;
+        when s_wait_uart =>
+          sequencer_state <= s_play_note;
         when s_pause =>
           if clk_midi_enable = '1' then
             sequencer_state <= s_waiting;

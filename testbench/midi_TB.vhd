@@ -34,8 +34,17 @@ architecture TB_ARCHITECTURE of midi_tb is
   -- Observed signals - signals mapped to the output ports of tested entity
   signal data_out : STD_LOGIC_VECTOR(7 downto 0);
   signal midi_tx : STD_LOGIC;
-
   -- Add your code here ...
+  type pattern_mem is array(0 to 127) of integer;
+  signal pattern : pattern_mem :=
+    ( 01, 00, 00, 00, 01, 00, 00, 00, 01, 00, 00, 00, 01, 00, 00, 00,
+      00, 00, 00, 00, 01, 00, 00, 00, 01, 00, 00, 00, 00, 00, 00, 00,
+      00, 00, 01, 00, 00, 00, 01, 00, 00, 00, 01, 00, 00, 00, 01, 00,
+      00, 00, 01, 01, 00, 00, 01, 01, 00, 00, 01, 01, 00, 00, 01, 01,
+      00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00,
+      00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00,
+      00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00,
+      00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00 );
 
 begin
 
@@ -92,9 +101,9 @@ begin
       set_reg(16#80# + a, std_logic_vector(to_unsigned(a, 8)));
     end loop;
     for a in 0 to 127 loop
-      set_reg(a, std_logic_vector(to_unsigned(a, 8)));
+      set_reg(a, std_logic_vector(to_unsigned(pattern(a), 8)));
     end loop;
-    set_reg(16#89#, X"03");
+    set_reg(16#89#, X"10");
     set_reg(16#8A#, X"00");
     set_reg(16#8B#, X"01");
     wait;
