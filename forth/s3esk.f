@@ -97,19 +97,19 @@ hex
     40 or send-lcd ;
 
 : lcd-init ( -- )
-    200 ms
+    10 ms
     03 send-lcd
-    200 ms
+    10 ms
     03 send-lcd
-    200 ms
+    10 ms
     03 send-lcd
-    200 ms
+    10 ms
     02 send-lcd
     28 lcd-command \ function set
     06 lcd-command \ entry mode set
     0C lcd-command \ display on/off
     01 lcd-command \ clear screen
-    30 ms ;
+    3 ms ;
 
 : lcd-string ( adr count -- )
     0 do
