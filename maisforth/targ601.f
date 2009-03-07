@@ -190,7 +190,7 @@ EXTRA:
 CODE !USART ( baudbyte -- )   \ Set up on-board i/o, See COLD
     \ Fixed at 9600/8/n/1
     ACIA-CONTROL # LDX
-    55 # LDA
+    D5 # LDA
     X ) STA
     REG D PULS
     NEXT  END-CODE
@@ -213,6 +213,7 @@ CODE KEY ( -- char )
     ACIA-CONTROL # LDX
     \ ACIA-CONTROL C@ 1 AND UNTIL
     BEGIN
+        SYNC
         X ) LDB
         1 # ANDB
     =? NO UNTIL
