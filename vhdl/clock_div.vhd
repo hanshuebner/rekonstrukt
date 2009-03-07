@@ -13,8 +13,7 @@ entity clock_div is
     -- 25 Mhz clock input
     clk        : in  std_logic;
     reset      : in  std_logic;
-    clk_1mhz   : out std_logic;
-    clk_500khz : out std_logic
+    clk_1mhz   : out std_logic
     );
 end clock_div;
 
@@ -49,7 +48,5 @@ begin
       end if;
     end if;
   end process;
-
-  clk_500khz <= count2(0);
 
 end;

@@ -32,29 +32,30 @@ entity midi is
     data_out : out std_logic_vector(7 downto 0);
     --
     clk_1mhz : in  std_logic;
-    midi_tx  : out std_logic
+    midi_tx  : out std_logic;
+    midi_led : out std_logic
     );
 end midi;
 
 architecture rtl of midi is
 
   -- Counter and divider for MIDI clock
-  signal midi_count      : std_logic_vector(15 downto 0);
-  signal clk_midi_enable : std_logic;
-  signal buf_1mhz        : std_logic;
-  signal clk_midi_stb    : std_logic;
-  signal clk_midi        : std_logic;
-  signal clk_midi_serial : std_logic;
+  signal midi_count        : std_logic_vector(15 downto 0);
+  signal sequencer_running : std_logic;
+  signal buf_1mhz          : std_logic;
+  signal clk_midi_stb      : std_logic;
+  signal clk_midi          : std_logic;
+  signal clk_midi_serial   : std_logic;
   -- Interface to the dual port pattern ram
-  signal ram_we          : std_logic;
-  signal ram_uart_addr   : std_logic_vector(10 downto 0);  -- UART RAM read address
-  signal ram_host_addr   : std_logic_vector(10 downto 0);  -- Host RAM read address
-  signal ram_uart_data   : std_logic_vector(7 downto 0);  -- UART RAM read port
-  signal ram_host_data   : std_logic_vector(7 downto 0);  -- Host RAM read port
+  signal ram_we            : std_logic;
+  signal ram_read_addr     : std_logic_vector(10 downto 0);  -- UART RAM read address
+  signal ram_host_addr     : std_logic_vector(10 downto 0);  -- Host RAM read address
+  signal ram_read_data     : std_logic_vector(7 downto 0);  -- UART RAM read port
+  signal ram_host_data     : std_logic_vector(7 downto 0);  -- Host RAM read port
   -- Interface to serial transmitter
-  signal uart_we         : std_logic;
-  signal uart_empty      : std_logic;
-  signal uart_data       : std_logic_vector(7 downto 0);
+  signal uart_we           : std_logic;
+  signal uart_empty        : std_logic;
+  signal uart_data         : std_logic_vector(7 downto 0);
 
   --
   -- Sequencer variables
@@ -87,43 +88,49 @@ begin
     clk  => clk,
     we   => ram_we,
     a    => ram_host_addr,
-    dpra => ram_uart_addr,
+    dpra => ram_read_addr,
     di   => data_in,
     spo  => ram_host_data,
-    dpo  => ram_uart_data);
+    dpo  => ram_read_data);
 
   ram_host_addr              <= pattern & addr(6 downto 0);
-  ram_uart_addr(10 downto 7) <= pattern;
+  ram_read_addr(10 downto 7) <= pattern;
 
   handle_host_write : process(clk, rst)
   begin
     if rst = '1' then
-      tempo           <= (others => '0');
-      clk_midi_enable <= '0';
+      tempo             <= (others => '0');
+      sequencer_running <= '0';
     elsif falling_edge(clk) then
-      ram_we <= '0';
       if cs = '1' and rw = '0' then
-        if addr(7) = '0' then
-          -- write to pattern memory
-          ram_we <= '1';
-        elsif addr(6 downto 3) = "0000" then
-          -- write to note assignment number
-          notes(conv_integer(addr(2 downto 0))) <= data_in;
-        else
-          -- write to control register
-          case conv_integer(addr(6 downto 0)) is
-            when 16#8#  => pattern            <= data_in(3 downto 0);
-            when 16#9#  => tempo(15 downto 8) <= data_in;
-            when 16#A#  => tempo(7 downto 0)  <= data_in;
-            when 16#B#  => clk_midi_enable    <= data_in(0);
-            when others => null;
-          end case;
+        if addr(7) = '1' then
+          if addr(6 downto 3) = "0000" then
+            -- write to note assignment number
+            notes(conv_integer(addr(2 downto 0))) <= data_in;
+          else
+            case addr(7 downto 0) is
+              when X"88"  => pattern            <= data_in(3 downto 0);
+              when X"89"  => tempo(15 downto 8) <= data_in;
+              when X"8A"  => tempo(7 downto 0)  <= data_in;
+              when X"8B"  => sequencer_running  <= data_in(0);
+              when others => null;
+            end case;
+          end if;
         end if;
       end if;
     end if;
   end process;
 
-  handle_host_read : process(tempo, addr)
+  gen_ram_we : process(cs, rw, addr)
+  begin
+    if cs = '1' and rw = '0' and addr(7) = '0' then
+      ram_we <= '1';
+    else
+      ram_we <= '0';
+    end if;
+  end process;
+
+  handle_host_read : process(tempo, addr, sequencer_running, pattern, pattern_pos, notes, ram_host_data)
   begin
     data_out <= (others => '0');
     if addr(7) = '0' then
@@ -137,7 +144,7 @@ begin
         when 16#8#  => data_out(3 downto 0) <= pattern;
         when 16#9#  => data_out             <= tempo(15 downto 8);
         when 16#A#  => data_out             <= tempo(7 downto 0);
-        when 16#B#  => data_out(0)          <= clk_midi_enable;
+        when 16#B#  => data_out(0)          <= sequencer_running;
         when others => null;
       end case;
     end if;
@@ -147,10 +154,10 @@ begin
   gen_midi_stb : process(clk, rst)
   begin
     if rst = '1' then
-      midi_count <= (others => '0');
+      midi_count   <= (others => '0');
       clk_midi_stb <= '0';
     elsif falling_edge(clk) then
-      if clk_midi_enable = '1' then
+      if sequencer_running = '1' then
         if buf_1mhz = '0' and clk_1mhz = '1' then
           midi_count   <= midi_count + 1;
           clk_midi_stb <= '0';
@@ -228,20 +235,20 @@ begin
 
   -- For now, just connect the uart data port to the secondary RAM output.
   -- We'll propably want a multiplexer here
-  uart_data     <= ram_uart_data;
-  ram_uart_addr <= pattern & channel & pattern_pos;
+  uart_data     <= notes(conv_integer(channel));
+  ram_read_addr <= pattern & channel & pattern_pos;
 
   sequencer : process(clk, rst)
   begin
     if rst = '1' then
       channel     <= (others => '0');
       pattern_pos <= (others => '0');
-      uart_we <= '0';
+      uart_we     <= '0';
     elsif falling_edge(clk) then
       uart_we <= '0';
       case sequencer_state is
         when s_waiting =>
-          if clk_midi_enable = '0' then
+          if sequencer_running = '0' then
             sequencer_state <= s_pause;
           elsif clk_16th = '1' then
             sequencer_state <= s_play_note;
@@ -249,11 +256,11 @@ begin
         when s_play_note =>
           if uart_empty = '1' then
             channel <= channel + 1;
-            if ram_uart_data /= X"00" then
-              uart_we <= '1';
+            if ram_read_data /= X"00" then
+              uart_we         <= '1';
               sequencer_state <= s_wait_uart;
             end if;
-            if channel = "111" then
+            if channel = "110" then
               sequencer_state <= s_waiting;
               pattern_pos     <= pattern_pos + 1;
             end if;
@@ -261,11 +268,24 @@ begin
         when s_wait_uart =>
           sequencer_state <= s_play_note;
         when s_pause =>
-          if clk_midi_enable = '1' then
+          if sequencer_running = '1' then
             sequencer_state <= s_waiting;
           end if;
       end case;
     end if;
   end process;
 
+  gen_led : process(clk, rst)
+  begin
+    if rst = '1' then
+      midi_led <= '0';
+    elsif falling_edge(clk) then
+      midi_led <= '0';
+      if sequencer_running = '1' then
+        if pattern_pos(1 downto 0) = "00" or pattern_pos = "0001" then
+          midi_led <= '1';
+        end if;
+      end if;
+    end if;
+  end process;
 end;

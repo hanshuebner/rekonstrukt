@@ -140,7 +140,7 @@ architecture my_computer of my_system09 is
   signal sys_spi_data_out  : std_logic_vector(7 downto 0);
   signal sys_spi_irq       : std_logic;
   signal ad_conv_n         : std_logic;
-  -- Timer / MIDI
+  -- Timer
   signal timer_cs          : std_logic;
   signal timer_irq         : std_logic;
   signal timer_data_out    : std_logic_vector(7 downto 0);
@@ -149,10 +149,14 @@ architecture my_computer of my_system09 is
   signal rotary_data_out   : std_logic_vector(7 downto 0);
   signal rotary_left       : std_logic_vector(15 downto 0);
   signal rotary_right      : std_logic_vector(15 downto 0);
+  -- MIDI
+  signal midi_cs           : std_logic;
+  signal midi_irq          : std_logic;
+  signal midi_data_out     : std_logic_vector(7 downto 0);
+  signal midi_led          : std_logic;
+  signal midi_tx           : std_logic;
   -- Clocks
   signal clk_1mhz          : std_logic;
-  signal clk_500khz        : std_logic;
-  signal clk_midi          : std_logic;
   -- IRQ buffer
   signal irq_buffer        : std_logic_vector(7 downto 0);
   -- CPU Interface signals
@@ -356,8 +360,7 @@ begin
   my_clock_div : entity clock_div port map (
     clk        => sysclk,
     reset      => cpu_reset,
-    clk_1mhz   => clk_1mhz,
-    clk_500khz => clk_500khz
+    clk_1mhz   => clk_1mhz
     );
 
   my_timer : entity timer port map (
@@ -370,7 +373,6 @@ begin
     data_out  => timer_data_out,
     --
     clk_1mhz  => clk_1mhz,
-    clk_midi  => clk_midi,
     timer_irq => timer_irq
     );
 
@@ -386,6 +388,19 @@ begin
     rot_left  => rotary_left,
     rot_right => rotary_right
     );
+
+  my_midi : entity midi port map (
+    clk      => sysclk,
+    rst      => cpu_reset,
+    cs       => midi_cs,
+    rw       => cpu_rw,
+    addr     => cpu_addr(7 downto 0),
+    data_in  => cpu_data_out,
+    data_out => midi_data_out,
+    --
+    clk_1mhz => clk_1mhz,
+    midi_tx  => midi_tx,
+    midi_led => midi_led);
 
   rotary_left  <= (0 => ROT_A, others => '0');
   rotary_right <= (0 => ROT_B, others => '0');
@@ -411,7 +426,8 @@ begin
                       led_reg, sw, rot_center,
                       btn_north, btn_west, btn_east, btn_south,
                       spi_data_out, sys_spi_data_out,
-                      timer_data_out, irq_buffer, rotary_data_out)
+                      timer_data_out, irq_buffer, rotary_data_out,
+                      midi_data_out)
     variable decode_addr : std_logic_vector(1 downto 0);
   begin
     decode_addr := cpu_addr(15 downto 14);
@@ -427,6 +443,7 @@ begin
     vdu_cs      <= '0';
     timer_cs    <= '0';
     rotary_cs   <= '0';
+    midi_cs     <= '0';
 
     case decode_addr is
 
@@ -508,7 +525,7 @@ begin
               end case;
 
             --
-            -- Timers & MIDI clock generation $B050-$B057
+            -- Timer clock generation $B050-$B057
             --
             when X"5" =>
               cpu_data_in <= timer_data_out;
@@ -531,6 +548,12 @@ begin
               null;
 
           end case;
+
+        elsif cpu_addr(13 downto 8) = "110001" then  -- B100-B1FF, MIDI
+
+          midi_cs     <= cpu_vma;
+          cpu_data_in <= midi_data_out;
+
         end if;
 
       --
@@ -605,7 +628,8 @@ begin
   RS232_DTE_TXD <= rts_n;
 
   led(7)          <= halted;
-  led(6 downto 0) <= led_reg(6 downto 0);
+  led(6)          <= midi_led;
+  led(5 downto 0) <= led_reg(5 downto 0);
   AD_CONV         <= not ad_conv_n;
 
   -- disable devices that would otherwise cause conflicts on the SPI bus
@@ -613,8 +637,8 @@ begin
   SF_OE         <= '1';
   SF_WE         <= '1';
 
-  fx2_io <= (5 => RS232_DCE_RXD, 6 => txbit, 7 => cpu_irq, 8 => cpu_firq,
-             1 => timer_irq, 2 => clk_midi, 3 => rot_a, 4 => rot_b,
+  fx2_io <= (5 => RS232_DCE_RXD, 6 => txbit, 7 => cpu_irq, 8 => midi_tx,
+             1 => timer_irq, 3 => rot_a, 4 => rot_b,
              others => '0');
 
 end my_computer;  --===================== End of architecture =======================--
