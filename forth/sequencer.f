@@ -16,9 +16,16 @@ B18B constant seq-status
         i clear-pattern
     loop ;
 
+: set-bpm ( bpm -- )
+    \ bpm in fixed point, one fractional digit.  120.0 => 1200
+    dm 24 *
+    dm 600000000. rot
+    du/mod rot drop drop
+    seq-tempo ! ;
+
 : init-seq ( -- )
     0 seq-status c!
-    4000 seq-tempo !
+    dm 1200 set-bpm
     clear-all-patterns
     8 0 do
         i dup seq-notes + c!
@@ -43,3 +50,4 @@ init-seq
 bn 1000100010001000 0 set-pattern
 bn 0000100000001000 1 set-pattern
 bn 0010001000100010 2 set-pattern
+start
