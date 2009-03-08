@@ -15,6 +15,7 @@
 -- 88    - Pattern select
 -- 89-8A - Tempo (usec/96th)
 -- 8B    - Control, 0: midi_enable
+-- 8C    - Midi transmit channel (lower 4 bits)
 
 library IEEE;
 use ieee.std_logic_1164.all;
@@ -48,6 +49,7 @@ architecture rtl of midi is
   signal clk_midi_serial   : std_logic;
   -- Interface to the dual port pattern ram
   signal ram_we            : std_logic;
+  signal ram_enable_host   : std_logic;
   signal ram_read_addr     : std_logic_vector(10 downto 0);  -- UART RAM read address
   signal ram_host_addr     : std_logic_vector(10 downto 0);  -- Host RAM read address
   signal ram_read_data     : std_logic_vector(7 downto 0);  -- UART RAM read port
@@ -62,36 +64,49 @@ architecture rtl of midi is
   --
 
   -- Current pattern number
-  signal pattern         : std_logic_vector(3 downto 0);
+  signal pattern      : std_logic_vector(3 downto 0);
   -- Current tempo
-  signal tempo           : std_logic_vector(15 downto 0);
+  signal tempo        : std_logic_vector(15 downto 0);
   -- Notes assignment array, defines the note that each channel plays
   type   notes_assignment is array(7 downto 0) of std_logic_vector(7 downto 0);
-  signal notes           : notes_assignment;
-  -- Playback stuff
-  -- Channel number to check next
-  signal channel         : std_logic_vector(2 downto 0);
-  -- Current pattern position
-  signal pattern_pos     : std_logic_vector(3 downto 0);
+  signal notes        : notes_assignment;
+  -- MIDI channel that the sequencer transmits to
+  signal midi_channel : std_logic_vector(3 downto 0);
+  -- Channels which had active notes in the last 16th, used to send "note off" messages
+  signal notes_on     : std_logic_vector(7 downto 0);
   -- Midi clock divider stuff
-  signal clk_16th_stb    : std_logic;
-  signal clk_16th        : std_logic;
-  signal buf_clk_midi    : std_logic;
-  signal count_96th      : std_logic_vector(2 downto 0);
+  signal clk_16th_stb : std_logic;
+  signal clk_16th     : std_logic;
+  signal buf_clk_midi : std_logic;
+  signal count_96th   : std_logic_vector(2 downto 0);
+  --
+  -- Sequencer state machine
+  --
+  -- Channel number to check next
+  signal channel      : std_logic_vector(2 downto 0);
+  -- Current pattern position
+  signal pattern_pos  : std_logic_vector(3 downto 0);
   -- Sequencer state
-  type   sequencer_state_type is (s_waiting, s_play_note, s_wait_uart, s_pause);
-  signal sequencer_state : sequencer_state_type;
+  type sequencer_state_type is (s_waiting,
+                                s_send_off_note, s_send_aftertouch,
+                                s_start_send_on_note, s_send_midi_note_on, s_send_on_note, s_send_velocity,
+                                s_pause);
+  signal sequencer_state   : sequencer_state_type;
+  -- Flag to indicate that the MIDI "note on" command has been sent in this 16th
+  signal midi_note_on_sent : std_logic;
 
 begin
 
   pattern_ram : entity dp_ram port map(
-    clk  => clk,
-    we   => ram_we,
-    a    => ram_host_addr,
-    dpra => ram_read_addr,
-    di   => data_in,
-    spo  => ram_host_data,
-    dpo  => ram_read_data);
+    clk   => clk,
+    ena   => ram_enable_host,
+    enb   => '1',
+    wea   => ram_we,
+    addra => ram_host_addr,
+    addrb => ram_read_addr,
+    dia   => data_in,
+    doa   => ram_host_data,
+    dob   => ram_read_data);
 
   ram_host_addr              <= pattern & addr(6 downto 0);
   ram_read_addr(10 downto 7) <= pattern;
@@ -101,6 +116,7 @@ begin
     if rst = '1' then
       tempo             <= (others => '0');
       sequencer_running <= '0';
+      midi_channel      <= (others => '0');
     elsif falling_edge(clk) then
       if cs = '1' and rw = '0' then
         if addr(7) = '1' then
@@ -113,6 +129,7 @@ begin
               when X"89"  => tempo(15 downto 8) <= data_in;
               when X"8A"  => tempo(7 downto 0)  <= data_in;
               when X"8B"  => sequencer_running  <= data_in(0);
+              when X"8C"  => midi_channel       <= data_in(3 downto 0);
               when others => null;
             end case;
           end if;
@@ -121,14 +138,8 @@ begin
     end if;
   end process;
 
-  gen_ram_we : process(cs, rw, addr)
-  begin
-    if cs = '1' and rw = '0' and addr(7) = '0' then
-      ram_we <= '1';
-    else
-      ram_we <= '0';
-    end if;
-  end process;
+  ram_we          <= not rw;
+  ram_enable_host <= '1' when cs = '1' and addr(7) = '0' else '0';
 
   handle_host_read : process(tempo, addr, sequencer_running, pattern, pattern_pos, notes, ram_host_data)
   begin
@@ -145,6 +156,7 @@ begin
         when 16#9#  => data_out             <= tempo(15 downto 8);
         when 16#A#  => data_out             <= tempo(7 downto 0);
         when 16#B#  => data_out(0)          <= sequencer_running;
+        when 16#C#  => data_out(3 downto 0) <= midi_channel;
         when others => null;
       end case;
     end if;
@@ -235,7 +247,6 @@ begin
 
   -- For now, just connect the uart data port to the secondary RAM output.
   -- We'll propably want a multiplexer here
-  uart_data     <= notes(conv_integer(channel));
   ram_read_addr <= pattern & channel & pattern_pos;
 
   sequencer : process(clk, rst)
@@ -244,34 +255,80 @@ begin
       channel     <= (others => '0');
       pattern_pos <= (others => '0');
       uart_we     <= '0';
+      notes_on    <= (others => '0');
     elsif falling_edge(clk) then
       uart_we <= '0';
-      case sequencer_state is
-        when s_waiting =>
-          if sequencer_running = '0' then
-            sequencer_state <= s_pause;
-          elsif clk_16th = '1' then
-            sequencer_state <= s_play_note;
-          end if;
-        when s_play_note =>
-          if uart_empty = '1' then
-            channel <= channel + 1;
-            if ram_read_data /= X"00" then
-              uart_we         <= '1';
-              sequencer_state <= s_wait_uart;
+      if uart_empty = '1' and uart_we = '0' then
+        case sequencer_state is
+          when s_waiting =>
+            if sequencer_running = '0' then
+              sequencer_state <= s_pause;
+            elsif clk_16th = '1' then   -- clk_16th is a
+                                        -- conditioned pulse
+              if notes_on = X"00" then
+                sequencer_state <= s_start_send_on_note;
+              else
+                uart_data       <= X"8" & midi_channel;  -- MIDI note off
+                uart_we         <= '1';
+                sequencer_state <= s_send_off_note;
+              end if;
             end if;
-            if channel = "110" then
+          when s_send_off_note =>
+            if notes_on(0) = '1' then
+              uart_data <= notes(conv_integer(channel));
+              uart_we   <= '1';
+            end if;
+            sequencer_state <= s_send_aftertouch;
+          when s_send_aftertouch =>
+            if notes_on(0) = '1' then
+              uart_data <= X"00";       -- fixed aftertouch for now
+              uart_we   <= '1';
+            end if;
+            channel  <= channel + 1;
+            notes_on <= '0' & notes_on(7 downto 1);
+            if channel = "111" then
+              sequencer_state <= s_start_send_on_note;
+            else
+              sequencer_state <= s_send_off_note;
+            end if;
+          when s_start_send_on_note =>
+            midi_note_on_sent <= '0';
+            sequencer_state   <= s_send_on_note;
+          when s_send_midi_note_on =>
+            midi_note_on_sent <= '1';
+            uart_data         <= X"9" & midi_channel;    -- MIDI note on
+            uart_we           <= '1';
+            sequencer_state   <= s_send_on_note;
+          when s_send_on_note =>
+            notes_on        <= '0' & notes_on(7 downto 1);
+            sequencer_state <= s_send_velocity;
+            if ram_read_data /= X"00" then
+              if midi_note_on_sent = '0' then
+                sequencer_state <= s_send_midi_note_on;
+              else
+                uart_data <= notes(conv_integer(channel));
+                uart_we   <= '1';
+              end if;
+            end if;
+          when s_send_velocity =>
+            if ram_read_data /= X"00" then
+              notes_on(7) <= '1';
+              uart_data   <= X"7F";     -- fixed velocity for now
+              uart_we     <= '1';
+            end if;
+            channel <= channel + 1;
+            if channel = "111" then
               sequencer_state <= s_waiting;
               pattern_pos     <= pattern_pos + 1;
+            else
+              sequencer_state <= s_send_on_note;
             end if;
-          end if;
-        when s_wait_uart =>
-          sequencer_state <= s_play_note;
-        when s_pause =>
-          if sequencer_running = '1' then
-            sequencer_state <= s_waiting;
-          end if;
-      end case;
+          when s_pause =>
+            if sequencer_running = '1' then
+              sequencer_state <= s_waiting;
+            end if;
+        end case;
+      end if;
     end if;
   end process;
 

@@ -6,6 +6,8 @@ B180 constant seq-notes
 B188 constant seq-pattern
 B189 constant seq-tempo
 B18B constant seq-status
+B18B constant seq-status
+B18C constant seq-midi-channel
 
 : clear-pattern ( n -- )
     seq-pattern c!
@@ -16,7 +18,7 @@ B18B constant seq-status
         i clear-pattern
     loop ;
 
-: set-bpm ( bpm -- )
+: bpm! ( bpm -- )
     \ bpm in fixed point, one fractional digit.  120.0 => 1200
     dm 24 *
     dm 600000000. rot
@@ -25,7 +27,7 @@ B18B constant seq-status
 
 : init-seq ( -- )
     0 seq-status c!
-    dm 1200 set-bpm
+    dm 1200 bpm!
     clear-all-patterns
     8 0 do
         i dup seq-notes + c!
@@ -37,7 +39,7 @@ B18B constant seq-status
 : start ( -- )
     1 seq-status c! ;
 
-: set-pattern ( pattern channel -- )
+: pattern! ( pattern channel -- )
     \ pattern is a binary bit mask, 16 bits
     4 lshift seq-data +
     dup 10 + swap do
@@ -47,7 +49,7 @@ B18B constant seq-status
     drop ;
 
 init-seq
-bn 1000100010001000 0 set-pattern
-bn 0000100000001000 1 set-pattern
-bn 0010001000100010 2 set-pattern
+bn 1000100010001000 0 pattern!
+bn 0000100000001000 1 pattern!
+bn 0010001000100010 2 pattern!
 start
