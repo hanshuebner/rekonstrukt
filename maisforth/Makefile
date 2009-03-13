@@ -16,11 +16,11 @@ $(TARGET).bin: meta601.f cras601.f targ601.f
 $(TARGET).hex: $(TARGET).bin
 	objcopy -I binary $(TARGET).bin -O ihex --adjust-vma 0xc000 $(TARGET).hex
 
-$(TARGET).bit: $(TARGET).mem $(BITSTREAM)
+$(TARGET).bit: $(TARGET).mem $(BITSTREAM) $(BMM)
 	-data2mem -bm $(BMM) -bt $(BITSTREAM) -bd an601.mem -o b $(TARGET).bit
 
 $(TARGET).mem: $(TARGET).bin
-	perl ../tools/bin-to-mem.pl $(TARGET).bin
+	perl ../tools/bin-to-mem.pl -o 0xC000 $(TARGET).bin
 
 $(TARGET).vhd: $(TARGET).bin
 	perl ../tools/bin-to-ramb16.pl $(TARGET).bin

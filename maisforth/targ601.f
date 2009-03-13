@@ -1788,7 +1788,7 @@ EXTRA:
 
 INSIDE:
 : !TOPNFA ( -- )
-  FALSE 23 3                    \ DICTIOARY
+  FALSE 23 3                    \ DICTIONARY
   DO         I @ ORIGIN - UMAX
   CELL +LOOP ORIGIN + TO TOPNFA ;
 : CURTAIL ( fence here linkfield distance -- fence here linkfield2 )
@@ -1885,6 +1885,12 @@ CODE COLD ( ? -- )   \ cold start Forth system (AN) 2004
  !TOPNFA 0 TO CS#
  SAFE-THERE DROP
  FRESH DEFINITIONS
+ \ set up serial console
+ HIMEM 2 - @ DUP IF
+     TO HERE
+ ELSE
+     DROP
+ THEN
  ['] UART-EMIT 'EMIT !
  7F !USART
  CR 0 .MSG
