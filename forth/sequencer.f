@@ -6,7 +6,6 @@ B180 constant seq-notes
 B188 constant seq-pattern
 B189 constant seq-tempo
 B18B constant seq-status
-B18B constant seq-status
 B18C constant seq-midi-channel
 
 : clear-pattern ( n -- )
@@ -43,13 +42,36 @@ B18C constant seq-midi-channel
     \ pattern is a binary bit mask, 16 bits
     4 lshift seq-data +
     dup 10 + swap do
-        dup 8000 and 0= i c!
+        dup 8000 and 0<> i c!
         1 lshift
     loop
     drop ;
+
+: note! ( note-no channel -- )
+    seq-notes + c! ;
 
 init-seq
 bn 1000100010001000 0 pattern!
 bn 0000100000001000 1 pattern!
 bn 0010001000100010 2 pattern!
 start
+
+\ rotary encoders
+hex
+: encode-tempo
+    dm 1200
+    begin
+        B061 c@ 0= if
+            B070 c@ dup if
+                dup 80 and if
+                    FF00 or
+                then
+                + dup .
+                1B emit 5B emit 4B emit 0D emit
+                dup bpm!
+            else
+                drop
+            then
+        then
+    key? until
+    key drop ;
