@@ -637,7 +637,7 @@ begin
   SF_OE         <= '1';
   SF_WE         <= '1';
 
-  fx2_io <= (5 => RS232_DCE_RXD, 6 => txbit, 7 => cpu_irq, 8 => midi_tx,
+  fx2_io <= (5 => RS232_DCE_RXD, 6 => txbit, 7 => cpu_irq, 8 => not midi_tx,
              1 => timer_irq, 3 => rot_a, 4 => rot_b,
              others => '0');
 

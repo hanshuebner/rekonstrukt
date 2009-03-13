@@ -24,3 +24,30 @@ ADDRESS_BLOCK my_rom RAMB16 [0xC000:0xFFFF]
                         my_rom/RAM7 [7:0];
               END_BUS_BLOCK;
 END_ADDRESS_BLOCK;
+
+ADDRESS_BLOCK my_ram RAMB16 [0x0000:0x3FFF]
+              BUS_BLOCK
+                        my_ram/RAM0 [7:0];
+              END_BUS_BLOCK;
+              BUS_BLOCK
+                        my_ram/RAM1 [7:0];
+              END_BUS_BLOCK;
+              BUS_BLOCK
+                        my_ram/RAM2 [7:0];
+              END_BUS_BLOCK;
+              BUS_BLOCK
+                        my_ram/RAM3 [7:0];
+              END_BUS_BLOCK;
+              BUS_BLOCK
+                        my_ram/RAM4 [7:0];
+              END_BUS_BLOCK;
+              BUS_BLOCK
+                        my_ram/RAM5 [7:0];
+              END_BUS_BLOCK;
+              BUS_BLOCK
+                        my_ram/RAM6 [7:0];
+              END_BUS_BLOCK;
+              BUS_BLOCK
+                        my_ram/RAM7 [7:0];
+              END_BUS_BLOCK;
+END_ADDRESS_BLOCK;
