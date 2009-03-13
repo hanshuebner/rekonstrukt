@@ -1885,12 +1885,12 @@ CODE COLD ( ? -- )   \ cold start Forth system (AN) 2004
  !TOPNFA 0 TO CS#
  SAFE-THERE DROP
  FRESH DEFINITIONS
- \ set up serial console
  HIMEM 2 - @ DUP IF
      TO HERE
  ELSE
      DROP
  THEN
+ \ set up serial console
  ['] UART-EMIT 'EMIT !
  7F !USART
  CR 0 .MSG
