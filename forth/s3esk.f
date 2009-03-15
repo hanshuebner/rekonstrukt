@@ -68,7 +68,6 @@ B030 constant leds
 B031 constant switches
 B032 constant rotary
 B033 constant lcd
-55 leds c!
 
 decimal
 : poll-keys
@@ -123,8 +122,6 @@ hex
 : banner ( -- )
     lcd-init
     0 lcd-line " Maisforth an601 " lcd-string ;
-
-banner
     
 decimal
 : up ( -- )
@@ -168,8 +165,6 @@ B040 constant spi-lsb
 B041 constant spi-msb
 B042 constant spi-status
 B043 constant spi-config
-
-FF spi-config c!
 
 hex
 : spi-send
