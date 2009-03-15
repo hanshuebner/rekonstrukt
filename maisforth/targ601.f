@@ -389,8 +389,6 @@ INSIDE:  0 IVAR WRD  2 UALLOT   \ see WORD
 FORTH:   0 IVAR >IN      \ ( -- adr )
         0A IVAR BASE     \ ( -- adr )
          0 IVAR STATE    \ ( -- adr )
-EXTRA:   0 IVAR 'EMIT    \ ( -- xt )
-         0 IVAR 'KEY     \ ( -- xt )
 
 \ Interrupt and exception vectores
 \ The pointers in FFF0-FFFF point to these addresses.
@@ -872,6 +870,8 @@ CODE S>D   REG D PSHS   A B TFR   SEX   A B TFR   NEXT END-CODE
 
 \ ----- 09 -----
 
+EXTRA: ' UART-EMIT TARGA IVAR 'EMIT    \ ( -- xt )
+                       0 IVAR 'KEY     \ ( -- xt )
 FORTH:
 : (EMIT  ( c -- ) 'EMIT @ EXECUTE ;
 \ : (EMIT ( c -- ) UART-EMIT ;
@@ -1944,7 +1944,6 @@ CODE COLD ( ? -- )   \ cold start Forth system (AN) 2004
  SAFE-THERE DROP
  FRESH DEFINITIONS
  \ set up serial console
- ['] UART-EMIT 'EMIT !
  7F !USART
  TURNKEY DUP IF
      EXECUTE
