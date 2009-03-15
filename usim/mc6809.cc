@@ -336,6 +336,8 @@ void mc6809::execute(void)
     swi2(); break;
   case 0x113f:
     swi3(); break;
+  case 0x13:
+    sync(); break;
   case 0x1f:
     tfr(); break;
   case 0x4d:

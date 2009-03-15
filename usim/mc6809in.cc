@@ -1167,3 +1167,8 @@ void mc6809::do_lbr(int test)
   Word offset = fetch_word_operand();
   if (test) pc += offset;
 }
+
+void mc6809::sync()
+{
+  // do nothing - may be overridden by derived classes
+}

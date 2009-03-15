@@ -78,9 +78,9 @@ class mc6809 : virtual public USimMotorola {
   Byte&			byterefreg(int);
   Word&			wordrefreg(int);
 
-  Byte			fetch_operand(void);
-  Word			fetch_word_operand(void);
-  Word			fetch_effective_address(void);
+  Byte			fetch_operand();
+  Word			fetch_word_operand();
+  Word			fetch_effective_address();
   Word			do_effective_address(Byte);
   void			do_predecrement(Byte);
   void			do_postincrement(Byte);
@@ -140,17 +140,17 @@ class mc6809 : virtual public USimMotorola {
   void			std(), stx(), sty(), sts(), stu();
   void			suba(), subb();
   void			subd();
-  void			swi(), swi2(), swi3();
-  void			sync();
+  virtual void          swi(), swi2(), swi3();
+  virtual void          sync();
   void			tfr();
   void			tsta(), tstb(), tst();
 
   void			do_br(int);
   void			do_lbr(int);
 
-  void			do_nmi(void);
-  void			do_firq(void);
-  void			do_irq(void);
+  void			do_nmi();
+  void			do_firq();
+  void			do_irq();
 
   void			help_adc(Byte&);
   void			help_add(Byte&);
@@ -182,14 +182,14 @@ class mc6809 : virtual public USimMotorola {
   void			help_tst(Byte);
 
  protected:
-  virtual void		execute(void);
+  virtual void		execute();
 
  public:
   mc6809();		// public constructor
   virtual			~mc6809();		// public destructor
 
-  virtual void		reset(void);		// CPU reset
-  virtual void		status(void);
+  virtual void		reset();		// CPU reset
+  virtual void		status();
 
   virtual void trace(const char* filename);
 

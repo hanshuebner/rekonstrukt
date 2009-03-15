@@ -25,6 +25,7 @@ class mc6850 {
 
   // Access to real IO device
 
+ public:                        /* public so that CPU can access poll() */
   Terminal term;
 
 #ifdef THREADS
