@@ -5,10 +5,10 @@ use Getopt::Std;
 
 my %opt;
 
-getopts('s:n', \%opt);
+getopts('s:n:r', \%opt);
 
 my $bin_filename = shift @ARGV;
-my $rom_name = ($opt{n} or "ROM");
+my $instance_name = ($opt{n} or ($opt{r} ? "ROM" : "RAM"));
 
 sub usage {
     die "usage: $0 [-s <size>] <input>.bin\n";
@@ -27,8 +27,8 @@ open(VHDL, ">$vhdl_filename") or die "$0: can't open vhdl output file $vhdl_file
 
 my $end = 0;
 
-my $ROM;
-my $length = read(BIN, $ROM, 10000000);
+my $DATA;
+my $length = read(BIN, $DATA, 10000000);
 
 my $rom_size = ($opt{s} or $length);
 
@@ -46,18 +46,20 @@ use ieee.numeric_std.all;
 library unisim;
 use unisim.vcomponents.all;
 
-entity ${rom_name} is
+entity ${instance_name} is
   Port (
-    clk  : in  std_logic;
-    rst  : in  std_logic;
-    cs   : in  std_logic;
-    addr : in  std_logic_vector (13 downto 0);
-    data : out std_logic_vector (7 downto 0)
+    clk   : in  std_logic;
+    rst   : in  std_logic;
+    cs    : in  std_logic;",
+    ($opt{r} ? "" : "
+    we    : in  std_logic;
+    wdata : in  std_logic;"), "
+    addr  : in  std_logic_vector (13 downto 0);
+    rdata : out std_logic_vector (7 downto 0)
     );
-end ${rom_name};
+end ${instance_name};
 
-architecture rtl of ${rom_name} is
-
+architecture rtl of ${instance_name} is
 
   signal dp    : std_logic_vector(7 downto 0);
   signal ce    : std_logic_vector(7 downto 0);
@@ -76,13 +78,13 @@ begin
 
 for (my $page = 0; $page < 8; $page++) {
     print VHDL "
-  RAM${page} : RAMB16_S9
+  ${instance_name}${page} : RAMB16_S9
     generic map (
 ";
     for (my $row = 0; $row < 0x40; $row++) {
         printf VHDL "      INIT_%02x => x\"", $row;
         for (my $byte = 31; $byte >= 0; $byte--) {
-            printf VHDL "%02x", ord(substr($ROM, $page * 2048 + $row * 32 + $byte));
+            printf VHDL "%02x", ord(substr($DATA, $page * 2048 + $row * 32 + $byte));
         }
         if ($row != 0x3f) {
             printf VHDL "\",\n";
@@ -90,25 +92,25 @@ for (my $page = 0; $page < 8; $page++) {
             printf VHDL "\")";
         }
     }
-    printf VHDL "
+    print VHDL "
     port map (
       do   => data_${page},
       dop(0) => dp(${page}),
       addr => addr(10 downto 0),
       clk  => clk,
-      di   => (others => '0'),
+      di   => wdata,
       dip(0) => dp(${page}),
       en   => ce(${page}),
       ssr  => rst,
-      we   => '0'
+      we   => ", ($opt{r} ? "'0'" : "we"), "
       );
 ";
 }
 
 print VHDL "
-  my_${rom_name} : process ( cs, addr,
-                             data_0, data_1, data_2, data_3,
-                             data_4, data_5, data_6, data_7)
+  my_${instance_name} : process ( cs, addr,
+                                  data_0, data_1, data_2, data_3,
+                                  data_4, data_5, data_6, data_7)
   begin
     case addr(13 downto 11) is
       when \"000\" =>

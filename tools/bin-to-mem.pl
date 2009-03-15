@@ -5,12 +5,12 @@ use Getopt::Std;
 
 my %opt;
 
-getopts('o:s:', \%opt);
+getopts('s:o:', \%opt);
 
 my $bin_filename = shift @ARGV;
 
 sub usage {
-    die "usage: $0 [-o <origin>] [-s <size>] <input>.bin\n";
+    die "usage: $0 [-o <origin> ] [-s <size>] <input>.bin\n";
 }
 
 usage() unless ($bin_filename);
@@ -30,7 +30,7 @@ my $ROM;
 my $length = read(BIN, $ROM, 10000000);
 
 my $rom_size = ($opt{s} or $length);
-my $origin = oct($opt{o} || "0x0000");
+my $origin = oct($opt{o} or "0");
 
 die "empty rom" unless ($rom_size);
 
