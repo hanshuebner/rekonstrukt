@@ -1943,11 +1943,6 @@ CODE COLD ( ? -- )   \ cold start Forth system (AN) 2004
  0 TO CS#
  SAFE-THERE DROP
  FRESH DEFINITIONS
- HIMEM 2 - @ DUP IF
-     TO HERE
- ELSE
-     DROP
- THEN
  \ set up serial console
  ['] UART-EMIT 'EMIT !
  7F !USART
