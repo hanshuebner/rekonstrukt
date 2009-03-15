@@ -23,4 +23,4 @@ $(TARGET).mem: $(TARGET).bin
 	perl ../tools/bin-to-mem.pl -o 0xC000 $(TARGET).bin
 
 $(TARGET).vhd: $(TARGET).bin
-	perl ../tools/bin-to-ramb16.pl $(TARGET).bin
+	perl ../tools/bin-to-ramb16.pl -r $(TARGET).bin

@@ -2,7 +2,8 @@
 
 \ MAIS AN601 TARGET CODE -- Albert Nijhof -- 06jun2005
 
-HX 67 TO USERBYTES
+\ Adjust this according to the number of user bytes needed
+HX 69 TO USERBYTES
 
 \ HX 2000 TO ORIGINTARGA
 NOTRACE
@@ -25,7 +26,7 @@ wish to study the details of what happens when that code is metacompiled.
  00~ 75      "USER Page"
        --- ---
        00     JMP COLD
-       03     Dictionary with hx 10 topnfas
+       03     Dictionary with 16 topnfas
        23-75  Cold start data: space available
               for up to 32 users(64 bytes)
               and 6 vectors(18 bytes)
@@ -55,8 +56,8 @@ HIMEM   = End of RAM
 
 1) Words
 
-  hx 10 Topnfa's (Threads) of the dictionary,
-  in RAM: hx (03~23), in ROM: ORIGIN+(03~23).
+  16 Topnfa's (Threads) of the dictionary,
+  in RAM: hx (03~22), in ROM: ORIGIN+(03~22).
 
   Word map (there is a Homlink only if Name is a homonym).
   | Homlink | Link | Homvocimm | Count + Name | Cf    | Body
@@ -110,6 +111,18 @@ HIMEM   = End of RAM
   'SWI3  ENABLE        \ 7E = JMP into byte 1.
   'SWI3  DISABLE       \ 3B = RTI into byte 1.
 
+Hashed dictionary access:
+
+The names of the words are hashed for faster access.  THREAD returns
+the address of the thread that a given counted string is supposed to
+be found in.
+
+Vocabularies are identified by a one-byte identifier (wid).  After
+a name has been resolved to a NFA, the one-byte identifier is compared
+to the current vocabulary search order stack (see CONTEXT).  Only if
+the wid of the word is in the current vocabulary search stack, it is
+really found.
+  
 MaisForth Target code:
 ---->
 
@@ -331,8 +344,15 @@ CODE J ( -- j )   REG D PSHS   U 6 #) LDD   U 8 #) SUBD   NEXT END-CODE
 
 \ ----- 05 ----- ttt
 
+\ Emulation hooks, SWI2 is used to trap back into the emulator
 
-: BYE FFFF EXECUTE ;
+\ A: command
+\ B: parameter
+
+CODE BYE                # 0 LDA # 0 LDB SWI2 NEXT END-CODE
+CODE EXIT-BATCH-COMPILE # 1 LDA # 0 LDB SWI2 NEXT END-CODE
+CODE DUMP-RAM           # 2 LDA # 0 LDB SWI2 NEXT END-CODE
+
 
 <----
 IVAL and IVAR
@@ -370,6 +390,7 @@ FORTH:   0 IVAR >IN      \ ( -- adr )
         0A IVAR BASE     \ ( -- adr )
          0 IVAR STATE    \ ( -- adr )
 EXTRA:   0 IVAR 'EMIT    \ ( -- xt )
+         0 IVAR 'KEY     \ ( -- xt )
 
 \ Interrupt and exception vectores
 \ The pointers in FFF0-FFFF point to these addresses.
@@ -390,8 +411,8 @@ DROP  -2 UALLOT   \ Only the byte with RTI is included.
 
 \ 'NMI is the last "user"!  If you want to create more indirect
 \ variables, add them behind the interrupt vectors.  The USERBYTES
-\ value in the meta compiler then needs to be adjusted according to
-\ this formula:
+\ value at the beginning of this file then needs to be adjusted
+\ according to this formula:
 \ 
 \ (number of indirect variables)*2 + (number of vectors)*3 - 2
 
@@ -1502,6 +1523,7 @@ FORTH:
         CR INITMODE
         DUP INVERT 0= IF WRD 2@ TYPE SPACE THEN ( -1? )
         .MSG SPACE CLEAR-S
+        EXIT-BATCH-COMPILE
   AGAIN (;)
 CODE THROW ( x -- )   \ (AN) 2004
     0 # CMPD   =?   IF   REG D PULS   NEXT   THEN
@@ -1787,6 +1809,7 @@ EXTRA:
 : VOCABULARY   CREATE WORDLIST DROP DOVOC ;
 
 INSIDE:
+\ Find last created word, store NFA in TOPNFA
 : !TOPNFA ( -- )
   FALSE 23 3                    \ DICTIONARY
   DO         I @ ORIGIN - UMAX
@@ -1863,6 +1886,23 @@ INSIDE:
          OR
   UNTIL ; \ HIMEM now points to the first non-matching addres (or $8000, whatever smaller)
 
+: DICT-FROM-RAM ( -- f ) \ initialize dictionary from pre-initialized ram
+    HIMEM CELL - @ DUP IF
+        TO HERE
+        HIMEM 11 CELLS -
+        DUP 03 10 CELLS MOVE
+        11 CELLS 0 FILL
+        TRUE
+    ELSE
+        DROP FALSE
+    THEN ;
+
+EXTRA:
+: DUMP-CORE
+    03 HIMEM 11 CELLS - 10 CELLS MOVE
+    HERE HIMEM CELL - !
+    DUMP-RAM BYE ;
+
 FORTH:
 : UNUSED ( -- n )   HIMEM 20 - HERE - ;
 
@@ -1871,6 +1911,22 @@ CREATE BUILD-INFO BUILD-INFO
 
 CODE SYNC-IRQ ( -- byte ) \ puts IRQ source onto the stack
     SYNC NEXT END-CODE
+
+: BANNER ( -- )
+    CR 0 .MSG
+    CR ." Copyright (c) 2005 HCC Forth-gg " BUILD-INFO COUNT TYPE
+    CR HIMEM 0A RSHIFT  9 .R ."  kB RAM" IF ."  [pre-initialized]" THEN
+    CR CR ;
+
+: 'TURNKEY ( -- a )
+    HIMEM 12 CELLS - ;
+
+: TURNKEY ( -- xt )
+    'TURNKEY DUP @
+    SWAP 0 SWAP ! ;
+
+: TURNKEY! ( xt -- )
+    'TURNKEY ! ;
 
 CODE COLD ( ? -- )   \ cold start Forth system (AN) 2004
   CLRA      A DP TFR          \ initial DP, direct page
@@ -1882,7 +1938,9 @@ CODE COLD ( ? -- )   \ cold start Forth system (AN) 2004
  ]
  ORIGIN 0 [ UOFFSET ] LITERAL CMOVE
  !HIMEM
- !TOPNFA 0 TO CS#
+ DICT-FROM-RAM
+ !TOPNFA
+ 0 TO CS#
  SAFE-THERE DROP
  FRESH DEFINITIONS
  HIMEM 2 - @ DUP IF
@@ -1893,10 +1951,12 @@ CODE COLD ( ? -- )   \ cold start Forth system (AN) 2004
  \ set up serial console
  ['] UART-EMIT 'EMIT !
  7F !USART
- CR 0 .MSG
- CR ." Copyright (c) 2005 HCC Forth-gg " BUILD-INFO COUNT TYPE
- CR HIMEM 0A RSHIFT  9 .R ."  kB RAM"
- CR CR QUIT [
+ TURNKEY DUP IF
+     EXECUTE
+ ELSE
+     DROP BANNER
+ THEN
+ QUIT [
 
 INSIDE:
 : (DOES>  ( -- ) R> !DOER ;   \ TOPNFA NAME> 1+ ! ;
@@ -2149,12 +2209,11 @@ ONLY:
 : [IF] ( flag -- )   ?EXIT POSTPONE [ELSE] ; IMMEDIATE
 
 FORTH:
-HX B050 CONSTANT MIDI-CONTROL
-HX B051 CONSTANT MIDI-COUNT
 HX B054 CONSTANT TIMER-CONTROL
 HX B055 CONSTANT TIMER-COUNT
 HX B0F0 CONSTANT IRQ-SOURCE
 
+\ Define IRQ numbers
 01 CONSTANT IRQ-UART
 02 CONSTANT IRQ-KEYBOARD
 04 CONSTANT IRQ-TIMER

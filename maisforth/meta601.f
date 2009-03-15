@@ -14,7 +14,7 @@ DECIMAL
 \ voordat het metacompileren begint. Zie begin van de Target file.
 
 HEX  C000 VALUE ORIGINTARGA \ Startadres van de nieuwe Forth.
-HEX   5F VALUE USERBYTES    \ ORIGIN until ORIGIN+USERBYTES: area with cold data.
+HEX    5F VALUE USERBYTES   \ ORIGIN until ORIGIN+USERBYTES: area with cold data.
 DECIMAL
 
 \ Error messages
