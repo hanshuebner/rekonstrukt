@@ -197,11 +197,11 @@ begin
    );
 
   my_rom : entity rom port map (
-    clk  => sysclk,
-    rst  => cpu_reset,
-    cs   => '1',
-    addr => cpu_addr(13 downto 0),
-    data => rom_data_out
+    clk   => sysclk,
+    rst   => cpu_reset,
+    cs    => '1',
+    addr  => cpu_addr(13 downto 0),
+    rdata => rom_data_out
    );
 
   my_ram : entity ram_16k port map (

@@ -1,5 +1,5 @@
-set -tmpdir "C:/hans/rekonstrukt/ise/xst/projnav.tmp"
-set -xsthdpdir "C:/hans/rekonstrukt/ise/xst"
+set -tmpdir "H:/rekonstrukt/ise/xst/projnav.tmp"
+set -xsthdpdir "H:/rekonstrukt/ise/xst"
 run
 -ifn my_system09.prj
 -ifmt mixed

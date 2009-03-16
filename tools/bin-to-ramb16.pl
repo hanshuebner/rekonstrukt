@@ -98,7 +98,7 @@ for (my $page = 0; $page < 8; $page++) {
       dop(0) => dp(${page}),
       addr => addr(10 downto 0),
       clk  => clk,
-      di   => wdata,
+      di   => ", ($opt{r} ? "(others => '0')" : "wdata"), ",
       dip(0) => dp(${page}),
       en   => ce(${page}),
       ssr  => rst,
@@ -114,21 +114,21 @@ print VHDL "
   begin
     case addr(13 downto 11) is
       when \"000\" =>
-        data <= data_0;
+        rdata <= data_0;
       when \"001\" =>
-        data <= data_1;
+        rdata <= data_1;
       when \"010\" =>
-        data <= data_2;
+        rdata <= data_2;
       when \"011\" =>
-        data <= data_3;
+        rdata <= data_3;
       when \"100\" =>
-        data <= data_4;
+        rdata <= data_4;
       when \"101\" =>
-        data <= data_5;
+        rdata <= data_5;
       when \"110\" =>
-        data <= data_6;
+        rdata <= data_6;
       when \"111\" =>
-        data <= data_7;
+        rdata <= data_7;
       when others =>
         null;
     end case;

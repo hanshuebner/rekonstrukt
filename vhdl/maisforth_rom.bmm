@@ -1,27 +1,27 @@
 ADDRESS_BLOCK my_rom RAMB16 [0xC000:0xFFFF]
               BUS_BLOCK
-                        my_rom/RAM0 [7:0];
+                        my_rom/ROM0 [7:0];
               END_BUS_BLOCK;
               BUS_BLOCK
-                        my_rom/RAM1 [7:0];
+                        my_rom/ROM1 [7:0];
               END_BUS_BLOCK;
               BUS_BLOCK
-                        my_rom/RAM2 [7:0];
+                        my_rom/ROM2 [7:0];
               END_BUS_BLOCK;
               BUS_BLOCK
-                        my_rom/RAM3 [7:0];
+                        my_rom/ROM3 [7:0];
               END_BUS_BLOCK;
               BUS_BLOCK
-                        my_rom/RAM4 [7:0];
+                        my_rom/ROM4 [7:0];
               END_BUS_BLOCK;
               BUS_BLOCK
-                        my_rom/RAM5 [7:0];
+                        my_rom/ROM5 [7:0];
               END_BUS_BLOCK;
               BUS_BLOCK
-                        my_rom/RAM6 [7:0];
+                        my_rom/ROM6 [7:0];
               END_BUS_BLOCK;
               BUS_BLOCK
-                        my_rom/RAM7 [7:0];
+                        my_rom/ROM7 [7:0];
               END_BUS_BLOCK;
 END_ADDRESS_BLOCK;
 
