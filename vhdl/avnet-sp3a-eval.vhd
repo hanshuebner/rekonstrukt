@@ -23,10 +23,10 @@ entity my_system09 is
     --SF_Wn     : out std_logic;
 
     -- LEDS & Switches
-    --LED1,
-    --LED2,
-    --LED3,
-    --LED4        : out std_logic;
+    LED1,
+    LED2,
+    LED3,
+    LED4        : out std_logic;
     FPGA_RESET,
     FPGA_PUSH_A,
     FPGA_PUSH_B,
@@ -43,7 +43,7 @@ architecture my_computer of my_system09 is
   -- constants
   -----------------------------------------------------------------------------
   constant SYSCLK_FREQ   : integer := 16000000;  -- System clock frequency
-  constant BAUD_RATE     : integer := 19200;     -- Baud Rate
+  constant BAUD_RATE     : integer := 115200;    -- Baud Rate
   constant ACIA_CLK_FREQ : integer := BAUD_RATE * 16;
 
   -----------------------------------------------------------------------------
@@ -433,10 +433,10 @@ begin
   rxbit    <= UART_TXD;
   UART_RXD <= txbit;
 
-  --LED1 <= led_reg(0);
-  --LED2 <= led_reg(1);
-  --LED3 <= led_reg(2);
-  --LED4 <= led_reg(3);
+  LED1 <= led_reg(0);
+  LED2 <= led_reg(1);
+  LED3 <= led_reg(2);
+  LED4 <= led_reg(3);
 
 end my_computer;  --===================== End of architecture =======================--
 
