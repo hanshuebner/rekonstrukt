@@ -9,8 +9,9 @@ library unisim;
 use unisim.vcomponents.all;
 
 entity clock_div is
+  generic(INPUT_CLK_FREQ : integer := 25000000   -- Hz
+          );
   port(
-    -- 25 Mhz clock input
     clk        : in  std_logic;
     reset      : in  std_logic;
     clk_1mhz   : out std_logic
@@ -31,7 +32,7 @@ begin
       count2 <= (others => '0');
     elsif falling_edge(clk) then
       count1 <= count1 + 1;
-      if unsigned(count1) = 24 then
+      if unsigned(count1) = ((INPUT_CLK_FREQ / 1000000) - 1) then
         count1 <= (others => '0');
         count2 <= count2 + "1";
       end if;
@@ -43,7 +44,7 @@ begin
     if falling_edge(clk) then
       if unsigned(count1) = 1 then
         clk_1mhz <= '1';
-      elsif unsigned(count1) = 13 then
+      elsif unsigned(count1) = ((INPUT_CLK_FREQ / 1000000) / 2) then
         clk_1mhz <= '0';
       end if;
     end if;
