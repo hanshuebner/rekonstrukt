@@ -15,12 +15,12 @@ entity my_system09 is
     UART_TXD : in std_logic;
 
     -- System SPI interface
-    --FLASH_D00 : in  std_logic;
-    --FPGA_MOSI : out std_logic;
-    --SPI_CLK   : out std_logic;
-    --FPGA_SPI_SELn,
-    --SF_HOLDn
-    --SF_Wn     : out std_logic;
+    FLASH_D00 : in  std_logic;
+    FPGA_MOSI : out std_logic;
+    SPI_CLK   : out std_logic;
+    FPGA_SPI_SELn,
+    SF_HOLDn,
+    SF_Wn     : out std_logic;
 
     -- LEDS & Switches
     LED1,
@@ -43,7 +43,7 @@ architecture my_computer of my_system09 is
   -- constants
   -----------------------------------------------------------------------------
   constant SYSCLK_FREQ   : integer := 16000000;  -- System clock frequency
-  constant BAUD_RATE     : integer := 115200;    -- Baud Rate
+  constant BAUD_RATE     : integer := 19200;     -- Baud Rate
   constant ACIA_CLK_FREQ : integer := BAUD_RATE * 16;
 
   -----------------------------------------------------------------------------
@@ -210,25 +210,21 @@ begin
   --  spi_cs_n(7 downto 1) => unused_cs(6 downto 0)
   -- );
 
-  --my_sys_spi_master : entity spi_master port map (
-  --  clk                  => sysclk,
-  --  reset                => cpu_reset,
-  --  cs                   => sys_spi_cs,
-  --  rw                   => cpu_rw,
-  --  addr                 => cpu_addr(1 downto 0),
-  --  data_in              => cpu_data_out,
-  --  data_out             => sys_spi_data_out,
-  --  irq                  => sys_spi_irq,
-  --  spi_clk              => SPI_SCK,
-  --  spi_mosi             => SPI_MOSI,
-  --  spi_miso             => SPI_MISO,
-  --  spi_cs_n(0)          => DAC_CS,
-  --  spi_cs_n(1)          => AMP_CS,
-  --  spi_cs_n(2)          => ad_conv_n,
-  --  spi_cs_n(3)          => SPI_SS_B,
-  --  spi_cs_n(4)          => SF_CE0,
-  --  spi_cs_n(7 downto 5) => unused_cs(9 downto 7)
-  -- );
+  my_sys_spi_master : entity spi_master port map (
+    clk                  => sysclk,
+    reset                => cpu_reset,
+    cs                   => sys_spi_cs,
+    rw                   => cpu_rw,
+    addr                 => cpu_addr(1 downto 0),
+    data_in              => cpu_data_out,
+    data_out             => sys_spi_data_out,
+    irq                  => sys_spi_irq,
+    spi_clk              => SPI_CLK,
+    spi_mosi             => FPGA_MOSI,
+    spi_miso             => FLASH_D00,
+    spi_cs_n(0)          => FPGA_SPI_SELn,
+    spi_cs_n(7 downto 1) => unused_cs(6 downto 0)
+    );
 
   my_clock_div : entity clock_div
     generic map (INPUT_CLK_FREQ => SYSCLK_FREQ)
@@ -437,6 +433,9 @@ begin
   LED2 <= led_reg(1);
   LED3 <= led_reg(2);
   LED4 <= led_reg(3);
+
+  SF_HOLDn <= '1';
+  SF_Wn    <= '1';
 
 end my_computer;  --===================== End of architecture =======================--
 

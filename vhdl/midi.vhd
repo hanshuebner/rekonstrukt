@@ -141,7 +141,8 @@ begin
   ram_we          <= not rw;
   ram_enable_host <= '1' when cs = '1' and addr(7) = '0' else '0';
 
-  handle_host_read : process(tempo, addr, sequencer_running, pattern, pattern_pos, notes, ram_host_data)
+  handle_host_read : process(tempo, addr, sequencer_running, pattern, pattern_pos, notes, ram_host_data,
+                             midi_channel)
   begin
     data_out <= (others => '0');
     if addr(7) = '0' then
