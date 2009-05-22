@@ -1,0 +1,28 @@
+elbread.dll ver. 1.0.5.375 Thu May 21 13:02:09 2009
+
+
+-------------------------------------
+Entity    | Architecture    | Library
+-------------------------------------
+beep_tb   | tb_architecture | dactest
+beep      | rtl             | dactest
+dac       | rtl             | dactest
+sawtooth  | rtl             | dactest
+-------------------------------------
+
+-----------------------------
+Package             | Library
+-----------------------------
+standard            | std
+textio              | std
+std_logic_1164      | ieee
+std_logic_arith     | ieee
+numeric_std         | ieee
+std_logic_unsigned  | ieee
+-----------------------------
+
+-----------------------------
+Configuration       | Library
+-----------------------------
+testbench_for_beep  | dactest
+-----------------------------

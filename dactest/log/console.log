@@ -1,0 +1,902 @@
+# ELBREAD: Elaboration process.
+# ELBREAD: Elaboration time 0.5 [s].
+acom -reorder -work dactest -2002  $DSN/../vhdl/dac.vhd $DSN/../vhdl/sawtooth.vhd $DSN/src/testbench/dac_tb.vhd
+# Compile with File Reorder...
+# File: c:\hans\rekonstrukt\vhdl\dac.vhd
+# Compile Entity "dac"
+# Compile Architecture "rtl" of Entity "dac"
+# File: c:\hans\rekonstrukt\vhdl\sawtooth.vhd
+# Compile Entity "sawtooth"
+# Compile Architecture "rtl" of Entity "sawtooth"
+# File: c:\hans\rekonstrukt\dactest\src\testbench\dac_tb.vhd
+# Compile Entity "dac_tb"
+# Compile Architecture "TB_ARCHITECTURE" of Entity "dac_tb"
+# Compile Configuration "TESTBENCH_FOR_dac"
+# Top-level unit(s) detected:
+# Configuration => TESTBENCH_FOR_dac
+# Entity => dac_tb
+# Error: COMP96_0111: sawtooth.vhd : (13, 5): Labels do not match.
+# Error: COMP96_0019: sawtooth.vhd : (24, 3): Keyword "end" expected.
+# Error: COMP96_0016: sawtooth.vhd : (24, 12): Design unit declaration expected.
+# Compile failure 3 Errors 0 Warnings  Analysis time :  0.1 [s]
+acom -reorder -work dactest -2002  $DSN/../vhdl/dac.vhd $DSN/../vhdl/sawtooth.vhd $DSN/src/testbench/dac_tb.vhd
+# Compile with File Reorder...
+# File: c:\hans\rekonstrukt\vhdl\dac.vhd
+# Compile Entity "dac"
+# Compile Architecture "rtl" of Entity "dac"
+# File: c:\hans\rekonstrukt\vhdl\sawtooth.vhd
+# Compile Entity "sawtooth"
+# Compile Architecture "rtl" of Entity "sawtooth"
+# File: c:\hans\rekonstrukt\dactest\src\testbench\dac_tb.vhd
+# Compile Entity "dac_tb"
+# Compile Architecture "TB_ARCHITECTURE" of Entity "dac_tb"
+# Compile Configuration "TESTBENCH_FOR_dac"
+# Top-level unit(s) detected:
+# Configuration => TESTBENCH_FOR_dac
+# Entity => dac_tb
+# Error: COMP96_0019: sawtooth.vhd : (24, 3): Keyword "end" expected.
+# Error: COMP96_0016: sawtooth.vhd : (24, 12): Design unit declaration expected.
+# Compile failure 2 Errors 0 Warnings  Analysis time :  0.1 [s]
+acom -reorder -work dactest -2002  $DSN/../vhdl/dac.vhd $DSN/../vhdl/sawtooth.vhd $DSN/src/testbench/dac_tb.vhd
+# Compile with File Reorder...
+# File: c:\hans\rekonstrukt\vhdl\dac.vhd
+# Compile Entity "dac"
+# Compile Architecture "rtl" of Entity "dac"
+# File: c:\hans\rekonstrukt\vhdl\sawtooth.vhd
+# Compile Entity "sawtooth"
+# Compile Architecture "rtl" of Entity "sawtooth"
+# File: c:\hans\rekonstrukt\dactest\src\testbench\dac_tb.vhd
+# Compile Entity "dac_tb"
+# Compile Architecture "TB_ARCHITECTURE" of Entity "dac_tb"
+# Compile Configuration "TESTBENCH_FOR_dac"
+# Top-level unit(s) detected:
+# Entity => sawtooth
+# Configuration => TESTBENCH_FOR_dac
+# Entity => dac_tb
+# Compile success 0 Errors 0 Warnings  Analysis time :  0.1 [s]
+acom -work dactest -2002  $DSN/../vhdl/sawtooth.vhd
+# Compile...
+# File: c:\hans\rekonstrukt\vhdl\sawtooth.vhd
+# Compile Entity "sawtooth"
+# Compile Architecture "rtl" of Entity "sawtooth"
+# Compile success 0 Errors 0 Warnings  Analysis time :  47.0 [ms]
+acom -work dactest -2002  $DSN/../vhdl/dac.vhd
+# Compile...
+# File: c:\hans\rekonstrukt\vhdl\dac.vhd
+# Compile Entity "dac"
+# Compile Architecture "rtl" of Entity "dac"
+# Compile success 0 Errors 0 Warnings  Analysis time :  31.0 [ms]
+acom -work dactest -2002  $DSN/src/TestBench/dac_TB.vhd
+# Compile...
+# File: c:\hans\rekonstrukt\dactest\src\TestBench\dac_TB.vhd
+# Compile Entity "dac_tb"
+# Compile Architecture "TB_ARCHITECTURE" of Entity "dac_tb"
+# Error: COMP96_0078: dac_TB.vhd : (53, 17): Unknown identifier "divisor".
+# Error: COMP96_0133: dac_TB.vhd : (53, 17): Cannot find object declaration.
+# Error: COMP96_0104: dac_TB.vhd : (53, 7): Undefined type of expression.
+# Compile Configuration "TESTBENCH_FOR_dac"
+# Error: COMP96_0134: dac_TB.vhd : (62, 15): Cannot find component declaration.
+# Compile failure 4 Errors 0 Warnings  Analysis time :  47.0 [ms]
+acom -work dactest -2002  $DSN/src/TestBench/dac_TB.vhd
+# Compile...
+# File: c:\hans\rekonstrukt\dactest\src\TestBench\dac_TB.vhd
+# Compile Entity "dac_tb"
+# Compile Architecture "TB_ARCHITECTURE" of Entity "dac_tb"
+# Compile Configuration "TESTBENCH_FOR_dac"
+# Error: COMP96_0213: dac_TB.vhd : (63, 9): Component instance "UUT : dac" not found.
+# Compile failure 1 Errors 0 Warnings  Analysis time :  32.0 [ms]
+acom -work dactest -2002  $DSN/src/TestBench/dac_TB.vhd
+# Compile...
+# File: c:\hans\rekonstrukt\dactest\src\TestBench\dac_TB.vhd
+# Compile Entity "dac_tb"
+# Compile Architecture "TB_ARCHITECTURE" of Entity "dac_tb"
+# Compile Configuration "TESTBENCH_FOR_dac"
+# Compile success 0 Errors 0 Warnings  Analysis time :  31.0 [ms]
+acom -work dactest -2002  $DSN/src/TestBench/dac_TB.vhd
+# Compile...
+# File: c:\hans\rekonstrukt\dactest\src\TestBench\dac_TB.vhd
+# Compile Entity "dac_tb"
+# Compile Architecture "TB_ARCHITECTURE" of Entity "dac_tb"
+# Compile Configuration "TESTBENCH_FOR_dac"
+# Compile success 0 Errors 0 Warnings  Analysis time :  47.0 [ms]
+runscript -do "c:\hans\rekonstrukt\dactest\src\TestBench\dac_TB_runtest.do"
+SetActiveLib -work
+comp -include "$DSN\src\dac.vhd" 
+# Compile...
+# File: c:\hans\rekonstrukt\dactest\src\dac.vhd
+# Error: COMP96_0001: Cannot find source file c:\hans\rekonstrukt\dactest\src\dac.vhd.
+# Compile failure 1 Errors 0 Warnings  Analysis time :  15.0 [ms]
+# Error: DO_001 in file c:\hans\rekonstrukt\dactest\src\TestBench\dac_TB_runtest.do line 2
+# Error: Cannot run c:\hans\rekonstrukt\dactest\src\TestBench\dac_TB_runtest.do
+runscript -do "c:\hans\rekonstrukt\dactest\src\TestBench\dac_TB_runtest.do"
+SetActiveLib -work
+comp -include "$DSN\..\..\vhdl\dac.vhd" 
+# Compile...
+# File: c:\hans\vhdl\dac.vhd
+# Error: COMP96_0001: Cannot find source file c:\hans\vhdl\dac.vhd.
+# Compile failure 1 Errors 0 Warnings  Analysis time :  15.0 [ms]
+# Error: DO_001 in file c:\hans\rekonstrukt\dactest\src\TestBench\dac_TB_runtest.do line 2
+# Error: Cannot run c:\hans\rekonstrukt\dactest\src\TestBench\dac_TB_runtest.do
+runscript -do "c:\hans\rekonstrukt\dactest\src\TestBench\dac_TB_runtest.do"
+SetActiveLib -work
+comp -include "$DSN\..\vhdl\dac.vhd" 
+# Compile...
+# File: c:\hans\rekonstrukt\vhdl\dac.vhd
+# Compile Entity "dac"
+# Compile Architecture "rtl" of Entity "dac"
+# Compile success 0 Errors 0 Warnings  Analysis time :  31.0 [ms]
+comp -include "$DSN\..\vhdl\sawtooth.vhd" 
+# Compile...
+# File: c:\hans\rekonstrukt\vhdl\sawtooth.vhd
+# Compile Entity "sawtooth"
+# Compile Architecture "rtl" of Entity "sawtooth"
+# Compile success 0 Errors 0 Warnings  Analysis time :  31.0 [ms]
+comp -include "$DSN\src\TestBench\dac_TB.vhd" 
+# Compile...
+# File: c:\hans\rekonstrukt\dactest\src\TestBench\dac_TB.vhd
+# Compile Entity "dac_tb"
+# Compile Architecture "TB_ARCHITECTURE" of Entity "dac_tb"
+# Compile Configuration "TESTBENCH_FOR_dac"
+# Compile success 0 Errors 0 Warnings  Analysis time :  31.0 [ms]
+asim TESTBENCH_FOR_dac 
+# ELBREAD: Elaboration process.
+# ELBREAD: Elaboration time 0.0 [s].
+# asim: Stack memory: 32MB
+# asim: Retval memory: 32MB
+# KERNEL: Main thread initiated.
+# KERNEL: Kernel process initialization phase.
+# KERNEL: Time resolution set to 1ps.
+# ELAB2: Elaboration final pass...
+# ELAB2: Create instances ...
+# ELAB2: Create instances complete.
+# ELAB2: Elaboration final pass complete - time: 0.0 [s].
+# KERNEL: Kernel process initialization done.
+# Allocation: Simulator allocated 1781 kB (elbread=1023 elab2=487 kernel=270 sdf=0)
+# KERNEL: ASDB file was created in location c:\hans\rekonstrukt\dactest\src\wave.asdb
+#  12:14, Donnerstag, 21. Mai 2009
+#  Simulation has been initialized
+#  Selected Top-Level: testbench_for_dac
+wave 
+wave -noreg reset
+wave -noreg clk
+wave -noreg data
+wave -noreg analog_out
+# # The following lines can be used for timing simulation
+# # acom <backannotated_vhdl_file_name>
+# # comp -include "$DSN\src\TestBench\dac_TB_tim_cfg.vhd" 
+# # asim TIMING_FOR_dac 
+# 4 signal(s) traced.
+run 1000 ns
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 0 ps,  Iteration: 0,  Instance: /my_dac,  Process: line__25.
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 0 ps,  Iteration: 0,  Instance: /my_dac,  Process: line__26.
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 0 ps,  Iteration: 1,  Instance: /my_dac,  Process: line__26.
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 0 ps,  Iteration: 1,  Instance: /my_dac,  Process: line__25.
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 0 ps,  Iteration: 2,  Instance: /my_dac,  Process: line__26.
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 0 ps,  Iteration: 3,  Instance: /my_dac,  Process: line__25.
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 532661 ps,  Iteration: 2,  Instance: /my_dac,  Process: line__26.
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 532661 ps,  Iteration: 3,  Instance: /my_dac,  Process: line__25.
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 532661 ps,  Iteration: 3,  Instance: /my_dac,  Process: line__26.
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 532661 ps,  Iteration: 4,  Instance: /my_dac,  Process: line__26.
+# KERNEL: stopped at time: 1 us
+run 1000 ns
+# KERNEL: stopped at time: 2 us
+run 1000 ns
+# KERNEL: stopped at time: 3 us
+run 1000 ns
+# KERNEL: stopped at time: 4 us
+run 1000 ns
+# KERNEL: stopped at time: 5 us
+run 1000 ns
+# KERNEL: stopped at time: 6 us
+run 1000 ns
+# KERNEL: stopped at time: 7 us
+run 1000 ns
+# KERNEL: stopped at time: 8 us
+run 1000 ns
+# KERNEL: stopped at time: 9 us
+run 1000 ns
+# KERNEL: stopped at time: 10 us
+run 1000 ns
+# KERNEL: stopped at time: 11 us
+run 1000 ns
+# KERNEL: stopped at time: 12 us
+run 1000 ns
+# KERNEL: stopped at time: 13 us
+run 1000 ns
+# KERNEL: stopped at time: 14 us
+# 1 signal(s) traced.
+# 1 signal(s) traced.
+# 1 signal(s) traced.
+run 1000 ns
+# KERNEL: stopped at time: 15 us
+run 1000 ns
+# KERNEL: stopped at time: 16 us
+run 1000 ns
+# KERNEL: stopped at time: 17 us
+run 1000 ns
+# KERNEL: stopped at time: 18 us
+run 1000 ns
+# KERNEL: stopped at time: 19 us
+run 10000 ns
+# KERNEL: stopped at time: 29 us
+run 10000 ns
+# KERNEL: stopped at time: 39 us
+run 10000 ns
+# KERNEL: stopped at time: 49 us
+run 10000 ns
+# KERNEL: stopped at time: 59 us
+run 10000 ns
+# KERNEL: stopped at time: 69 us
+run 10000 ns
+# KERNEL: stopped at time: 79 us
+restart
+# ELBREAD: Elaboration process.
+# ELBREAD: Elaboration time 0.0 [s].
+# KERNEL: Main thread initiated.
+# KERNEL: Kernel process initialization phase.
+# KERNEL: Time resolution set to 1ps.
+# ELAB2: Elaboration final pass...
+# ELAB2: Create instances ...
+# ELAB2: Create instances complete.
+# ELAB2: Elaboration final pass complete - time: 0.0 [s].
+# KERNEL: Kernel process initialization done.
+# Allocation: Simulator allocated 1781 kB (elbread=1023 elab2=487 kernel=270 sdf=0)
+# KERNEL: ASDB file was created in location c:\hans\rekonstrukt\dactest\src\wave.asdb
+#  12:27, Donnerstag, 21. Mai 2009
+#  Simulation has been initialized
+#  Selected Top-Level: testbench_for_dac
+acom -reorder -work dactest -2002  $DSN/../vhdl/dac.vhd $DSN/../vhdl/sawtooth.vhd $DSN/src/testbench/dac_tb.vhd
+# Compile with File Reorder...
+# File: c:\hans\rekonstrukt\vhdl\dac.vhd
+# Compile Entity "dac"
+# Compile Architecture "rtl" of Entity "dac"
+# File: c:\hans\rekonstrukt\vhdl\sawtooth.vhd
+# Compile Entity "sawtooth"
+# Compile Architecture "rtl" of Entity "sawtooth"
+# File: c:\hans\rekonstrukt\dactest\src\testbench\dac_tb.vhd
+# Compile Entity "dac_tb"
+# Compile Architecture "TB_ARCHITECTURE" of Entity "dac_tb"
+# Compile Configuration "TESTBENCH_FOR_dac"
+# Top-level unit(s) detected:
+# Configuration => TESTBENCH_FOR_dac
+# Entity => dac_tb
+# Compile success 0 Errors 0 Warnings  Analysis time :  0.1 [s]
+restart
+# ELBREAD: Elaboration process.
+# ELBREAD: Elaboration time 0.0 [s].
+# KERNEL: Main thread initiated.
+# KERNEL: Kernel process initialization phase.
+# KERNEL: Time resolution set to 1ps.
+# ELAB2: Elaboration final pass...
+# ELAB2: Create instances ...
+# ELAB2: Create instances complete.
+# ELAB2: Elaboration final pass complete - time: 0.0 [s].
+# KERNEL: Kernel process initialization done.
+# Allocation: Simulator allocated 1781 kB (elbread=1023 elab2=487 kernel=270 sdf=0)
+# KERNEL: ASDB file was created in location c:\hans\rekonstrukt\dactest\src\wave.asdb
+#  12:27, Donnerstag, 21. Mai 2009
+#  Simulation has been initialized
+#  Selected Top-Level: testbench_for_dac
+run 10000 ns
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 0 ps,  Iteration: 0,  Instance: /my_dac,  Process: line__25.
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 0 ps,  Iteration: 0,  Instance: /my_dac,  Process: line__26.
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 0 ps,  Iteration: 1,  Instance: /my_dac,  Process: line__26.
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 0 ps,  Iteration: 1,  Instance: /my_dac,  Process: line__25.
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 0 ps,  Iteration: 2,  Instance: /my_dac,  Process: line__26.
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 0 ps,  Iteration: 3,  Instance: /my_dac,  Process: line__25.
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 532661 ps,  Iteration: 2,  Instance: /my_dac,  Process: line__26.
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 532661 ps,  Iteration: 3,  Instance: /my_dac,  Process: line__25.
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 532661 ps,  Iteration: 3,  Instance: /my_dac,  Process: line__26.
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 532661 ps,  Iteration: 4,  Instance: /my_dac,  Process: line__26.
+# KERNEL: stopped at time: 10 us
+# 5 signal(s) traced.
+restart
+# ELBREAD: Elaboration process.
+# ELBREAD: Elaboration time 0.0 [s].
+# KERNEL: Main thread initiated.
+# KERNEL: Kernel process initialization phase.
+# KERNEL: Time resolution set to 1ps.
+# ELAB2: Elaboration final pass...
+# ELAB2: Create instances ...
+# ELAB2: Create instances complete.
+# ELAB2: Elaboration final pass complete - time: 0.0 [s].
+# KERNEL: Kernel process initialization done.
+# Allocation: Simulator allocated 1781 kB (elbread=1023 elab2=487 kernel=270 sdf=0)
+# KERNEL: ASDB file was created in location c:\hans\rekonstrukt\dactest\src\wave.asdb
+#  12:28, Donnerstag, 21. Mai 2009
+#  Simulation has been initialized
+#  Selected Top-Level: testbench_for_dac
+run 10000 ns
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 0 ps,  Iteration: 0,  Instance: /my_dac,  Process: line__25.
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 0 ps,  Iteration: 0,  Instance: /my_dac,  Process: line__26.
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 0 ps,  Iteration: 1,  Instance: /my_dac,  Process: line__26.
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 0 ps,  Iteration: 1,  Instance: /my_dac,  Process: line__25.
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 0 ps,  Iteration: 2,  Instance: /my_dac,  Process: line__26.
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 0 ps,  Iteration: 3,  Instance: /my_dac,  Process: line__25.
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 532661 ps,  Iteration: 2,  Instance: /my_dac,  Process: line__26.
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 532661 ps,  Iteration: 3,  Instance: /my_dac,  Process: line__25.
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 532661 ps,  Iteration: 3,  Instance: /my_dac,  Process: line__26.
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 532661 ps,  Iteration: 4,  Instance: /my_dac,  Process: line__26.
+# KERNEL: stopped at time: 10 us
+acom -reorder -work dactest -2002  $DSN/../vhdl/dac.vhd $DSN/../vhdl/sawtooth.vhd $DSN/src/testbench/dac_tb.vhd
+# Compile with File Reorder...
+# File: c:\hans\rekonstrukt\vhdl\dac.vhd
+# Compile Entity "dac"
+# Compile Architecture "rtl" of Entity "dac"
+# File: c:\hans\rekonstrukt\vhdl\sawtooth.vhd
+# Compile Entity "sawtooth"
+# Compile Architecture "rtl" of Entity "sawtooth"
+# File: c:\hans\rekonstrukt\dactest\src\testbench\dac_tb.vhd
+# Compile Entity "dac_tb"
+# Compile Architecture "TB_ARCHITECTURE" of Entity "dac_tb"
+# Compile Configuration "TESTBENCH_FOR_dac"
+# Top-level unit(s) detected:
+# Configuration => TESTBENCH_FOR_dac
+# Entity => dac_tb
+# Compile success 0 Errors 0 Warnings  Analysis time :  0.1 [s]
+restart
+# ELBREAD: Elaboration process.
+# ELBREAD: Elaboration time 0.0 [s].
+# KERNEL: Main thread initiated.
+# KERNEL: Kernel process initialization phase.
+# KERNEL: Time resolution set to 1ps.
+# ELAB2: Elaboration final pass...
+# ELAB2: Create instances ...
+# ELAB2: Create instances complete.
+# ELAB2: Elaboration final pass complete - time: 0.0 [s].
+# KERNEL: Kernel process initialization done.
+# Allocation: Simulator allocated 1782 kB (elbread=1023 elab2=488 kernel=270 sdf=0)
+# KERNEL: ASDB file was created in location c:\hans\rekonstrukt\dactest\src\wave.asdb
+#  12:29, Donnerstag, 21. Mai 2009
+#  Simulation has been initialized
+#  Selected Top-Level: testbench_for_dac
+run 10000 ns
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 0 ps,  Iteration: 0,  Instance: /my_dac,  Process: line__25.
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 0 ps,  Iteration: 0,  Instance: /my_dac,  Process: line__26.
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 0 ps,  Iteration: 2,  Instance: /my_dac,  Process: line__26.
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 0 ps,  Iteration: 2,  Instance: /my_dac,  Process: line__25.
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 0 ps,  Iteration: 3,  Instance: /my_dac,  Process: line__25.
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 532661 ps,  Iteration: 2,  Instance: /my_dac,  Process: line__25.
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 532661 ps,  Iteration: 2,  Instance: /my_dac,  Process: line__26.
+# KERNEL: stopped at time: 10 us
+acom -reorder -work dactest -2002  $DSN/../vhdl/dac.vhd $DSN/../vhdl/sawtooth.vhd $DSN/src/testbench/dac_tb.vhd
+# Compile with File Reorder...
+# File: c:\hans\rekonstrukt\vhdl\dac.vhd
+# Compile Entity "dac"
+# Compile Architecture "rtl" of Entity "dac"
+# File: c:\hans\rekonstrukt\vhdl\sawtooth.vhd
+# Compile Entity "sawtooth"
+# Compile Architecture "rtl" of Entity "sawtooth"
+# File: c:\hans\rekonstrukt\dactest\src\testbench\dac_tb.vhd
+# Compile Entity "dac_tb"
+# Compile Architecture "TB_ARCHITECTURE" of Entity "dac_tb"
+# Compile Configuration "TESTBENCH_FOR_dac"
+# Top-level unit(s) detected:
+# Configuration => TESTBENCH_FOR_dac
+# Entity => dac_tb
+# Compile success 0 Errors 0 Warnings  Analysis time :  0.1 [s]
+restart
+# ELBREAD: Elaboration process.
+# ELBREAD: Elaboration time 0.0 [s].
+# KERNEL: Main thread initiated.
+# KERNEL: Kernel process initialization phase.
+# KERNEL: Time resolution set to 1ps.
+# ELAB2: Elaboration final pass...
+# ELAB2: Create instances ...
+# ELAB2: Create instances complete.
+# ELAB2: Elaboration final pass complete - time: 0.0 [s].
+# KERNEL: Kernel process initialization done.
+# Allocation: Simulator allocated 1782 kB (elbread=1023 elab2=488 kernel=270 sdf=0)
+# KERNEL: ASDB file was created in location c:\hans\rekonstrukt\dactest\src\wave.asdb
+#  12:30, Donnerstag, 21. Mai 2009
+#  Simulation has been initialized
+#  Selected Top-Level: testbench_for_dac
+run 10000 ns
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 0 ps,  Iteration: 0,  Instance: /my_dac,  Process: line__25.
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 0 ps,  Iteration: 0,  Instance: /my_dac,  Process: line__26.
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 0 ps,  Iteration: 2,  Instance: /my_dac,  Process: line__26.
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 0 ps,  Iteration: 2,  Instance: /my_dac,  Process: line__25.
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 0 ps,  Iteration: 3,  Instance: /my_dac,  Process: line__25.
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 532661 ps,  Iteration: 2,  Instance: /my_dac,  Process: line__25.
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 532661 ps,  Iteration: 2,  Instance: /my_dac,  Process: line__26.
+# KERNEL: stopped at time: 10 us
+restart
+# ELBREAD: Elaboration process.
+# ELBREAD: Elaboration time 0.0 [s].
+# KERNEL: Main thread initiated.
+# KERNEL: Kernel process initialization phase.
+# KERNEL: Time resolution set to 1ps.
+# ELAB2: Elaboration final pass...
+# ELAB2: Create instances ...
+# ELAB2: Create instances complete.
+# ELAB2: Elaboration final pass complete - time: 0.0 [s].
+# KERNEL: Kernel process initialization done.
+# Allocation: Simulator allocated 1782 kB (elbread=1023 elab2=488 kernel=270 sdf=0)
+# KERNEL: ASDB file was created in location c:\hans\rekonstrukt\dactest\src\wave.asdb
+#  12:30, Donnerstag, 21. Mai 2009
+#  Simulation has been initialized
+#  Selected Top-Level: testbench_for_dac
+run 500 ns
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 0 ps,  Iteration: 0,  Instance: /my_dac,  Process: line__25.
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 0 ps,  Iteration: 0,  Instance: /my_dac,  Process: line__26.
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 0 ps,  Iteration: 2,  Instance: /my_dac,  Process: line__26.
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 0 ps,  Iteration: 2,  Instance: /my_dac,  Process: line__25.
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 0 ps,  Iteration: 3,  Instance: /my_dac,  Process: line__25.
+# KERNEL: stopped at time: 500 ns
+restart
+# ELBREAD: Elaboration process.
+# ELBREAD: Elaboration time 0.0 [s].
+# KERNEL: Main thread initiated.
+# KERNEL: Kernel process initialization phase.
+# KERNEL: Time resolution set to 1ps.
+# ELAB2: Elaboration final pass...
+# ELAB2: Create instances ...
+# ELAB2: Create instances complete.
+# ELAB2: Elaboration final pass complete - time: 0.0 [s].
+# KERNEL: Kernel process initialization done.
+# Allocation: Simulator allocated 1782 kB (elbread=1023 elab2=488 kernel=270 sdf=0)
+# KERNEL: ASDB file was created in location c:\hans\rekonstrukt\dactest\src\wave.asdb
+#  12:32, Donnerstag, 21. Mai 2009
+#  Simulation has been initialized
+#  Selected Top-Level: testbench_for_dac
+acom -reorder -work dactest -2002  $DSN/../vhdl/dac.vhd $DSN/../vhdl/sawtooth.vhd $DSN/src/testbench/dac_tb.vhd
+# Compile with File Reorder...
+# File: c:\hans\rekonstrukt\vhdl\dac.vhd
+# Compile Entity "dac"
+# Compile Architecture "rtl" of Entity "dac"
+# File: c:\hans\rekonstrukt\vhdl\sawtooth.vhd
+# Compile Entity "sawtooth"
+# Compile Architecture "rtl" of Entity "sawtooth"
+# File: c:\hans\rekonstrukt\dactest\src\testbench\dac_tb.vhd
+# Compile Entity "dac_tb"
+# Compile Architecture "TB_ARCHITECTURE" of Entity "dac_tb"
+# Compile Configuration "TESTBENCH_FOR_dac"
+# Top-level unit(s) detected:
+# Configuration => TESTBENCH_FOR_dac
+# Entity => dac_tb
+# Compile success 0 Errors 0 Warnings  Analysis time :  0.1 [s]
+restart
+# ELBREAD: Elaboration process.
+# ELBREAD: Elaboration time 0.0 [s].
+# KERNEL: Main thread initiated.
+# KERNEL: Kernel process initialization phase.
+# KERNEL: Time resolution set to 1ps.
+# ELAB2: Elaboration final pass...
+# ELAB2: Create instances ...
+# ELAB2: Create instances complete.
+# ELAB2: Elaboration final pass complete - time: 0.0 [s].
+# KERNEL: Kernel process initialization done.
+# Allocation: Simulator allocated 1782 kB (elbread=1023 elab2=487 kernel=270 sdf=0)
+# KERNEL: ASDB file was created in location c:\hans\rekonstrukt\dactest\src\wave.asdb
+#  12:32, Donnerstag, 21. Mai 2009
+#  Simulation has been initialized
+#  Selected Top-Level: testbench_for_dac
+run 500 ns
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 500 ns,  Iteration: 0,  Instance: /my_dac,  Process: process_signals.
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 500 ns,  Iteration: 0,  Instance: /my_dac,  Process: process_signals.
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 500 ns,  Iteration: 1,  Instance: /my_dac,  Process: process_signals.
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 500 ns,  Iteration: 1,  Instance: /my_dac,  Process: process_signals.
+# KERNEL: stopped at time: 500 ns
+# Breakpoint set on signal "my_dac/sigma_adder".
+restart
+# Breakpoint set on signal "my_dac/sigma_adder".
+# ELBREAD: Elaboration process.
+# ELBREAD: Elaboration time 0.0 [s].
+# KERNEL: Main thread initiated.
+# KERNEL: Kernel process initialization phase.
+# KERNEL: Time resolution set to 1ps.
+# ELAB2: Elaboration final pass...
+# ELAB2: Create instances ...
+# ELAB2: Create instances complete.
+# ELAB2: Elaboration final pass complete - time: 0.0 [s].
+# KERNEL: Kernel process initialization done.
+# Allocation: Simulator allocated 1782 kB (elbread=1023 elab2=487 kernel=270 sdf=0)
+# KERNEL: ASDB file was created in location c:\hans\rekonstrukt\dactest\src\wave.asdb
+#  12:33, Donnerstag, 21. Mai 2009
+#  Simulation has been initialized
+#  Selected Top-Level: testbench_for_dac
+# Breakpoint set on signal "my_dac/sigma_adder".
+run 500 ns
+# KERNEL: stopped at delta: 1 at time 0 ps.
+# Stopped at breakpoint in file c:\hans\rekonstrukt\vhdl\dac.vhd at line 37.
+step -over
+step -over
+step -over
+step -over
+step -over
+step -over
+step -over
+step -over
+step -over
+step -over
+step -over
+step -over
+step -over
+step -over
+step -over
+step -over
+step -over
+step -over
+step -over
+step -over
+step -over
+step -over
+# Stopped at breakpoint in file c:\hans\rekonstrukt\vhdl\dac.vhd at line 37.
+step -over
+step -over
+step -over
+acom -reorder -work dactest -2002  $DSN/../vhdl/dac.vhd $DSN/../vhdl/sawtooth.vhd $DSN/src/testbench/dac_tb.vhd
+# Compile with File Reorder...
+# File: c:\hans\rekonstrukt\vhdl\dac.vhd
+# Compile Entity "dac"
+# Compile Architecture "rtl" of Entity "dac"
+# File: c:\hans\rekonstrukt\vhdl\sawtooth.vhd
+# Compile Entity "sawtooth"
+# Compile Architecture "rtl" of Entity "sawtooth"
+# File: c:\hans\rekonstrukt\dactest\src\testbench\dac_tb.vhd
+# Compile Entity "dac_tb"
+# Compile Architecture "TB_ARCHITECTURE" of Entity "dac_tb"
+# Compile Configuration "TESTBENCH_FOR_dac"
+# Top-level unit(s) detected:
+# Configuration => TESTBENCH_FOR_dac
+# Entity => dac_tb
+# Error: COMP96_0077: dac.vhd : (38, 22): Assignment target incompatible with right side. Expected type "STD_LOGIC_VECTOR".
+# Error: COMP96_0077: dac.vhd : (39, 22): Assignment target incompatible with right side. Expected type "STD_LOGIC_VECTOR".
+# Error: COMP96_0077: dac.vhd : (40, 22): Assignment target incompatible with right side. Expected type "STD_LOGIC_VECTOR".
+# Compile failure 3 Errors 0 Warnings  Analysis time :  0.1 [s]
+acom -reorder -work dactest -2002  $DSN/../vhdl/dac.vhd $DSN/../vhdl/sawtooth.vhd $DSN/src/testbench/dac_tb.vhd
+# Compile with File Reorder...
+# File: c:\hans\rekonstrukt\vhdl\dac.vhd
+# Compile Entity "dac"
+# Compile Architecture "rtl" of Entity "dac"
+# File: c:\hans\rekonstrukt\vhdl\sawtooth.vhd
+# Compile Entity "sawtooth"
+# Compile Architecture "rtl" of Entity "sawtooth"
+# File: c:\hans\rekonstrukt\dactest\src\testbench\dac_tb.vhd
+# Compile Entity "dac_tb"
+# Compile Architecture "TB_ARCHITECTURE" of Entity "dac_tb"
+# Compile Configuration "TESTBENCH_FOR_dac"
+# Top-level unit(s) detected:
+# Configuration => TESTBENCH_FOR_dac
+# Entity => dac_tb
+# Compile success 0 Errors 0 Warnings  Analysis time :  0.1 [s]
+restart
+# Breakpoint set on signal "my_dac/sigma_adder".
+# ELBREAD: Elaboration process.
+# ELBREAD: Elaboration time 0.0 [s].
+# KERNEL: Main thread initiated.
+# KERNEL: Kernel process initialization phase.
+# KERNEL: Time resolution set to 1ps.
+# ELAB2: Elaboration final pass...
+# ELAB2: Create instances ...
+# ELAB2: Create instances complete.
+# ELAB2: Elaboration final pass complete - time: 0.0 [s].
+# KERNEL: Kernel process initialization done.
+# Allocation: Simulator allocated 1782 kB (elbread=1023 elab2=487 kernel=270 sdf=0)
+# KERNEL: ASDB file was created in location c:\hans\rekonstrukt\dactest\src\wave.asdb
+#  12:35, Donnerstag, 21. Mai 2009
+#  Simulation has been initialized
+#  Selected Top-Level: testbench_for_dac
+# Breakpoint set on signal "my_dac/sigma_adder".
+run 500 ns
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 500 ns,  Iteration: 0,  Instance: /my_dac,  Process: process_signals.
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 500 ns,  Iteration: 0,  Instance: /my_dac,  Process: process_signals.
+# KERNEL: stopped at time: 500 ns
+# Stopped at breakpoint on signal "my_dac/sigma_adder" (Event condition).
+acom -reorder -work dactest -2002  $DSN/../vhdl/dac.vhd $DSN/../vhdl/sawtooth.vhd $DSN/src/testbench/dac_tb.vhd
+# Compile with File Reorder...
+# File: c:\hans\rekonstrukt\vhdl\dac.vhd
+# Compile Entity "dac"
+# Compile Architecture "rtl" of Entity "dac"
+# File: c:\hans\rekonstrukt\vhdl\sawtooth.vhd
+# Compile Entity "sawtooth"
+# Compile Architecture "rtl" of Entity "sawtooth"
+# File: c:\hans\rekonstrukt\dactest\src\testbench\dac_tb.vhd
+# Compile Entity "dac_tb"
+# Compile Architecture "TB_ARCHITECTURE" of Entity "dac_tb"
+# Compile Configuration "TESTBENCH_FOR_dac"
+# Top-level unit(s) detected:
+# Configuration => TESTBENCH_FOR_dac
+# Entity => dac_tb
+# Compile success 0 Errors 0 Warnings  Analysis time :  0.1 [s]
+# 1 signal(s) traced.
+restart
+# Breakpoint set on signal "my_dac/sigma_adder".
+# ELBREAD: Elaboration process.
+# ELBREAD: Elaboration time 0.0 [s].
+# KERNEL: Main thread initiated.
+# KERNEL: Kernel process initialization phase.
+# KERNEL: Time resolution set to 1ps.
+# ELAB2: Elaboration final pass...
+# ELAB2: Create instances ...
+# ELAB2: Create instances complete.
+# ELAB2: Elaboration final pass complete - time: 0.0 [s].
+# KERNEL: Kernel process initialization done.
+# Allocation: Simulator allocated 1781 kB (elbread=1023 elab2=487 kernel=270 sdf=0)
+# KERNEL: ASDB file was created in location c:\hans\rekonstrukt\dactest\src\wave.asdb
+#  12:39, Donnerstag, 21. Mai 2009
+#  Simulation has been initialized
+#  Selected Top-Level: testbench_for_dac
+# Breakpoint set on signal "my_dac/sigma_adder".
+run 500 ns
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 0 ps,  Iteration: 0,  Instance: /my_dac,  Process: line__26.
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 0 ps,  Iteration: 0,  Instance: /my_dac,  Process: line__27.
+# KERNEL: stopped at delta: 1 at time 0 ps.
+# Stopped at breakpoint on signal "my_dac/sigma_adder" (Event condition).
+run 500 ns
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 0 ps,  Iteration: 1,  Instance: /my_dac,  Process: line__27.
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 0 ps,  Iteration: 1,  Instance: /my_dac,  Process: line__26.
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 0 ps,  Iteration: 2,  Instance: /my_dac,  Process: line__27.
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 0 ps,  Iteration: 3,  Instance: /my_dac,  Process: line__26.
+# KERNEL: stopped at time: 500 ns
+run 500 ns
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 532661 ps,  Iteration: 2,  Instance: /my_dac,  Process: line__27.
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 532661 ps,  Iteration: 3,  Instance: /my_dac,  Process: line__26.
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 532661 ps,  Iteration: 3,  Instance: /my_dac,  Process: line__27.
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 532661 ps,  Iteration: 4,  Instance: /my_dac,  Process: line__27.
+# KERNEL: stopped at time: 1 us
+run 500 ns
+# KERNEL: stopped at time: 1500 ns
+acom -reorder -work dactest -2002  $DSN/../vhdl/dac.vhd $DSN/../vhdl/sawtooth.vhd $DSN/src/testbench/dac_tb.vhd
+# Compile with File Reorder...
+# File: c:\hans\rekonstrukt\vhdl\dac.vhd
+# Compile Entity "dac"
+# Compile Architecture "rtl" of Entity "dac"
+# File: c:\hans\rekonstrukt\vhdl\sawtooth.vhd
+# Compile Entity "sawtooth"
+# Compile Architecture "rtl" of Entity "sawtooth"
+# File: c:\hans\rekonstrukt\dactest\src\testbench\dac_tb.vhd
+# Compile Entity "dac_tb"
+# Compile Architecture "TB_ARCHITECTURE" of Entity "dac_tb"
+# Compile Configuration "TESTBENCH_FOR_dac"
+# Top-level unit(s) detected:
+# Configuration => TESTBENCH_FOR_dac
+# Entity => dac_tb
+# Compile success 0 Errors 0 Warnings  Analysis time :  0.1 [s]
+restart
+# Breakpoint set on signal "my_dac/sigma_adder".
+# ELBREAD: Elaboration process.
+# ELBREAD: Elaboration time 0.0 [s].
+# KERNEL: Main thread initiated.
+# KERNEL: Kernel process initialization phase.
+# KERNEL: Time resolution set to 1ps.
+# ELAB2: Elaboration final pass...
+# ELAB2: Create instances ...
+# ELAB2: Create instances complete.
+# ELAB2: Elaboration final pass complete - time: 0.0 [s].
+# KERNEL: Kernel process initialization done.
+# Allocation: Simulator allocated 1782 kB (elbread=1023 elab2=487 kernel=270 sdf=0)
+# KERNEL: ASDB file was created in location c:\hans\rekonstrukt\dactest\src\wave.asdb
+#  12:41, Donnerstag, 21. Mai 2009
+#  Simulation has been initialized
+#  Selected Top-Level: testbench_for_dac
+# Breakpoint set on signal "my_dac/sigma_adder".
+run 500 ns
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 0 ps,  Iteration: 0,  Instance: /my_dac,  Process: signals.
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 0 ps,  Iteration: 0,  Instance: /my_dac,  Process: signals.
+# KERNEL: stopped at delta: 1 at time 0 ps.
+# Stopped at breakpoint on signal "my_dac/sigma_adder" (Event condition).
+run 500 ns
+# KERNEL: stopped at delta: 2 at time 0 ps.
+# Stopped at breakpoint on signal "my_dac/sigma_adder" (Event condition).
+run 500 ns
+# KERNEL: stopped at time: 500 ns
+run 500 ns
+# KERNEL: stopped at time: 1 us
+run 500 ns
+# KERNEL: stopped at time: 1500 ns
+run 500 ns
+# KERNEL: stopped at time: 2 us
+run 500 ns
+# KERNEL: stopped at time: 2500 ns
+run 500 ns
+# KERNEL: stopped at time: 3 us
+run 500 ns
+# KERNEL: stopped at time: 3500 ns
+run 500 ns
+# KERNEL: stopped at time: 4 us
+run 500 ns
+# KERNEL: stopped at time: 4500 ns
+run 500 ns
+# KERNEL: stopped at time: 5 us
+run 500 ns
+# KERNEL: stopped at time: 5500 ns
+run 500 ns
+# KERNEL: stopped at time: 6 us
+# KERNEL: stopped at time: 8 us
+run 2 us
+# KERNEL: stopped at time: 10 us
+run 2 us
+# KERNEL: stopped at time: 12 us
+run 2 us
+# KERNEL: stopped at time: 14 us
+run 20 us
+# KERNEL: stopped at time: 34 us
+run 20 us
+# KERNEL: stopped at time: 54 us
+run 20 us
+# KERNEL: stopped at time: 74 us
+run 20 us
+# KERNEL: stopped at delta: 4 at time 80745141 ps.
+# Stopped at breakpoint on signal "my_dac/sigma_adder" (Event condition).
+run 20 us
+# KERNEL: stopped at delta: 3 at time 80807807 ps.
+# Stopped at breakpoint on signal "my_dac/sigma_adder" (Event condition).
+run 20 us
+# KERNEL: stopped at delta: 3 at time 80870473 ps.
+# Stopped at breakpoint on signal "my_dac/sigma_adder" (Event condition).
+run 20 us
+# KERNEL: stopped at delta: 3 at time 80933139 ps.
+# Stopped at breakpoint on signal "my_dac/sigma_adder" (Event condition).
+run 20 us
+# KERNEL: stopped at delta: 3 at time 80995805 ps.
+# Stopped at breakpoint on signal "my_dac/sigma_adder" (Event condition).
+run 20 us
+# KERNEL: stopped at delta: 3 at time 81058471 ps.
+# Stopped at breakpoint on signal "my_dac/sigma_adder" (Event condition).
+run 20 us
+# KERNEL: stopped at delta: 3 at time 81121137 ps.
+# Stopped at breakpoint on signal "my_dac/sigma_adder" (Event condition).
+run 20 us
+# KERNEL: stopped at delta: 3 at time 81183803 ps.
+# Stopped at breakpoint on signal "my_dac/sigma_adder" (Event condition).
+run 20 us
+# KERNEL: stopped at delta: 3 at time 81246469 ps.
+# Stopped at breakpoint on signal "my_dac/sigma_adder" (Event condition).
+run 20 us
+# KERNEL: stopped at delta: 3 at time 81309135 ps.
+# Stopped at breakpoint on signal "my_dac/sigma_adder" (Event condition).
+run 20 us
+# KERNEL: stopped at delta: 3 at time 81371801 ps.
+# Stopped at breakpoint on signal "my_dac/sigma_adder" (Event condition).
+run 20 us
+# KERNEL: stopped at delta: 3 at time 81434467 ps.
+# Stopped at breakpoint on signal "my_dac/sigma_adder" (Event condition).
+# Breakpoint on signal "my_dac/sigma_adder" cleared.
+run 20 us
+# KERNEL: stopped at time: 101434467 ps
+run 20 us
+# KERNEL: stopped at time: 121434467 ps
+run 20 us
+# KERNEL: stopped at time: 141434467 ps
+run 20 us
+# KERNEL: stopped at time: 161434467 ps
+run 20 us
+# KERNEL: stopped at time: 181434467 ps
+run 20 us
+# KERNEL: stopped at time: 201434467 ps
+run 20 us
+# KERNEL: stopped at time: 221434467 ps
+# KERNEL: stopped at time: 1221434467 ps
+# KERNEL: stopped at time: 11221434467 ps
+# KERNEL: stopped at time: 111221434467 ps
+acom -work dactest -2002  $DSN/../vhdl/beep.vhd
+# Compile...
+# File: c:\hans\rekonstrukt\vhdl\beep.vhd
+# Compile Entity "beep"
+# Compile Architecture "RTL" of Entity "beep"
+# Compile success 0 Errors 0 Warnings  Analysis time :  31.0 [ms]
+runscript -do "c:\hans\rekonstrukt\dactest\src\TestBench\beep_TB_runtest.do"
+SetActiveLib -work
+comp -include "c:\hans\rekonstrukt\vhdl\beep.vhd" 
+# Compile...
+# File: c:\hans\rekonstrukt\vhdl\beep.vhd
+# Compile Entity "beep"
+# Compile Architecture "RTL" of Entity "beep"
+# Compile success 0 Errors 0 Warnings  Analysis time :  31.0 [ms]
+comp -include "$DSN\src\TestBench\beep_TB.vhd" 
+# Compile...
+# File: c:\hans\rekonstrukt\dactest\src\TestBench\beep_TB.vhd
+# Compile Entity "beep_tb"
+# Compile Architecture "TB_ARCHITECTURE" of Entity "beep_tb"
+# Compile Configuration "TESTBENCH_FOR_beep"
+# Compile success 0 Errors 0 Warnings  Analysis time :  31.0 [ms]
+asim TESTBENCH_FOR_beep 
+#  Simulation has been stopped
+# ELBREAD: Elaboration process.
+# ELBREAD: Elaboration time 0.0 [s].
+# asim: Stack memory: 32MB
+# asim: Retval memory: 32MB
+# KERNEL: Main thread initiated.
+# KERNEL: Kernel process initialization phase.
+# KERNEL: Time resolution set to 1ps.
+# ELAB2: Elaboration final pass...
+# ELAB2: Create instances ...
+# ELAB2: Create instances complete.
+# ELAB2: Elaboration final pass complete - time: 0.0 [s].
+# KERNEL: Kernel process initialization done.
+# Allocation: Simulator allocated 1782 kB (elbread=1023 elab2=487 kernel=270 sdf=0)
+# KERNEL: ASDB file was created in location c:\hans\rekonstrukt\dactest\src\wave.asdb
+#  13:02, Donnerstag, 21. Mai 2009
+#  Simulation has been initialized
+#  Selected Top-Level: testbench_for_beep
+wave 
+wave -noreg reset
+wave -noreg clk
+wave -noreg analog_out
+# # The following lines can be used for timing simulation
+# # acom <backannotated_vhdl_file_name>
+# # comp -include "$DSN\src\TestBench\beep_TB_tim_cfg.vhd" 
+# # asim TIMING_FOR_beep 
+# 3 signal(s) traced.
+run 100ms
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 0 ps,  Iteration: 0,  Instance: /UUT/my_dac,  Process: signals.
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 0 ps,  Iteration: 0,  Instance: /UUT/my_dac,  Process: signals.
+# KERNEL: stopped at time: 100 ms
+# Running synthesis...
+# Synthesis: 0 errors, 0 warnings
+# Checking if synthesis needs to be updated...
+# Launching Xdm Explorer...
+# Generating ISE project file....
+# ISE has been started
+# Generating ISE project file....
+# ISE has been started

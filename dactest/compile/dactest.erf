@@ -1,0 +1,5 @@
+MESSAGE "File: c:\hans\rekonstrukt\dactest\src\TestBench\beep_TB.vhd" 
+MESSAGE "Compile Entity "beep_tb"" 
+MESSAGE "Compile Architecture "TB_ARCHITECTURE" of Entity "beep_tb"" 
+MESSAGE "Compile Configuration "TESTBENCH_FOR_beep"" 
+SUCCESS "Compile success 0 Errors 0 Warnings  Analysis time :  31.0 [ms]" 

@@ -1,0 +1,6 @@
+.\..\vhdl\dac.vhd
+.\..\vhdl\sawtooth.vhd
+.\..\vhdl\beep.vhd
+.\src\TestBench\dac_TB.vhd
+.\src\TestBench\beep_TB.vhd
+.\synthesis\beep.vhd

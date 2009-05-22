@@ -1,0 +1,1 @@
+-w -s "c:\hans\rekonstrukt\library.cfg"  -j "c:\hans\rekonstrukt\dactest\projlib.cfg"  -d "c:\hans\rekonstrukt\dactest\compile"   -work dactest  -dbg -e 100 -2002 "c:\\hans\\rekonstrukt\\dactest\\src\\TestBench\\beep_TB.vhd" 
