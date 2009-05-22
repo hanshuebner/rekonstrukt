@@ -52,7 +52,7 @@ NET FLASH_A20           LOC = D16   | IOSTANDARD = LVCMOS33               ;   # 
 NET FLASH_A21           LOC = D15   | IOSTANDARD = LVCMOS33               ;   # FLASH_A21
 NET FLASH_BYTEn         LOC = N14   | IOSTANDARD = LVCMOS33               ;   # FLASH_BYTE#
 NET FLASH_CEn           LOC = P15   | IOSTANDARD = LVCMOS33               ;   # FLASH_CE#
-NET FLASH_D00           LOC = T14   | IOSTANDARD = LVCMOS33               ;   # FLASH_D0
+#NET FLASH_D00           LOC = T14   | IOSTANDARD = LVCMOS33               ;   # FLASH_D0
 NET FLASH_D01           LOC = R13   | IOSTANDARD = LVCMOS33               ;   # FLASH_D1
 NET FLASH_D02           LOC = T13   | IOSTANDARD = LVCMOS33               ;   # FLASH_D2
 NET FLASH_D03           LOC = P12   | IOSTANDARD = LVCMOS33               ;   # FLASH_D3

@@ -9,8 +9,6 @@ use ieee.std_logic_1164.all;
 use IEEE.STD_LOGIC_ARITH.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
 use ieee.numeric_std.all;
-library unisim;
-use unisim.vcomponents.all;
 library work;
 use work.bit_funcs.all;
 

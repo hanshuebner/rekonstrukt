@@ -20,6 +20,7 @@
 library IEEE;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
+use work.all;
 
 entity midi is
   port(

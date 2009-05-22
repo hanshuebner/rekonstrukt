@@ -5,8 +5,6 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.numeric_std.all;
-library unisim;
-use unisim.vcomponents.all;
 
 entity clock_div is
   generic(INPUT_CLK_FREQ : integer := 25000000   -- Hz

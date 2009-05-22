@@ -50,8 +50,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
---library unisim;
---      use unisim.vcomponents.all;
+use work.all;
 
 -----------------------------------------------------------------------
 -- Entity for ACIA_6850                                              --
@@ -191,7 +190,7 @@ begin
   -- Instantiation of internal components
   -----------------------------------------------------------------------------
 
-  RxDev : entity ACIA_RX port map (
+  RxDev : entity work.ACIA_RX port map (
     Clk    => clk,
     RxRst  => RxRst,
     RxRd   => ReadRR,

@@ -73,6 +73,8 @@ architecture my_computer of my_system09 is
   -- LED
   signal led_cs           : std_logic;
   signal led_reg          : std_logic_vector(7 downto 0);
+  -- Buttons
+  signal button_reg       : std_logic_vector(7 downto 0);
   -- SPI
   signal spi_cs           : std_logic;
   signal spi_data_out     : std_logic_vector(7 downto 0);
@@ -334,6 +336,8 @@ begin
                 when "0000" =>
                   cpu_data_in <= led_reg;
                   led_cs      <= cpu_vma;
+                when "0001" =>
+                  cpu_data_in <= button_reg;
                 when others =>
                   null;
               end case;
@@ -416,6 +420,17 @@ begin
       end if;
     end if;
   end process;
+
+  read_buttons : process(sysclk)
+  begin
+    if falling_edge(sysclk) then
+      button_reg <= (2      => FPGA_PUSH_C,
+                     1      => FPGA_PUSH_B,
+                     0      => FPGA_PUSH_A,
+                     others => '0');
+    end if;
+  end process;
+
 
   reset_key : process(sysclk)
   begin
