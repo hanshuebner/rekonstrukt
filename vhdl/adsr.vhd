@@ -44,6 +44,7 @@ begin
   begin
     if reset = '1' then
       step_divider <= (others => '0');
+      step_pulse   <= '0';
     elsif rising_edge(clk) then
       step_divider <= step_divider + 1;
       step_pulse   <= '0';
@@ -57,8 +58,9 @@ begin
   my_adsr : process(clk, reset)
   begin
     if reset = '1' then
-      state <= s_release;
-      level <= (others => '0');
+      state         <= s_release;
+      level         <= (others => '0');
+      phase_counter <= '0';
     elsif rising_edge(clk) then
 
       if step_pulse = '1' then
