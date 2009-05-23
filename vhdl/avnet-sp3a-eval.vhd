@@ -30,7 +30,13 @@ entity my_system09 is
     FPGA_RESET,
     FPGA_PUSH_A,
     FPGA_PUSH_B,
-    FPGA_PUSH_C : in  std_logic
+    FPGA_PUSH_C : in  std_logic;
+
+    -- Digilent header 1
+    DIGI1_0,
+    DIGI1_1,
+    DIGI1_2,
+    DIGI1_3 : out std_logic
 
    );
 end my_system09;
@@ -94,6 +100,9 @@ architecture my_computer of my_system09 is
   signal midi_data_out    : std_logic_vector(7 downto 0);
   signal midi_led         : std_logic;
   signal midi_tx          : std_logic;
+  -- Synthesizer
+  signal synth_cs         : std_logic;
+  signal synth_data_out   : std_logic_vector(7 downto 0);
   -- Clocks
   signal clk_1mhz         : std_logic;
   -- IRQ buffer
@@ -262,6 +271,17 @@ begin
     midi_tx  => midi_tx,
     midi_led => midi_led);
 
+  my_synth : entity synth port map (
+    clk          => sysclk,
+    rst          => cpu_reset,
+    cs           => synth_cs,
+    rw           => cpu_rw,
+    addr         => cpu_addr(3 downto 0),
+    data_in      => cpu_data_out,
+    data_out     => synth_data_out,
+    --
+    audio_output => DIGI1_0);
+  
   CLK_16MHZ_IBUFG : IBUFG
     port map (I => CLK_16MHZ,
               O => sysclk_buf);
@@ -281,10 +301,10 @@ begin
                       rom_data_out, 
                       ram_data_out,
                       uart_data_out,
-                      led_reg,
+                      led_reg, button_reg,
                       spi_data_out, sys_spi_data_out,
                       timer_data_out, irq_buffer,
-                      midi_data_out)
+                      midi_data_out, synth_data_out)
     variable decode_addr : std_logic_vector(1 downto 0);
   begin
     decode_addr := cpu_addr(15 downto 14);
@@ -297,6 +317,7 @@ begin
     uart_cs     <= '0';
     timer_cs    <= '0';
     midi_cs     <= '0';
+    synth_cs    <= '0';
 
     case decode_addr is
 
@@ -363,6 +384,13 @@ begin
             when X"5" =>
               cpu_data_in <= timer_data_out;
               timer_cs    <= cpu_vma;
+
+            --
+            -- Synthesizer
+            --
+            when X"6" =>
+              cpu_data_in <= synth_data_out;
+              synth_cs    <= cpu_vma;
 
             --
             -- IRQ buffer readout $B0F0
@@ -451,6 +479,10 @@ begin
 
   SF_HOLDn <= '1';
   SF_Wn    <= '1';
+
+  DIGI1_1 <= '0';
+  DIGI1_2 <= '0';
+  DIGI1_3 <= '0';
 
 end my_computer;  --===================== End of architecture =======================--
 
