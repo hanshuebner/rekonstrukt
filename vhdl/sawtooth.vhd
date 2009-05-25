@@ -21,22 +21,30 @@ architecture rtl of sawtooth is
   signal output_divider : std_logic_vector(7 downto 0);
 
 begin
-  process(reset, clk)
+
+  generate_waveform : process(reset, clk)
   begin
     if reset = '1' then
       value          <= (others => '0');
       count          <= (others => '0');
+    elsif rising_edge(clk) then
+      count          <= count + 1;
+      if count = div then
+        value <= value + 1;
+        count <= (others => '0');
+      end if;
+    end if;
+  end process;
+
+  sample_output : process(reset, clk)
+  begin
+    if reset = '1' then
       output_divider <= (others => '0');
       output         <= (others => '0');
     elsif rising_edge(clk) then
       output_divider <= output_divider + 1;
-      count          <= count + 1;
       if output_divider = 0 then
         output <= value;
-      end if;
-      if count = div then
-        value <= value + 1;
-        count <= (others => '0');
       end if;
     end if;
   end process;

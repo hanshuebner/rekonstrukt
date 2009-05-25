@@ -71,8 +71,8 @@ begin
       if cs = '1' and rw = '0' then
         case addr(3 downto 0) is
           when X"0"   => velocity               <= data_in;
-          when X"1"   => frequency(7 downto 0)  <= data_in;
-          when X"2"   => frequency(15 downto 8) <= data_in;
+          when X"1"   => frequency(15 downto 8) <= data_in;
+          when X"2"   => frequency(7 downto 0)  <= data_in;
           when X"3"   => attack                 <= data_in;
           when X"4"   => decay                  <= data_in;
           when X"5"   => sustain                <= data_in;

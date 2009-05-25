@@ -22,7 +22,7 @@ architecture rtl of adsr is
   signal level         : std_logic_vector(7 downto 0);
   type   state_type is (s_attack, s_decay, s_sustain, s_release);
   signal state         : state_type;
-  signal step_divider  : std_logic_vector(5 downto 0);
+  signal step_divider  : std_logic_vector(7 downto 0);
   signal step_pulse    : std_logic;
   signal phase_counter : std_logic_vector(7 downto 0);
 begin
