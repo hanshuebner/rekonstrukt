@@ -1,20 +1,24 @@
 
 hex
-B060 constant velocity
-B061 constant frequency
-B063 constant attack
-B064 constant decay
-B065 constant sustain
-B066 constant release
+B060 constant frequency
+B064 constant velocity
+B065 constant attack
+B066 constant decay
+B067 constant sustain
+B068 constant release
+B069 constant waveform
 
 decimal
-: bing ( freq -- )
+: bing ( dfreq -- )
+    frequency 2 + !
     frequency !
     128 velocity c!
-    200 ms
-    0 velocity c! ;
+    50 ms
+    0 velocity c!
+    100 ms
+;
 
 : pling ( -- )
-    300 0 do
-        i bing
-    10 +loop ;
+    5 0 do
+        1 i 3000 * bing
+    1 +loop ;

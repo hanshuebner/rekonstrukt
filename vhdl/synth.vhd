@@ -73,10 +73,10 @@ begin
     elsif falling_edge(clk) then
       if cs = '1' and rw = '0' then
         case addr(3 downto 0) is
-          when X"0"   => frequency(7 downto 0)   <= data_in;
-          when X"1"   => frequency(15 downto 8)  <= data_in;
-          when X"2"   => frequency(23 downto 16) <= data_in;
-          when X"3"   => frequency(31 downto 24) <= data_in;
+          when X"0"   => frequency(31 downto 24) <= data_in;
+          when X"1"   => frequency(23 downto 16) <= data_in;
+          when X"2"   => frequency(15 downto 8)  <= data_in;
+          when X"3"   => frequency(7 downto 0)   <= data_in;
           when X"4"   => velocity                <= data_in;
           when X"5"   => attack                  <= data_in;
           when X"6"   => decay                   <= data_in;
@@ -90,16 +90,16 @@ begin
   end process;
 
   with addr select data_out <=
-    frequency(7 downto 0)    when X"0",
-    frequency(15 downto 8)   when X"1",
-    frequency(23 downto 16)  when X"2",
-    frequency(31 downto 24)  when X"3",
+    frequency(31 downto 24)  when X"0",
+    frequency(23 downto 16)  when X"1",
+    frequency(15 downto 8)   when X"2",
+    frequency(7 downto 0)    when X"3",
     velocity                 when X"4",
     attack                   when X"5",
     decay                    when X"6",
     sustain                  when X"7",
     release                  when X"8",
-    select_waveform & "0000" when X"9",
+    "0000" & select_waveform when X"9",
     (others => '0')          when others;
 
 end;

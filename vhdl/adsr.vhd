@@ -60,7 +60,7 @@ begin
     if reset = '1' then
       state         <= s_release;
       level         <= (others => '0');
-      phase_counter <= '0';
+      phase_counter <= (others => '0');
     elsif rising_edge(clk) then
 
       if step_pulse = '1' then
