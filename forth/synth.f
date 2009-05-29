@@ -8,17 +8,17 @@ B067 constant sustain
 B068 constant release
 B069 constant waveform
 
-decimal
-: bing ( dfreq -- )
-    frequency 2 + !
-    frequency !
-    128 velocity c!
-    50 ms
-    0 velocity c!
-    100 ms
-;
-
-: pling ( -- )
-    5 0 do
-        1 i 3000 * bing
-    1 +loop ;
+hex
+: plong ( -- )
+    FFFF frequency !
+    60 sustain c!
+    2 attack c!
+    2 release c!
+    FF00 0 do
+        i frequency 2 + !
+        80 velocity c!
+        40 ms
+        0 velocity c!
+        20 ms
+    1000 +loop ;
+    

@@ -14,7 +14,11 @@ sys-spi-base 3 + constant sys-spi-config
 
 \ serial flash routines
 
+\ s3esk: spi flash at 30
+\ 30 constant sf-address \ spi address mask
+\ s3aek
 01 constant sf-address \ spi address mask
+
 
 : sf-initspi ( -- ) bn 0111 sys-spi-config c! ;
 : sf-deselect ( -- ) 2 sf-address or sys-spi-status c! ;

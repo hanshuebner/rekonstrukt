@@ -1,7 +1,7 @@
 
 library ieee;
 use ieee.std_logic_1164.all;
-use ieee.std_logic_arith.all;
+use ieee.numeric_std.all;
 
 entity oscillator is
   port(
@@ -43,7 +43,7 @@ begin
     if reset = '1' then
       phase_accumulator <= (others => '0');
     elsif rising_edge(clk) then
-      phase_accumulator <= unsigned(phase_accumulator) + unsigned(phase_increment);
+      phase_accumulator <= phase_accumulator + phase_increment;
     end if;
   end process;
 
